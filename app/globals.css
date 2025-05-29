@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+
+body {
+    font-family: 'Josefin Sans', sans-serif;
+    letter-spacing: -0.03em;
+}
