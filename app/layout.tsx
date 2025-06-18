@@ -5,6 +5,8 @@ import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import { defaultItems } from "./data/marquee";
 import Marquee from "./components/layout/Marquee";
+import { Providers } from "./providers";
+
 const josefin = Josefin_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -20,10 +22,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={josefin.className}>
-        <Marquee items={defaultItems} />
-        <Header />
-        {children}
-        <Footer />
+        <Providers>
+          <Marquee items={defaultItems} />
+          <Header />
+          {children}
+          <Footer />
+        </Providers>
       </body>
     </html>
   );
