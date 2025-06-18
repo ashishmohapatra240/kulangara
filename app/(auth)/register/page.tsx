@@ -1,25 +1,35 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import Button from '@/app/components/ui/Button';
-import Image from 'next/image';
+import { useState } from "react";
+import Link from "next/link";
+import Button from "@/app/components/ui/Button";
+import Image from "next/image";
+import { useAuth } from "@/app/hooks/useAuth";
+import { Toaster } from "react-hot-toast";
+
 export default function RegisterPage() {
+  const { register, isLoading } = useAuth();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    phone: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement registration logic
-    console.log('Register attempt:', formData);
+
+    const registerData = {
+      ...formData,
+      role: "CUSTOMER",
+    };
+    register(registerData);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center">
+      <Toaster position="top-right" />
       {/* Image container - hidden on mobile */}
       <div className="hidden lg:block w-1/2 h-screen mt-30">
         <Image
@@ -30,7 +40,7 @@ export default function RegisterPage() {
           width={1000}
         />
       </div>
-      
+
       {/* Form container */}
       <div className="w-full lg:w-1/2 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
@@ -39,7 +49,7 @@ export default function RegisterPage() {
               Create your account
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
-              Already have an account?{' '}
+              Already have an account?{" "}
               <Link
                 href="/login"
                 className="font-medium text-black hover:text-gray-800"
@@ -50,22 +60,41 @@ export default function RegisterPage() {
           </div>
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4">
-              <div>
-                <label htmlFor="name" className="sr-only">
-                  Full Name
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 sm:text-sm"
-                  placeholder="Full Name"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="firstName" className="sr-only">
+                    First Name
+                  </label>
+                  <input
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    required
+                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 sm:text-sm"
+                    placeholder="First Name"
+                    value={formData.firstName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, firstName: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <label htmlFor="lastName" className="sr-only">
+                    Last Name
+                  </label>
+                  <input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    required
+                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 sm:text-sm"
+                    placeholder="Last Name"
+                    value={formData.lastName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, lastName: e.target.value })
+                    }
+                  />
+                </div>
               </div>
               <div>
                 <label htmlFor="email" className="sr-only">
@@ -86,6 +115,23 @@ export default function RegisterPage() {
                 />
               </div>
               <div>
+                <label htmlFor="phone" className="sr-only">
+                  Phone Number
+                </label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  required
+                  className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 sm:text-sm"
+                  placeholder="Phone Number"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
+                />
+              </div>
+              <div>
                 <label htmlFor="password" className="sr-only">
                   Password
                 </label>
@@ -102,37 +148,23 @@ export default function RegisterPage() {
                   }
                 />
               </div>
-              <div>
-                <label htmlFor="confirm-password" className="sr-only">
-                  Confirm Password
-                </label>
-                <input
-                  id="confirm-password"
-                  name="confirm-password"
-                  type="password"
-                  required
-                  className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 sm:text-sm"
-                  placeholder="Confirm Password"
-                  value={formData.confirmPassword}
-                  onChange={(e) =>
-                    setFormData({ ...formData, confirmPassword: e.target.value })
-                  }
-                />
-              </div>
             </div>
 
             <div>
-              <Button type="submit" className="w-full">
-                Create Account
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Creating Account..." : "Create Account"}
               </Button>
             </div>
 
             <div className="text-sm text-center text-gray-600">
-              By registering, you agree to our{' '}
-              <Link href="/terms" className="font-medium text-black hover:text-gray-800">
+              By registering, you agree to our{" "}
+              <Link
+                href="/terms"
+                className="font-medium text-black hover:text-gray-800"
+              >
                 Terms of Service
-              </Link>{' '}
-              and{' '}
+              </Link>{" "}
+              and{" "}
               <Link
                 href="/privacy"
                 className="font-medium text-black hover:text-gray-800"
@@ -145,4 +177,4 @@ export default function RegisterPage() {
       </div>
     </div>
   );
-} 
+}
