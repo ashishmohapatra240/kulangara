@@ -4,7 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import Button from "@/app/components/ui/Button";
 import Image from "next/image";
+import { useAuth } from "@/app/hooks/useAuth";
+import { Toaster } from "react-hot-toast";
+
 export default function LoginPage() {
+  const { login, isLoading } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -12,12 +16,12 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement login logic
-    console.log("Login attempt:", formData);
+    login(formData);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center">
+      <Toaster position="top-right" />
       {/* Image container - hidden on mobile */}
       <div className="hidden lg:block w-1/2 h-screen mt-30">
         <Image
@@ -113,8 +117,8 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <Button type="submit" className="w-full">
-                Sign in
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Signing in..." : "Sign in"}
               </Button>
             </div>
           </form>
