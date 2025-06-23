@@ -1,7 +1,6 @@
 import axiosInstance from './axios';
-import { LoginCredentials, RegisterCredentials, AuthResponse } from '../types/auth';
+import { LoginCredentials, RegisterCredentials, AuthResponse } from '../types/auth.type';
 
-// Configure axios to include credentials
 axiosInstance.defaults.withCredentials = true;
 
 const authService = {
