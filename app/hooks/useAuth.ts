@@ -4,6 +4,7 @@ import authService from '../services/auth.service';
 import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
 import { AuthResponse } from '../types/auth.type';
+import { getErrorMessage } from '../lib/utils';
 
 type User = AuthResponse['user'] | null;
 
@@ -11,7 +12,6 @@ export const useAuth = () => {
     const queryClient = useQueryClient();
     const router = useRouter();
 
-    // Query to get current user
     const { data: user, isLoading: isLoadingUser } = useQuery<User>({
         queryKey: ['user'],
         queryFn: async (): Promise<User> => {
@@ -20,11 +20,9 @@ export const useAuth = () => {
                 return response.user || null;
             } catch (error) {
                 if (error instanceof AxiosError && error.response?.status === 401) {
-                    // Clear any existing user data
                     queryClient.setQueryData(['user'], null);
                     return null;
                 }
-                // For any other error, return null instead of throwing
                 return null;
             }
         },
@@ -41,7 +39,7 @@ export const useAuth = () => {
             router.push('/');
         },
         onError: (error: AxiosError) => {
-            toast.error(error.message || 'Login failed');
+            toast.error(getErrorMessage(error));
         },
     });
 
@@ -53,7 +51,7 @@ export const useAuth = () => {
             router.push('/');
         },
         onError: (error: AxiosError) => {
-            toast.error(error.message || 'Registration failed');
+            toast.error(getErrorMessage(error));
         },
     });
 
@@ -65,7 +63,7 @@ export const useAuth = () => {
             router.push('/login');
         },
         onError: (error: AxiosError) => {
-            toast.error(error.message || 'Logout failed');
+            toast.error(getErrorMessage(error));
         },
     });
 
@@ -75,7 +73,7 @@ export const useAuth = () => {
             toast.success('Password reset instructions sent to your email');
         },
         onError: (error: AxiosError) => {
-            toast.error(error.message || 'Failed to send reset instructions');
+            toast.error(getErrorMessage(error));
         },
     });
 
