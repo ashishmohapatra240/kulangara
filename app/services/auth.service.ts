@@ -1,4 +1,4 @@
-import axiosInstance from './axios';
+import axiosInstance from '../lib/axios';
 import { LoginCredentials, RegisterCredentials, AuthResponse } from '../types/auth.type';
 
 axiosInstance.defaults.withCredentials = true;
