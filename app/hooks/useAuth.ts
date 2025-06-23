@@ -3,18 +3,18 @@ import { useRouter } from 'next/navigation';
 import authService from '../services/auth.service';
 import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
-import { AuthResponse } from '../types/auth.type';
+import { IAuthResponse } from '../types/auth.type';
 import { getErrorMessage } from '../lib/utils';
 
-type User = AuthResponse['user'] | null;
+type IUser = IAuthResponse['user'] | null;
 
 export const useAuth = () => {
     const queryClient = useQueryClient();
     const router = useRouter();
 
-    const { data: user, isLoading: isLoadingUser } = useQuery<User>({
+    const { data: user, isLoading: isLoadingUser } = useQuery<IUser>({
         queryKey: ['user'],
-        queryFn: async (): Promise<User> => {
+        queryFn: async (): Promise<IUser> => {
             try {
                 const response = await authService.refreshToken();
                 return response.user || null;

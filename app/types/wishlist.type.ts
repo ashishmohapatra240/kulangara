@@ -1,11 +1,11 @@
-import { Product } from "./product.type";
+import { IProduct } from "./product.type";
 
 export interface IWishlistItem {
     id: string;
     userId: string;
     productId: string;
     createdAt: string;
-    product: Product;
+    product: IProduct;
 }
 
 export interface IWishlistListResponse {
