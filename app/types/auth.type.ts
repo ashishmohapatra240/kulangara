@@ -1,9 +1,9 @@
-export interface LoginCredentials {
+export interface ILoginCredentials {
     email: string;
     password: string;
 }
 
-export interface RegisterCredentials {
+export interface IRegisterCredentials {
     email: string;
     password: string;
     firstName: string;
@@ -12,7 +12,7 @@ export interface RegisterCredentials {
     role?: string;
 }
 
-export interface AuthResponse {
+export interface IAuthResponse {
     user: {
         id: string;
         email: string;

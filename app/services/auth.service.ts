@@ -1,15 +1,15 @@
 import axiosInstance from '../lib/axios';
-import { LoginCredentials, RegisterCredentials, AuthResponse } from '../types/auth.type';
+import { ILoginCredentials, IRegisterCredentials, IAuthResponse } from '../types/auth.type';
 
 axiosInstance.defaults.withCredentials = true;
 
 const authService = {
-    login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
+    login: async (credentials: ILoginCredentials): Promise<IAuthResponse> => {
         const response = await axiosInstance.post(`/api/v1/auth/login`, credentials);
         return response.data.data;
     },
 
-    register: async (credentials: RegisterCredentials): Promise<AuthResponse> => {
+    register: async (credentials: IRegisterCredentials): Promise<IAuthResponse> => {
         const response = await axiosInstance.post(`/api/v1/auth/register`, credentials);
         return response.data.data;
     },
@@ -18,7 +18,7 @@ const authService = {
         await axiosInstance.post(`/api/v1/auth/logout`);
     },
 
-    refreshToken: async (): Promise<AuthResponse> => {
+    refreshToken: async (): Promise<IAuthResponse> => {
         const response = await axiosInstance.post(`/api/v1/auth/refresh`);
         return response.data.data;
     },
