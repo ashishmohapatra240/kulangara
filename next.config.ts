@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "kulangara.s3.ap-south-1.amazonaws.com",
+        pathname: "/**",
       },
     ],
   },
