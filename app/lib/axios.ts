@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { queryClient } from '../lib/queryClient';
+import { queryClient } from './queryClient';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -22,8 +22,6 @@ axiosInstance.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        // Prevent infinite loop: don't retry if the request was to the refresh endpoint
-        // or if already retried, or if on login/register page
         const isAuthPage = typeof window !== 'undefined' && (
             window.location.pathname.includes('/login') ||
             window.location.pathname.includes('/register')
@@ -39,7 +37,7 @@ axiosInstance.interceptors.response.use(
 
             try {
                 const response = await axiosInstance.post('/api/v1/auth/refresh');
-                // Update the auth state in React Query
+
                 if (response.data?.user) {
                     if (queryClient) {
                         queryClient.setQueryData(['user'], response.data.user);

@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import authService from '../services/auth';
+import authService from '../services/auth.service';
 import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
-import { AuthResponse } from '../types/auth';
+import { AuthResponse } from '../types/auth.type';
 
 type User = AuthResponse['user'] | null;
 
