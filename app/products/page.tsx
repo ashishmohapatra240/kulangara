@@ -3,89 +3,140 @@
 import { useState } from "react";
 import ProductCard from "@/app/components/ui/ProductCard";
 import { IoMdArrowDropdown } from "react-icons/io";
-import Sidebar from "@/app/components/ui/products/Sidebar";
-import { Product } from "../types/product";
-
-const DUMMY_PRODUCTS: Product[] = [
-  {
-    id: "1",
-    name: "Sarbagila T-Shirt",
-    price: 999,
-    image:
-      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    sizes: ["S", "M", "L", "XL"],
-    details: {
-      material: "Cotton",
-      dimensions: "100x100cm",
-      care: ["Wash in cold water", "Do not bleach", "Iron on low heat"],
-    },
-    features: ["Breathable", "Comfortable", "Durable"],
-    inStock: true,
-    companyFeatures: [
-      {
-        icon: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        title: "Free Shipping",
-        description: "Free shipping on all orders",
-      },
-    ],
-    reviews: {
-      rating: 4.5,
-      total: 100,
-      items: [],
-    },
-    deliveryInfo: {
-      estimatedDays: "3-5 days",
-      shippingFee: 0,
-      returnPeriod: 30,
-    },
-    description: "This is a description of the product",
-  },
-];
+import { useProducts } from "../hooks/useProducts";
+import { IProductSearchParams } from "../types/product.type";
 
 export default function ProductsPage() {
-  const [sortBy, setSortBy] = useState("Featured");
+  const [searchParams, setSearchParams] = useState<IProductSearchParams>({
+    page: 1,
+    limit: 12,
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  });
 
-  return (
-    <div className="container mx-auto px-4 py-8 mt-30">
-      <div className="flex gap-8">
-        {/* Filters Sidebar */}
-        <Sidebar />
+  const { data: productsData, isLoading, error } = useProducts(searchParams);
 
-        {/* Products Section */}
-        <div className="flex-1">
-          <div className="flex justify-between items-center mb-6 gap-4">
-            <div className="relative">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="appearance-none px-4 py-2 pr-8 border border-gray-300"
-              >
-                <option>Featured</option>
-                <option>Price: Low to High</option>
-                <option>Price: High to Low</option>
-                <option>Newest</option>
-              </select>
-              <IoMdArrowDropdown className="absolute right-2 top-1/2 transform -translate-y-1/2" />
-            </div>
+  const handleSortChange = (sortBy: string) => {
+    let actualSortBy = sortBy;
+    let sortOrder: "asc" | "desc" = "desc";
+
+    if (sortBy === "price-asc") {
+      actualSortBy = "price";
+      sortOrder = "asc";
+    } else if (sortBy === "price-desc") {
+      actualSortBy = "price";
+      sortOrder = "desc";
+    }
+
+    setSearchParams((prev: IProductSearchParams) => ({
+      ...prev,
+      sortBy: actualSortBy,
+      sortOrder,
+    }));
+  };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8 mt-30">
+        <div className="flex justify-end items-center mb-6">
+          <div className="relative">
+            <select
+              className="appearance-none px-4 py-2 pr-8 border border-gray-300"
+              disabled
+            >
+              <option>Loading...</option>
+            </select>
+            <IoMdArrowDropdown className="absolute right-2 top-1/2 transform -translate-y-1/2" />
           </div>
-
-          {/* Products Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {DUMMY_PRODUCTS.map((product) => (
-              <ProductCard key={product.id} {...product} />
-            ))}
-          </div>
-
-          {/* No Results Message */}
-          {DUMMY_PRODUCTS.length === 0 && (
-            <div className="text-center py-8">
-              <p className="text-gray-500">
-                No products found matching your criteria.
-              </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="animate-pulse">
+              <div className="bg-gray-200 aspect-square mb-4"></div>
+              <div className="h-4 bg-gray-200 mb-2"></div>
+              <div className="h-4 bg-gray-200 w-1/2"></div>
             </div>
-          )}
+          ))}
         </div>
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8 mt-30">
+        <div className="text-center text-red-500">Error loading products</div>
+      </div>
+    );
+  }
+
+  const products = productsData?.data || [];
+
+  return (
+    <div className="container mx-auto px-4 py-8 mt-30 max-w-7xl">
+      <div className="flex justify-end items-center mb-6">
+        <div className="relative">
+          <select
+            value={
+              searchParams.sortBy === "price" &&
+              searchParams.sortOrder === "asc"
+                ? "price-asc"
+                : searchParams.sortBy === "price" &&
+                  searchParams.sortOrder === "desc"
+                ? "price-desc"
+                : searchParams.sortBy
+            }
+            onChange={(e) => handleSortChange(e.target.value)}
+            className="appearance-none px-4 py-2 pr-8 border border-gray-300"
+          >
+            <option value="createdAt">Newest</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name">Name: A to Z</option>
+          </select>
+          <IoMdArrowDropdown className="absolute right-2 top-1/2 transform -translate-y-1/2" />
+        </div>
+      </div>
+
+      {/* Products Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {products.map((product) => (
+          <ProductCard key={product.id} {...product} images={product.images || []} />
+        ))}
+      </div>
+
+      {/* No Results Message */}
+      {products.length === 0 && (
+        <div className="text-center py-8">
+          <p className="text-gray-500">
+            No products found matching your criteria.
+          </p>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {productsData && productsData.meta.totalPages > 1 && (
+        <div className="flex justify-center mt-8">
+          <div className="flex space-x-2">
+            {Array.from(
+              { length: productsData.meta.totalPages },
+              (_, i) => i + 1
+            ).map((page) => (
+              <button
+                key={page}
+                onClick={() => setSearchParams((prev: IProductSearchParams) => ({ ...prev, page }))}
+                className={`px-3 py-2 border ${
+                  searchParams.page === page
+                    ? "bg-black text-white border-black"
+                    : "bg-white text-black border-gray-300 hover:bg-gray-50"
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
