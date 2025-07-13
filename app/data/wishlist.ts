@@ -1,6 +1,6 @@
-import { Product } from "@/app/types/product";
+import { IProduct } from "@/app/types/product.type";
 
-export const DUMMY_WISHLIST: Product[] = [
+export const DUMMY_WISHLIST: IProduct[] = [
     {
         id: "1",
         name: "Zenith Retreat Tee",
