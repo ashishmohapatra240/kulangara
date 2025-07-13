@@ -6,6 +6,7 @@ import Footer from "./components/layout/Footer";
 import { defaultItems } from "./data/marquee";
 import Marquee from "./components/layout/Marquee";
 import { Providers } from "./providers";
+import { Toaster } from "react-hot-toast";
 
 const josefin = Josefin_Sans({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={josefin.className}>
         <Providers>
+          <Toaster position="top-right" reverseOrder={false} />
           <Marquee items={defaultItems} />
           <Header />
           {children}
