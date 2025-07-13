@@ -1,10 +1,11 @@
 "use client";
 import Link from "next/link";
-import { CiHeart, CiShoppingCart } from "react-icons/ci";
+import { CiHeart } from "react-icons/ci";
 import { RiMenu3Line, RiCloseLine } from "react-icons/ri";
 import { FiUser, FiShoppingBag, FiLogOut } from "react-icons/fi";
 import Button from "../ui/Button";
 import Search from "../ui/Search";
+import CartBadge from "../ui/CartBadge";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/app/hooks/useAuth";
 
@@ -50,9 +51,9 @@ export default function Header() {
           <Link href="/wishlist" className="p-2">
             <CiHeart className="w-6 h-6" />
           </Link>
-          <Link href="/cart" className="p-2">
-            <CiShoppingCart className="w-6 h-6" />
-          </Link>
+          <div className="p-2">
+            <CartBadge />
+          </div>
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
               <div className="relative" ref={dropdownRef}>
@@ -81,7 +82,7 @@ export default function Header() {
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                  <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg py-1 z-50 border border-gray-200">
                     <Link
                       href="/profile"
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -131,9 +132,9 @@ export default function Header() {
               <Link href="/wishlist" className="p-2">
                 <CiHeart className="w-6 h-6" />
               </Link>
-              <Link href="/cart" className="p-2">
-                <CiShoppingCart className="w-6 h-6" />
-              </Link>
+              <div className="p-2">
+                <CartBadge />
+              </div>
             </div>
             <div className="flex flex-col space-y-4 w-full">
               {isAuthenticated ? (
