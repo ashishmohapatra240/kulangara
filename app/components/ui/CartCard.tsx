@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CartItem } from "@/app/data/cart";
+import { ICartItem } from "@/app/types/cart.type";
 
 interface CartCardProps {
-  item: CartItem;
+  item: ICartItem;
   updateQuantity: (id: string, quantity: number) => void;
   removeFromCart: (id: string) => void;
 }
@@ -13,20 +13,57 @@ export default function CartCard({
   updateQuantity,
   removeFromCart,
 }: CartCardProps) {
+
+  const productId = item.product?.id || item.productId;
+
+  if (!productId) {
+    return (
+      <div className="flex items-start gap-4 border-b border-gray-200 py-4">
+        <div className="w-24 h-24 bg-gray-100 flex items-center justify-center text-gray-400">
+          No product info
+        </div>
+        <div className="flex-grow">
+          <h2 className="text-base font-medium">Product unavailable</h2>
+          <p className="text-sm text-gray-500">This item is no longer available.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const displayImage =
+    item.product.images?.[0]?.url ||
+    item.product.image ||
+    "/images/coming-soon.jpg";
+
+
   return (
     <div className="flex items-start gap-4 border-b border-gray-200 py-4">
       <Link
-        href={`/products/${item.id}`}
+        href={`/products/${productId}`}
         className="block w-24 h-24 relative flex-shrink-0"
       >
-        <Image src={item.image} alt={item.name} fill className="object-cover" />
+        <Image
+          src={displayImage}
+          alt={item.product.name}
+          fill
+          className="object-cover"
+        />
       </Link>
 
       <div className="flex-grow">
-        <Link href={`/products/${item.id}`}>
-          <h2 className="text-base font-medium hover:underline">{item.name}</h2>
+        <Link href={`/products/${productId}`}>
+          <h2 className="text-base font-medium hover:underline">
+            {item.product.name}
+          </h2>
         </Link>
         <p className="text-base mt-1">₹{item.price.toLocaleString()}.00</p>
+
+        {/* Show variant info if available */}
+        {item.variant && (
+          <p className="text-sm text-gray-500 mt-1">
+            Size: {item.variant.size} | Color: {item.variant.color}
+          </p>
+        )}
 
         <div className="flex items-center gap-4 mt-2">
           <div className="flex items-center border border-gray-300">
