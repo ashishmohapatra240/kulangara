@@ -3,14 +3,17 @@ import wishlistService from '../services/wishlist.service';
 import { getErrorMessage } from '../lib/utils';
 import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
+import { useAuth } from './useAuth';
 
 export const useWishlist = () => {
+    const { isAuthenticated } = useAuth();
     return useQuery({
         queryKey: ['wishlist'],
         queryFn: async () => {
             const response = await wishlistService.getWishlist();
             return response;
         },
+        enabled: isAuthenticated,
     });
 };
 
