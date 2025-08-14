@@ -91,7 +91,7 @@ export default function Header() {
                       Profile
                     </Link>
                     <Link
-                      href="/orders"
+                      href="/profile/orders"
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       <FiShoppingBag className="mr-2" />
@@ -147,7 +147,7 @@ export default function Header() {
                       Profile
                     </Button>
                   </Link>
-                  <Link href="/orders" className="w-full">
+                  <Link href="/profile/orders" className="w-full">
                     <Button variant="outline" className="w-full">
                       Orders
                     </Button>
