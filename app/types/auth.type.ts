@@ -18,6 +18,6 @@ export interface IAuthResponse {
         email: string;
         firstName: string;
         lastName: string;
-        role: string;
+    role: "SUPER_ADMIN" | "ADMIN" | "DELIVERY_PARTNER" | "CUSTOMER";
     };
 }
