@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient, UseQueryResult } from "@tanstack/react-query";
-import { ICartItem } from "@/app/types/cart.type";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { IAddress } from "@/app/types/profile.type";
 import { ICoupon } from "@/app/types/coupon.type";
 import { ICheckoutFormData } from "@/app/types/checkout.type";
@@ -11,32 +10,48 @@ import orderService from "@/app/services/order.service";
 import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
 import { getErrorMessage } from "@/app/lib/utils";
+import { useRazorpayPayment } from "./useRazorpayPayment";
+import { useAppDispatch } from "../store/hooks";
+import { clearCart as clearCartThunk, fetchCart as fetchCartThunk } from "../store/slices/cartSlice";
 
 export const useCheckout = () => {
     const queryClient = useQueryClient();
+    const { processRazorpayPayment, paymentStatus, resetPaymentStatus } = useRazorpayPayment();
+    const dispatch = useAppDispatch();
 
     // UI state
     const [selectedAddressId, setSelectedAddressId] = useState<string>("");
     const [couponCode, setCouponCode] = useState("");
 
     // Cart
-    const { data: cartData, isLoading: cartLoading, error: cartError, }: UseQueryResult<ICartItem[]> = useQuery({
+    const { data: cartData, isLoading: cartLoading, error: cartError } = useQuery({
         queryKey: ["cart"],
         queryFn: async () => {
-            const response = await cartService.getCart();
-            return response.data.items;
+            try {
+                const response = await cartService.getCart();
+                return response.data.items;
+            } catch (error) {
+                toast.error(getErrorMessage(error as AxiosError));
+                return [];
+            }
         },
     });
-    const cartItems = useMemo(() =>
-        cartData || []
-        , [cartData]);
+    const cartItems = useMemo(() => {
+        try {
+            const items = cartData || [];
+            return items;
+        } catch (error) {
+            toast.error(getErrorMessage(error as AxiosError));
+            return [];
+        }
+    }, [cartData]);
 
     // Addresses
     const {
         data: addressesData,
         isLoading: addressesLoading,
         error: addressesError,
-    }: UseQueryResult<IAddress[]> = useQuery({
+    } = useQuery({
         queryKey: ["addresses"],
         queryFn: async () => {
             const response = await ProfileService.getAddresses();
@@ -144,29 +159,76 @@ export const useCheckout = () => {
                 }),
                 couponCode: appliedCoupon?.code
             };
-            const response = await orderService.createOrder(orderData);
-            if (response.status === "success") {
-                try {
-                    await cartService.clearCart();
-                } catch {
-                    // Don't re-throw, as the order itself was successful
+            try {
+                const response = await orderService.createOrder(orderData);
+
+                if (response.status === "success") {
+                    // Do NOT clear cart here for online payments; handle after successful payment verification
+                    return response.data.order;
                 }
-                return response.data.order;
+                throw new Error(response.message || "Failed to create order");
+            } catch (orderError) {
+                throw orderError;
             }
-            throw new Error(response.message || "Failed to create order");
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
-            toast.success("Order placed successfully!");
+            // Keep side-effects minimal here; actual toasts/cart clearing handled based on payment method in createOrder
+            dispatch(fetchCartThunk());
         },
         onError: (error: Error | AxiosError) => {
             toast.error(getErrorMessage(error as AxiosError));
             orderMutation.reset();
         },
     });
+
     const createOrder = async (paymentMethod: string, formData?: ICheckoutFormData) => {
         orderMutation.reset();
-        return orderMutation.mutateAsync({ paymentMethod, formData });
+        resetPaymentStatus();
+
+        try {
+            // First create the order
+            const order = await orderMutation.mutateAsync({ paymentMethod, formData });
+
+            const normalizedMethod = paymentMethod.toLowerCase();
+
+            if (normalizedMethod === 'razorpay') {
+                const userEmail = formData?.email || '';
+                const userPhone = formData?.phone || '';
+
+                const paymentVerified = await processRazorpayPayment(order.id, userEmail, userPhone);
+
+                if (!paymentVerified) {
+                    throw new Error('Payment failed or cancelled');
+                }
+
+                // Payment verified => clear cart and notify
+                try {
+                    await dispatch(clearCartThunk()).unwrap();
+                } catch {
+                    // ignore
+                }
+                dispatch(fetchCartThunk());
+                toast.success('Order placed successfully!');
+                return order;
+            }
+
+            if (normalizedMethod === 'cod') {
+                // COD: order is placed immediately
+                try {
+                    await dispatch(clearCartThunk()).unwrap();
+                } catch {
+                    // ignore
+                }
+                dispatch(fetchCartThunk());
+                toast.success('Order placed successfully!');
+                return order;
+            }
+
+            // Unsupported/Not yet integrated payment methods
+            throw new Error('Selected payment method is not available yet. Please choose Razorpay or COD.');
+        } catch (error) {
+            throw error;
+        }
     };
 
     // Totals
@@ -199,6 +261,7 @@ export const useCheckout = () => {
         loading,
         error,
         couponMutation, // Expose couponMutation for error state in UI
+        paymentStatus, // Expose payment status for UI
 
         // Actions
         setSelectedAddressId,
@@ -208,6 +271,7 @@ export const useCheckout = () => {
         createOrder,
         loadCart: () => queryClient.invalidateQueries({ queryKey: ["cart"] }),
         loadAddresses: () => queryClient.invalidateQueries({ queryKey: ["addresses"] }),
+        resetPaymentStatus,
 
         // Calculations
         subtotal,
