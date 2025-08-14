@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Button from "@/app/components/ui/Button";
 import Image from "next/image";
 import { useAuth } from "@/app/hooks/useAuth";
@@ -9,7 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN", "DELIVERY_PARTNER"];
 
-export default function AdminLoginPage() {
+function AdminLoginContent() {
   const { loginAsync, isLoading } = useAuth();
   const router = useRouter();
   const params = useSearchParams();
@@ -118,4 +118,12 @@ export default function AdminLoginPage() {
       </div>
     </div>
   );
-} 
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <AdminLoginContent />
+    </Suspense>
+  );
+}
