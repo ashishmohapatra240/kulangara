@@ -8,6 +8,12 @@ const axiosInstance = axios.create({
     withCredentials: true,
 });
 
+// Public axios instance for unauthenticated/public API calls
+export const publicAxios = axios.create({
+    baseURL: API_URL,
+    withCredentials: false,
+});
+
 axiosInstance.interceptors.request.use(
     (config) => {
         return config;
@@ -22,6 +28,10 @@ axiosInstance.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
+        const requestUrl = typeof originalRequest?.url === 'string' ? originalRequest.url : '';
+        const public401SafePaths = ['/api/v1/products'];
+        const isPublicPath = public401SafePaths.some((p) => requestUrl.startsWith(p));
+
         const isAuthPage = typeof window !== 'undefined' && (
             window.location.pathname.includes('/login') ||
             window.location.pathname.includes('/register')
@@ -31,24 +41,30 @@ axiosInstance.interceptors.response.use(
             error.response?.status === 401 &&
             !originalRequest._retry &&
             !originalRequest.url.includes('/api/v1/auth/refresh') &&
-            !isAuthPage
+            !isAuthPage &&
+            !isPublicPath
         ) {
             originalRequest._retry = true;
 
             try {
                 const response = await axiosInstance.post('/api/v1/auth/refresh');
 
-                if (response.data?.user) {
-                    if (queryClient) {
-                        queryClient.setQueryData(['user'], response.data.user);
-                    }
+                const refreshedUser = response.data?.data?.user ?? response.data?.user ?? null;
+                if (refreshedUser && queryClient) {
+                    queryClient.setQueryData(['user'], refreshedUser);
                 }
                 return axiosInstance(originalRequest);
             } catch (refreshError) {
                 if (queryClient) {
                     queryClient.setQueryData(['user'], null);
                 }
-                window.location.href = '/login';
+                if (typeof window !== 'undefined') {
+                    const currentPath = window.location.pathname + window.location.search;
+                    const isAdminArea = window.location.pathname.startsWith('/admin');
+                    const target = isAdminArea ? `/admin/login` : `/login`;
+                    const sep = target.includes('?') ? '&' : '?';
+                    window.location.href = `${target}${currentPath ? `${sep}next=${encodeURIComponent(currentPath)}` : ''}`;
+                }
                 return Promise.reject(refreshError);
             }
         }
