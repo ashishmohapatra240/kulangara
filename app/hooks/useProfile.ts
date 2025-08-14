@@ -5,12 +5,15 @@ import {
   IProfileUpdateRequest,
   IChangePasswordRequest,
   IProfile,
+  IAddress,
   IAddressCreateRequest,
-  IAddressUpdateRequest
+  IAddressUpdateRequest,
+  IAddressResponse
 } from '../types/profile.type';
 import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
 import { getErrorMessage } from '../lib/utils';
+import { useEffect } from 'react';
 
 export const useProfile = () => {
   const queryClient = useQueryClient();
@@ -29,11 +32,12 @@ export const useProfile = () => {
     data: addressesData,
     isLoading: isLoadingAddresses,
     error: addressesError
-  } = useQuery({
+  } = useQuery<IAddress[]>({
     queryKey: ['addresses'],
     queryFn: async () => {
-      const response = await ProfileService.getAddresses();
-      return response.data;
+      const response: IAddressResponse = await ProfileService.getAddresses();
+      // Normalize to return just the array of addresses regardless of server envelope shape
+      return response.data?.addresses ?? [];
     },
   });
 
@@ -145,7 +149,7 @@ export const useProfile = () => {
 
   return {
     profile,
-    addresses: addressesData?.addresses || [],
+    addresses: addressesData || [],
     isLoading,
     isLoadingAddresses,
     error,
@@ -170,3 +174,82 @@ export const useProfile = () => {
     handleSetDefaultAddress,
   };
 };
+
+// Fetch all users (admin)
+export function useAdminUsers(search?: string) {
+  const query = useQuery({
+    queryKey: ["admin-users", search],
+    queryFn: async () => {
+      const response = await ProfileService.listUsers(search);
+      if (response.status === "success") {
+        return response.data.data;
+      } else {
+        throw new Error(response.message || "Failed to load users");
+      }
+    },
+    staleTime: 1000 * 60 * 2,
+  });
+  useEffect(() => {
+    if (query.error) {
+      toast.error(getErrorMessage(query.error as AxiosError));
+    }
+  }, [query.error]);
+  return query;
+}
+
+// Update user role (admin)
+export function useUpdateUserRole() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
+      const response = await ProfileService.updateUserRole(userId, role);
+      if (response.status === "success" || response.success) {
+        return response.data;
+      } else {
+        throw new Error(response.message || "Failed to update user role");
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast.success("User role updated successfully!");
+    },
+    onError: (error: Error | AxiosError) => {
+      toast.error(getErrorMessage(error as AxiosError));
+    },
+  });
+}
+
+// Update user status (admin)
+export function useUpdateUserStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, status }: { userId: string; status: string }) => {
+      const response = await ProfileService.updateUserStatus(userId, status);
+      if (response.status === "success" || response.success) {
+        return response.data;
+      } else {
+        throw new Error(response.message || "Failed to update user status");
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast.success("User status updated successfully!");
+    },
+    onError: (error: Error | AxiosError) => {
+      toast.error(getErrorMessage(error as AxiosError));
+    },
+  });
+}
+
+// Send admin email
+export function useSendAdminEmail() {
+  return useMutation({
+    mutationFn: ProfileService.sendAdminEmail,
+    onSuccess: () => {
+      toast.success("Email sent successfully!");
+    },
+    onError: (error: Error | AxiosError) => {
+      toast.error(getErrorMessage(error as AxiosError));
+    },
+  });
+}
