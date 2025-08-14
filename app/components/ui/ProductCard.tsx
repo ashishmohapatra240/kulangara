@@ -4,21 +4,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { CiHeart } from "react-icons/ci";
 import { FaHeart } from "react-icons/fa";
-import Button from "./Button";
-import ReviewSummary from "./ReviewSummary";
+import { FaStar } from "react-icons/fa";
 import { useWishlist, useCreateWishlistItems, useDeleteWishlistItems } from "@/app/hooks/useWishlist";
-import { useCart, useAddToCart } from "@/app/hooks/useCart";
+import { useReviews } from "@/app/hooks/useReviews";
 import { toast } from "react-hot-toast";
 
 interface ProductCardProps {
   id: string;
   name: string;
   price: number;
+  discountedPrice?: number;
   images?: { id: string; url: string; alt: string; isPrimary: boolean }[];
-  reviews?: {
-    rating: number;
-    total: number;
-  };
+  category?: { name: string };
 }
 
 const PLACEHOLDER_IMAGE =
@@ -28,21 +25,18 @@ export default function ProductCard({
   id,
   name,
   price,
+  discountedPrice,
   images,
-  reviews,
+  category,
 }: ProductCardProps) {
   const { data: wishlistResponse } = useWishlist();
   const createWishlistMutation = useCreateWishlistItems();
   const deleteWishlistMutation = useDeleteWishlistItems();
-  const { addItemToCart, loading: cartLoading } = useAddToCart();
-  const { items: cartItems, loading: cartStateLoading } = useCart();
+  const { data: reviewsData } = useReviews(id);
 
   // Check if product is in wishlist
   const wishlistItems = wishlistResponse?.data || [];
   const isInWishlist = wishlistItems.some(item => item.product.id === id);
-
-  // Check if product is in cart - improved logic
-  const isInCart = cartItems.some(item => item.productId === id);
 
   // Prefer primary image from images array, fallback to image string, then placeholder
   let displayImage = PLACEHOLDER_IMAGE;
@@ -54,7 +48,7 @@ export default function ProductCard({
   const toggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     try {
       if (isInWishlist) {
         await deleteWishlistMutation.mutateAsync(id);
@@ -68,33 +62,38 @@ export default function ProductCard({
     }
   };
 
-  const handleAddToCart = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    try {
-      await addItemToCart({
-        productId: id,
-        quantity: 1
-      });
-    } catch (error) {
-      console.error("Failed to add to cart:", error);
-    }
+  // Use fetched review data
+  const avgRating = reviewsData?.meta?.stats?.averageRating ?? 0;
+  const reviewCount = reviewsData?.meta?.total ?? 0;
+
+  // Render stars like product detail page
+  const renderStars = (rating: number, size: "sm" | "md" | "lg" = "md") => {
+    const sizeClasses = {
+      sm: "w-3 h-3",
+      md: "w-4 h-4",
+      lg: "w-5 h-5",
+    };
+    return [...Array(5)].map((_, i) => (
+      <FaStar
+        key={i}
+        className={`${sizeClasses[size]} ${i < Math.round(rating) ? "text-yellow-400" : "text-gray-200"}`}
+      />
+    ));
   };
 
   return (
-    <div className="group relative bg-white">
-      <div className="aspect-square w-full overflow-hidden">
+    <div className="group relative bg-white rounded-none border border-gray-200 transition-transform duration-200 hover:-translate-y-1">
+      <div className="aspect-square w-full overflow-hidden rounded-none">
         <Image
           src={displayImage}
           alt={name}
           width={500}
           height={500}
-          className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+          className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 rounded-none"
         />
         <button
           onClick={toggleWishlist}
-          className="absolute top-4 right-4 p-2 bg-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-50 rounded-full shadow-sm"
+          className="absolute top-4 right-4 p-2 bg-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-50 rounded-full border border-gray-200"
           disabled={createWishlistMutation.isPending || deleteWishlistMutation.isPending}
         >
           {isInWishlist ? (
@@ -104,48 +103,41 @@ export default function ProductCard({
           )}
         </button>
       </div>
-      <div>
+      <div className="p-4 flex flex-col gap-2">
         <div>
-          <div className="flex flex-row justify-between my-2">
-            <h3 className="text-lg font-medium">
+          {category?.name && (
+            <div className="text-xs text-gray-400 mb-1 uppercase tracking-wide font-medium">{category.name}</div>
+          )}
+          <div className="flex flex-row justify-between items-start mb-2">
+            <h3 className="text-lg font-medium leading-tight">
               <Link href={`/products/${id}`} className="hover:underline">
                 {name}
               </Link>
             </h3>
-            <p className="text-gray-900 font-medium">₹{price}</p>
+            <div className="flex flex-col items-end">
+              {discountedPrice && discountedPrice < price ? (
+                <>
+                  <span className="text-gray-900 font-semibold">₹{discountedPrice.toLocaleString()}</span>
+                  <span className="text-gray-400 line-through text-sm">₹{price.toLocaleString()}</span>
+                </>
+              ) : (
+                <span className="text-gray-900 font-semibold">₹{price.toLocaleString()}</span>
+              )}
+            </div>
           </div>
-
-          {/* Review Summary */}
-          {reviews && (
-            <div className="mb-2">
-              <ReviewSummary
-                averageRating={reviews.rating}
-                totalReviews={reviews.total}
-              />
+          {/* Rating row like product detail page */}
+          {avgRating > 0 && (
+            <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center">
+                {renderStars(avgRating, "lg")}
+              </div>
+              <span className="text-lg font-bold text-gray-900">{avgRating.toFixed(1)}</span>
+              <span className="text-sm text-gray-500">out of 5</span>
+              <span className="text-sm text-gray-600">{reviewCount} {reviewCount === 1 ? "review" : "reviews"}</span>
             </div>
           )}
+
         </div>
-        {isInCart ? (
-          <Link href="/cart" className="w-full">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="w-full"
-            >
-              Go to Cart
-            </Button>
-          </Link>
-        ) : (
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="w-full"
-            onClick={handleAddToCart}
-            disabled={cartLoading || cartStateLoading}
-          >
-            {cartLoading ? "Adding..." : "Add to Cart"}
-          </Button>
-        )}
       </div>
     </div>
   );

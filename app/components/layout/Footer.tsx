@@ -17,10 +17,10 @@ export default function Footer() {
               <h3 className="text-lg font-bold mb-4">Quick Links</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/about">About Us</Link>
+                  <Link href="/profile/about">About Us</Link>
                 </li>
                 <li>
-                  <Link href="/contact">Contact</Link>
+                  <Link href="/profile/contact">Contact</Link>
                 </li>
                 <li>
                   <Link href="/shipping">Shipping Info</Link>
@@ -64,8 +64,8 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-gray-800 text-center text-gray-400 flex flex-row justify-between">
           <p>&copy; 2025 Kulangara. All rights reserved.</p>
           <p>
-            <Link href="/privacy">Privacy Policy</Link> |{" "}
-            <Link href="/terms">Terms of Service</Link>
+            <Link href="/profile/privacy">Privacy Policy</Link> |{" "}
+            <Link href="/profile/terms">Terms of Service</Link>
           </p>
         </div>
       </div>

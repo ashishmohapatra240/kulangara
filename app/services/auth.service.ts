@@ -1,8 +1,6 @@
 import axiosInstance from '../lib/axios';
 import { ILoginCredentials, IRegisterCredentials, IAuthResponse } from '../types/auth.type';
 
-axiosInstance.defaults.withCredentials = true;
-
 const authService = {
     login: async (credentials: ILoginCredentials): Promise<IAuthResponse> => {
         const response = await axiosInstance.post(`/api/v1/auth/login`, credentials);

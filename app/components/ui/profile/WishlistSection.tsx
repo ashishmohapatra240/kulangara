@@ -3,10 +3,13 @@
 import { useWishlist, useDeleteWishlistItems } from "@/app/hooks/useWishlist";
 import { toast } from "react-hot-toast";
 import WishlistCard from "../WishlistCard";
+import { useAddToCart } from "@/app/hooks/useCart";
+import productsService from "@/app/services/products.service";
 
 export const WishlistSection = () => {
   const { data: wishlistResponse, isLoading, error } = useWishlist();
   const deleteWishlistMutation = useDeleteWishlistItems();
+  const { addItemToCart } = useAddToCart();
 
   const wishlistItems = wishlistResponse?.data || [];
 
@@ -18,10 +21,47 @@ export const WishlistSection = () => {
     });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleMoveToCart = (_productId: string) => {
-    // TODO: Implement move to cart functionality
-    toast.success("Item moved to cart");
+  const handleMoveToCart = async (productId: string, variantId?: string) => {
+    try {
+      const wishlistItem = wishlistItems.find(
+        (item) => item.product.id === productId
+      );
+
+      if (!wishlistItem) {
+        toast.error("Product not found in wishlist");
+        return;
+      }
+
+      // If no variant selected, fetch product to confirm variants exist
+      if (!variantId) {
+        try {
+          const fullProduct = await productsService.getProductById(productId);
+          if ((fullProduct.variants?.length || 0) > 0) {
+            toast.error("Please select a size");
+            return;
+          }
+        } catch {
+          if ((wishlistItem.product.variants?.length || 0) > 0) {
+            toast.error("Please select a size");
+            return;
+          }
+        }
+      }
+
+      await addItemToCart({
+        productId,
+        quantity: 1,
+        variantId,
+      });
+
+      deleteWishlistMutation.mutate(productId, {
+        onSuccess: () => {
+          toast.success("Item moved to cart successfully");
+        },
+      });
+    } catch {
+      toast.error("Failed to move item to cart");
+    }
   };
 
   if (isLoading) {

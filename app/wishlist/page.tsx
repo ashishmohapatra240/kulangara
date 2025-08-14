@@ -6,6 +6,7 @@ import WishlistCard from "@/app/components/ui/WishlistCard";
 import { useDeleteWishlistItems, useWishlist } from "../hooks/useWishlist";
 import { useAddToCart } from "../hooks/useCart";
 import { toast } from "react-hot-toast";
+import productsService from "../services/products.service";
 
 export default function WishlistPage() {
   const deleteWishlistMutation = useDeleteWishlistItems();
@@ -22,7 +23,7 @@ export default function WishlistPage() {
     });
   };
 
-  const handleMoveToCart = async (productId: string) => {
+  const handleMoveToCart = async (productId: string, variantId?: string) => {
     try {
       // Find the product in wishlist to get its details
       const wishlistItem = wishlistItems.find(
@@ -34,11 +35,28 @@ export default function WishlistPage() {
         return;
       }
 
+      // If no variant selected, fetch product to ensure whether variants exist
+      if (!variantId) {
+        try {
+          const fullProduct = await productsService.getProductById(productId);
+          if ((fullProduct.variants?.length || 0) > 0) {
+            toast.error("Please select a size");
+            return;
+          }
+        } catch {
+          // If product fetch fails, fall back to local check
+          if ((wishlistItem.product.variants?.length || 0) > 0) {
+            toast.error("Please select a size");
+            return;
+          }
+        }
+      }
+
       // Add to cart
       await addItemToCart({
         productId: productId,
         quantity: 1,
-        variantId: wishlistItem.product.variants?.[0]?.id, // Use first variant if available
+        variantId,
       });
 
       // Remove from wishlist after successful cart addition

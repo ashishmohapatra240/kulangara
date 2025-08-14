@@ -309,18 +309,24 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
 
             {/* Price Section */}
             <div className="flex items-center gap-3 mb-4">
-              <p className="text-3xl font-bold text-gray-900">
-                ₹{product.discountedPrice || product.price}
-              </p>
-              {product.discountedPrice && (
-                <p className="text-xl text-gray-500 line-through">
-                  ₹{product.price}
+              {product.discountedPrice && product.discountedPrice < product.price ? (
+                <>
+                  <p className="text-3xl font-bold text-gray-900">
+                    ₹{product.discountedPrice.toLocaleString()}
+                  </p>
+                  <p className="text-xl text-gray-500 line-through">
+                    ₹{product.price.toLocaleString()}
+                  </p>
+                  {discountPercentage > 0 && (
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm font-semibold">
+                      Save ₹{(product.price - product.discountedPrice).toLocaleString()}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <p className="text-3xl font-bold text-gray-900">
+                  ₹{product.price.toLocaleString()}
                 </p>
-              )}
-              {discountPercentage > 0 && (
-                <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm font-semibold">
-                  Save ₹{product.price - product.discountedPrice!}
-                </span>
               )}
             </div>
 

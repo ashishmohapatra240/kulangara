@@ -1,28 +1,34 @@
-import axiosInstance from '../lib/axios';
-import { IProduct, IProductListResponse, IProductSearchParams, ICreateProductData, IUpdateProductData, ICreateVariantData, IUpdateVariantData } from '../types/product.type';
+import axiosInstance, { publicAxios } from '../lib/axios';
+import { IProduct, IProductListResponse, IProductSearchParams, ICreateProductData, IUpdateProductData, ICreateVariantData, IUpdateVariantData, ICategoryListResponse } from '../types/product.type';
 
 const productsService = {
     // Get all products
     getProducts: async (params?: IProductSearchParams): Promise<IProductListResponse> => {
-        const response = await axiosInstance.get('/api/v1/products/list', { params });
+        const response = await publicAxios.get('/api/v1/products/list', { params });
+        return response.data.data;
+    },
+
+    // Get all products for admin (includes complete details, images, variants, metadata)
+    getAdminProducts: async (params?: IProductSearchParams): Promise<IProductListResponse> => {
+        const response = await axiosInstance.get('/api/v1/products/admin/list', { params });
         return response.data.data;
     },
 
     // Get product by ID
     getProductById: async (id: string): Promise<IProduct> => {
-        const response = await axiosInstance.get(`/api/v1/products/${id}`);
+        const response = await publicAxios.get(`/api/v1/products/${id}`);
         return response.data.data;
     },
 
     // Get product by slug
     getProductBySlug: async (slug: string): Promise<IProduct> => {
-        const response = await axiosInstance.get(`/api/v1/products/slug/${slug}`);
+        const response = await publicAxios.get(`/api/v1/products/slug/${slug}`);
         return response.data.data;
     },
 
     // Search products
     searchProducts: async (query: string): Promise<IProduct[]> => {
-        const response = await axiosInstance.get(`/api/v1/products/search?q=${encodeURIComponent(query)}`);
+        const response = await publicAxios.get(`/api/v1/products/search?q=${encodeURIComponent(query)}`);
         return response.data.data;
     },
 
@@ -38,13 +44,19 @@ const productsService = {
         return response.data.data;
     },
 
+  // Admin: Toggle featured status
+  toggleFeatured: async (id: string, isFeatured: boolean): Promise<IProduct> => {
+      const response = await axiosInstance.put(`/api/v1/products/${id}`, { isFeatured });
+      return response.data.data;
+  },
+
     // Admin: Delete product
     deleteProduct: async (id: string): Promise<void> => {
         await axiosInstance.delete(`/api/v1/products/${id}`);
     },
 
     // Admin: Get upload URLs for images
-    getUploadUrls: async (productId: string, fileTypes: string[]): Promise<{ urls: string[] }> => {
+    getUploadUrls: async (productId: string, fileTypes: string[]): Promise<{ uploadUrls: Array<{ uploadURL: string; key: string }> }> => {
         const response = await axiosInstance.post(`/api/v1/products/${productId}/images/upload-urls`, {
             fileTypes
         });
@@ -82,6 +94,12 @@ const productsService = {
     // Admin: Delete product variant
     deleteProductVariant: async (productId: string, variantId: string): Promise<void> => {
         await axiosInstance.delete(`/api/v1/products/${productId}/variants/${variantId}`);
+    },
+
+    // Categories
+    getCategories: async (): Promise<ICategoryListResponse> => {
+        const response = await publicAxios.get('/api/v1/categories');
+        return response.data.data;
     },
 };
 

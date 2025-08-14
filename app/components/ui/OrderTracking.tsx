@@ -4,10 +4,21 @@ import { ITrackingHistoryItem } from "@/app/types/order.type";
 
 interface OrderTrackingProps {
   tracking: ITrackingHistoryItem[];
-  onClose: () => void;
+  currentStatus?: string;
 }
 
-export const OrderTrackingComponent = ({ tracking, onClose }: OrderTrackingProps) => {
+const STATUS_ORDER: string[] = [
+  'CONFIRMED',
+  'PROCESSING',
+  'SHIPPED',
+  'OUT_FOR_DELIVERY',
+  'DELIVERED',
+  'CANCELLED',
+  'RETURNED',
+  'REFUNDED'
+];
+
+export const OrderTrackingComponent = ({ tracking, currentStatus }: OrderTrackingProps) => {
   const formatTimestamp = (timestamp: string) => {
     return new Date(timestamp).toLocaleString('en-US', {
       year: 'numeric',
@@ -18,40 +29,42 @@ export const OrderTrackingComponent = ({ tracking, onClose }: OrderTrackingProps
     });
   };
 
+  // Build a timeline based on enum order; enrich with timestamps if available in history
+  const timeline = STATUS_ORDER
+    .filter((s) => s !== 'CANCELLED' && s !== 'RETURNED' && s !== 'REFUNDED')
+    .map((status) => {
+      const match = tracking.find((t) => t.status === status);
+      return {
+        status,
+        note: match?.note || '',
+        createdAt: match?.createdAt || '',
+        reached: !!match || (currentStatus ? STATUS_ORDER.indexOf(currentStatus) >= STATUS_ORDER.indexOf(status) : false),
+      };
+    });
+
   return (
     <div className="p-4 border-b border-gray-200 bg-blue-50">
-      <div className="flex justify-between items-center mb-3">
-        <h4 className="font-medium text-gray-900">Tracking Information</h4>
-        <button
-          onClick={onClose}
-          className="text-sm text-gray-600 hover:text-gray-800"
-        >
-          Hide Tracking
-        </button>
-      </div>
-      
-      {tracking.length > 0 ? (
-        <div className="space-y-3">
-          {tracking.map((track: ITrackingHistoryItem) => (
-            <div key={track.id} className="bg-white p-3 rounded-md border border-gray-200">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900">{track.status}</div>
-                  <div className="text-sm text-gray-600 mt-1">{track.note}</div>
-                </div>
-                <div className="text-xs text-gray-500 ml-3 text-right">
-                  {formatTimestamp(track.createdAt)}
-                </div>
-              </div>
+      <h4 className="font-medium text-gray-900 mb-3">Tracking</h4>
+      <div className="flex items-stretch">
+        {timeline.map((step, idx) => (
+          <div key={step.status} className="flex-1 flex flex-col items-center text-center">
+            <div className="flex items-center w-full">
+              {/* Left connector */}
+              {idx > 0 && (
+                <div className={`h-1 flex-1 ${timeline[idx - 1].reached ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+              )}
+              {/* Dot */}
+              <div className={`w-4 h-4 rounded-full border-2 ${step.reached ? 'bg-green-500 border-green-600' : 'bg-white border-gray-300'}`}></div>
+              {/* Right connector */}
+              {idx < timeline.length - 1 && (
+                <div className={`h-1 flex-1 ${step.reached ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+              )}
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-4">
-          <div className="text-gray-500 text-sm">No tracking information available</div>
-          <div className="text-gray-400 text-xs mt-1">Check back later for updates</div>
-        </div>
-      )}
+            <div className={`mt-2 text-xs ${step.reached ? 'text-gray-900' : 'text-gray-400'}`}>{step.status.replaceAll('_', ' ')}</div>
+            <div className="mt-1 text-[10px] text-gray-500">{step.createdAt ? formatTimestamp(step.createdAt) : ''}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
-}; 
+};

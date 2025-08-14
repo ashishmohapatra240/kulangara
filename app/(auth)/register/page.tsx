@@ -5,7 +5,6 @@ import Link from "next/link";
 import Button from "@/app/components/ui/Button";
 import Image from "next/image";
 import { useAuth } from "@/app/hooks/useAuth";
-import { Toaster } from "react-hot-toast";
 
 export default function RegisterPage() {
   const { register, isLoading } = useAuth();
@@ -29,7 +28,6 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <Toaster position="top-right" />
       {/* Image container - hidden on mobile */}
       <div className="hidden lg:block w-1/2 h-screen mt-30">
         <Image

@@ -5,7 +5,7 @@ export interface IProfile {
     lastName: string;
     email: string;
     phone: string;
-    role: 'CUSTOMER' | 'ADMIN' | 'SUPER_ADMIN';
+    role: 'CUSTOMER' | 'ADMIN' | 'SUPER_ADMIN' | 'DELIVERY_PARTNER';
     createdAt: string;
     updatedAt: string;
   }

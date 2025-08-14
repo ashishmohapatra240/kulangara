@@ -12,6 +12,7 @@ export const useAuth = () => {
     const queryClient = useQueryClient();
     const router = useRouter();
 
+    const cachedUser = queryClient.getQueryData<IUser>(['user']);
     const { data: user, isLoading: isLoadingUser } = useQuery<IUser>({
         queryKey: ['user'],
         queryFn: async (): Promise<IUser> => {
@@ -26,6 +27,8 @@ export const useAuth = () => {
                 return null;
             }
         },
+        enabled: !cachedUser,
+        initialData: cachedUser,
         retry: 1,
         staleTime: 1000 * 60 * 5, // 5 minutes
         refetchOnWindowFocus: true,
@@ -36,7 +39,10 @@ export const useAuth = () => {
         onSuccess: (data) => {
             queryClient.setQueryData(['user'], data.user);
             toast.success('Login successful!');
-            router.push('/');
+            // Avoid overriding admin-specific redirects; only push if not on admin login pages
+            if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin')) {
+                router.push('/');
+            }
         },
         onError: (error: AxiosError) => {
             toast.error(getErrorMessage(error));
@@ -81,9 +87,12 @@ export const useAuth = () => {
         user,
         isLoading: isLoadingUser || loginMutation.isPending || registerMutation.isPending || logoutMutation.isPending,
         login: loginMutation.mutate,
+        loginAsync: loginMutation.mutateAsync,
         register: registerMutation.mutate,
         logout: logoutMutation.mutate,
         forgotPassword: forgotPasswordMutation.mutate,
+        forgotPasswordAsync: forgotPasswordMutation.mutateAsync,
+        forgotPasswordLoading: forgotPasswordMutation.isPending,
         isAuthenticated: !!user,
     };
 };

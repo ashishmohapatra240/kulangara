@@ -27,7 +27,7 @@ export interface IOrder {
     id: string;
     userId: string;
     orderNumber: string;
-    status: 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+    status: 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'CANCELLED' | 'RETURNED' | 'REFUNDED';
     items: IOrderItem[];
     shippingAddress: {
         id: string;
@@ -53,6 +53,7 @@ export interface IOrder {
     estimatedDelivery?: string;
     createdAt: string;
     updatedAt: string;
+    deliveredAt?: string;
 }
 
 export interface IOrderRequest {

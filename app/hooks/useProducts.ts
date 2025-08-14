@@ -48,6 +48,22 @@ export function useSearchProducts(query: string) {
     });
 }
 
+export function useAdminProducts(params?: IProductSearchParams) {
+    return useQuery({
+        queryKey: ['admin-products', params],
+        queryFn: () => productsService.getAdminProducts(params),
+        staleTime: 1000 * 60 * 5, // 5 minutes
+    });
+}
+
+export function useCategories() {
+    return useQuery({
+        queryKey: ['categories'],
+        queryFn: () => productsService.getCategories(),
+        staleTime: 1000 * 60 * 10,
+    });
+}
+
 //------------------------------Admin hooks--------------------------------------------
 export function useCreateProduct() {
     const queryClient = useQueryClient();
@@ -55,7 +71,7 @@ export function useCreateProduct() {
     return useMutation({
         mutationFn: productsService.createProduct,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['products'] });
+            queryClient.invalidateQueries({ queryKey: ['products'], exact: false });
             toast.success('Product created successfully!');
         },
         onError: (error: AxiosError) => {
@@ -71,9 +87,26 @@ export function useUpdateProduct() {
         mutationFn: ({ id, data }: { id: string; data: IUpdateProductData }) =>
             productsService.updateProduct(id, data),
         onSuccess: (_, { id }) => {
-            queryClient.invalidateQueries({ queryKey: ['products'] });
+            queryClient.invalidateQueries({ queryKey: ['products'], exact: false });
             queryClient.invalidateQueries({ queryKey: ['product', id] });
             toast.success('Product updated successfully!');
+        },
+        onError: (error: AxiosError) => {
+            toast.error(getErrorMessage(error));
+        },
+    });
+}
+
+export function useToggleFeaturedProduct() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, isFeatured }: { id: string; isFeatured: boolean }) =>
+            productsService.toggleFeatured(id, isFeatured),
+        onSuccess: (_, { id }) => {
+            queryClient.invalidateQueries({ queryKey: ['admin-products'], exact: false });
+            queryClient.invalidateQueries({ queryKey: ['products'], exact: false });
+            queryClient.invalidateQueries({ queryKey: ['product', id] });
+            toast.success('Featured status updated');
         },
         onError: (error: AxiosError) => {
             toast.error(getErrorMessage(error));
@@ -87,7 +120,7 @@ export function useDeleteProduct() {
     return useMutation({
         mutationFn: productsService.deleteProduct,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['products'] });
+            queryClient.invalidateQueries({ queryKey: ['products'], exact: false });
             toast.success('Product deleted successfully!');
         },
         onError: (error: AxiosError) => {

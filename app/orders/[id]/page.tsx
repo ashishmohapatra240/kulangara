@@ -6,6 +6,9 @@ import Image from "next/image";
 import Button from "@/app/components/ui/Button";
 import { IOrder, IOrderItem, ITrackingHistoryItem } from "@/app/types/order.type";
 import { OrderTrackingComponent } from "@/app/components/ui/OrderTracking";
+import ReviewModal from "@/app/components/ui/ReviewModal";
+import reviewService from "@/app/services/review.service";
+import { ICreateReviewData, IUpdateReviewData } from "@/app/types/review.type";
 import orderService from "@/app/services/order.service";
 
 interface ActualOrderApiResponse {
@@ -19,9 +22,12 @@ export default function OrderConfirmationPage() {
   const orderId = params.id as string;
   const [order, setOrder] = useState<IOrder | null>(null);
   const [tracking, setTracking] = useState<ITrackingHistoryItem[]>([]);
-  const [showTracking, setShowTracking] = useState(false);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [ratingModalOpen, setRatingModalOpen] = useState(false);
+  const [ratingProductId, setRatingProductId] = useState<string | null>(null);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   const loadOrder = useCallback(async () => {
     try {
@@ -70,8 +76,25 @@ export default function OrderConfirmationPage() {
   };
 
   const handleTrackOrder = async () => {
-    setShowTracking(true);
     await loadTracking();
+  };
+
+  const handleRateProduct = (productId: string) => {
+    setRatingProductId(productId);
+    setRatingModalOpen(true);
+  };
+
+  const submitReview = async (data: ICreateReviewData) => {
+    if (!ratingProductId) return;
+    try {
+      setIsSubmittingReview(true);
+      await reviewService.createReview(ratingProductId, data);
+      setRatingModalOpen(false);
+    } catch (e) {
+      console.error('Error submitting review', e);
+    } finally {
+      setIsSubmittingReview(false);
+    }
   };
 
   if (loading) {
@@ -98,6 +121,13 @@ export default function OrderConfirmationPage() {
       </div>
     );
   }
+
+  // compute delivered date for messaging
+  const deliveredAt = order.deliveredAt || tracking.find(t => t.status === 'DELIVERED')?.createdAt || null;
+  const deliveredDate = deliveredAt ? new Date(deliveredAt) : null;
+  const today = new Date();
+  const diffDays = deliveredDate ? Math.floor((today.getTime() - deliveredDate.getTime()) / (1000 * 60 * 60 * 24)) : null;
+  const isReturnEligible = deliveredDate ? diffDays !== null && diffDays <= 30 : false;
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl mt-30">
@@ -136,14 +166,12 @@ export default function OrderConfirmationPage() {
         </div>
 
         {/* Tracking Information */}
-        {showTracking && (
-          <div className="mb-6">
-            <OrderTrackingComponent
-              tracking={tracking}
-              onClose={() => setShowTracking(false)}
-            />
-          </div>
-        )}
+        <div className="mb-6">
+          <OrderTrackingComponent
+            tracking={tracking}
+            currentStatus={order.status}
+          />
+        </div>
 
         {/* Order Items */}
         <div className="mb-6">
@@ -178,6 +206,13 @@ export default function OrderConfirmationPage() {
                   <p className="font-medium">
                     ₹{item.price.toLocaleString()}.00
                   </p>
+                  {order.status === 'DELIVERED' && (
+                    <div className="mt-2">
+                      <Button size="sm" variant="outline" onClick={() => handleRateProduct(item.product?.id || item.productId)}>
+                        Rate this product
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -262,8 +297,20 @@ export default function OrderConfirmationPage() {
                 {order.paymentStatus}
               </span>
             </div>
+            {deliveredDate && (
+              <div className="mt-3 text-sm text-gray-700">
+                Delivered on {deliveredDate.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Return/Exchange policy note */}
+        {deliveredDate && (
+          <div className={`mb-6 p-4 rounded-lg border ${isReturnEligible ? 'bg-yellow-50 border-yellow-200 text-yellow-800' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>
+            Return/Exchange is eligible for 30 days post the delivery date. {isReturnEligible ? '' : `Your order is not eligible for return/exchange as it was delivered on ${deliveredDate.toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}.`}
+          </div>
+        )}
 
         {/* Action Buttons */}
         <div className="flex gap-4">
@@ -288,10 +335,19 @@ export default function OrderConfirmationPage() {
             variant="outline"
             className="text-blue-600 border-blue-600 hover:bg-blue-50"
           >
-            {showTracking ? "Hide Tracking" : "Track Order"}
+            Refresh Tracking
           </Button>
         </div>
       </div>
+
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={ratingModalOpen}
+        onClose={() => setRatingModalOpen(false)}
+        productId={ratingProductId || ''}
+        onSubmit={submitReview as (data: ICreateReviewData | IUpdateReviewData) => void}
+        isLoading={isSubmittingReview}
+      />
     </div>
   );
 }
