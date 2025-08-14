@@ -42,6 +42,18 @@ const orderService = {
     updateOrderStatus: async (orderId: string, status: string): Promise<IOrderResponse> => {
         const response = await axiosInstance.put(`/api/v1/orders/admin/${orderId}/status`, { status });
         return response.data;
+    },
+
+    // Get analytics (for admin)
+    getAnalytics: async () => {
+        const response = await axiosInstance.get('/api/v1/admin/analytics');
+        return response.data;
+    },
+
+    // Get order analytics (for admin)
+    getOrderAnalytics: async () => {
+        const response = await axiosInstance.get('/api/v1/admin/analytics/orders');
+        return response.data;
     }
 };
 

@@ -95,3 +95,91 @@ export function useCancelOrder() {
         },
     });
 }
+
+// Fetch all orders (admin)
+export function useAdminOrders() {
+    const query = useQuery({
+        queryKey: ["admin-orders"],
+        queryFn: async () => {
+            const response = await orderService.getAllOrders();
+            if (response.status === "success") {
+                return response.data.data;
+            } else {
+                throw new Error(response.message || "Failed to load admin orders");
+            }
+        },
+        staleTime: 1000 * 60 * 2, // 2 minutes
+    });
+    useEffect(() => {
+        if (query.error) {
+            toast.error(getErrorMessage(query.error as AxiosError));
+        }
+    }, [query.error]);
+    return query;
+}
+
+// Update order status (admin)
+export function useUpdateOrderStatus() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ orderId, status }: { orderId: string; status: string }) => {
+            const response = await orderService.updateOrderStatus(orderId, status);
+            if (response.status === "success" || response.success) {
+                return response.data;
+            } else {
+                throw new Error(response.message || "Failed to update order status");
+            }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+            toast.success("Order status updated successfully!");
+        },
+        onError: (error: Error | AxiosError) => {
+            toast.error(getErrorMessage(error as AxiosError));
+        },
+    });
+}
+
+// Fetch admin analytics
+export function useAdminAnalytics() {
+    const query = useQuery({
+        queryKey: ["admin-analytics"],
+        queryFn: async () => {
+            const response = await orderService.getAnalytics();
+            if (response.status === "success") {
+                return response.data;
+            } else {
+                throw new Error(response.message || "Failed to load analytics");
+            }
+        },
+        staleTime: 1000 * 60 * 2,
+    });
+    useEffect(() => {
+        if (query.error) {
+            toast.error(getErrorMessage(query.error as AxiosError));
+        }
+    }, [query.error]);
+    return query;
+}
+
+// Fetch admin order analytics
+export function useAdminOrderAnalytics() {
+    const query = useQuery({
+        queryKey: ["admin-order-analytics"],
+        queryFn: async () => {
+            const response = await orderService.getOrderAnalytics();
+            if (response.status === "success") {
+                return response.data;
+            } else {
+                throw new Error(response.message || "Failed to load order analytics");
+            }
+        },
+        staleTime: 1000 * 60 * 2,
+    });
+    useEffect(() => {
+        if (query.error) {
+            toast.error(getErrorMessage(query.error as AxiosError));
+        }
+    }, [query.error]);
+    return query;
+}
