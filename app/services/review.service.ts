@@ -1,9 +1,9 @@
-import axiosInstance from '../lib/axios';
+import axiosInstance, { publicAxios } from '../lib/axios';
 import { IReview, ICreateReviewData, IUpdateReviewData, IReviewListResponse, IReviewFilters } from '../types/review.type';
 
 const reviewService = {
     getReviews: async (productId: string, filters?: IReviewFilters): Promise<IReviewListResponse> => {
-        const response = await axiosInstance.get(`/api/v1/products/${productId}/reviews`, { params: filters });
+        const response = await publicAxios.get(`/api/v1/products/${productId}/reviews`, { params: filters });
         return response.data.data;
     },
 
