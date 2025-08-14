@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import cartService from '../../services/cart.service';
-import { ICartState, IAddToCartRequest, IUpdateCartItemRequest, ICartItem } from '../../types/cart.type';
+import { ICartState, IAddToCartRequest, IUpdateCartItemRequest, ICartItem, ICartResponse } from '../../types/cart.type';
 import { RootState } from '..';
 import { AxiosError } from 'axios';
 import { getErrorMessage } from '../../lib/utils';
@@ -16,13 +16,22 @@ const initialState: ICartState = {
     error: null,
 };
 
+// Utility to compute cart totals consistently
+function applyCartTotals(state: ICartState, items: ICartItem[], shipping?: number) {
+    state.items = items;
+    state.totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+    state.subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    state.shipping = typeof shipping === 'number' ? shipping : state.shipping || 0;
+    state.total = state.subtotal + state.shipping;
+}
+
 // Async thunks
 export const fetchCart = createAsyncThunk(
     'cart/fetchCart',
     async (_, { rejectWithValue }) => {
         try {
             const response = await cartService.getCart();
-            return response.data;
+            return response; // ICartResponse
         } catch (error: unknown) {
             const errorMessage = error instanceof AxiosError ? getErrorMessage(error) : 'Failed to fetch cart';
             return rejectWithValue(errorMessage);
@@ -35,7 +44,7 @@ export const addToCart = createAsyncThunk(
     async (data: IAddToCartRequest, { rejectWithValue }) => {
         try {
             const response = await cartService.addToCart(data);
-            return response.data;
+            return response; // ICartResponse
         } catch (error: unknown) {
             const errorMessage = error instanceof AxiosError ? getErrorMessage(error) : 'Failed to add item to cart';
             return rejectWithValue(errorMessage);
@@ -48,7 +57,7 @@ export const updateCartItem = createAsyncThunk(
     async ({ itemId, data }: { itemId: string; data: IUpdateCartItemRequest }, { rejectWithValue }) => {
         try {
             const response = await cartService.updateCartItem(itemId, data);
-            return response.data;
+            return response; // ICartResponse
         } catch (error: unknown) {
             const errorMessage = error instanceof AxiosError ? getErrorMessage(error) : 'Failed to update cart item';
             return rejectWithValue(errorMessage);
@@ -61,7 +70,7 @@ export const removeFromCart = createAsyncThunk(
     async (itemId: string, { rejectWithValue }) => {
         try {
             const response = await cartService.removeFromCart(itemId);
-            return response.data;
+            return response; // ICartResponse
         } catch (error: unknown) {
             const errorMessage = error instanceof AxiosError ? getErrorMessage(error) : 'Failed to remove item from cart';
             return rejectWithValue(errorMessage);
@@ -74,7 +83,7 @@ export const clearCart = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const response = await cartService.clearCart();
-            return response.data;
+            return response; // ICartResponse
         } catch (error: unknown) {
             const errorMessage = error instanceof AxiosError ? getErrorMessage(error) : 'Failed to clear cart';
             return rejectWithValue(errorMessage);
@@ -149,14 +158,9 @@ const cartSlice = createSlice({
         builder
             .addCase(fetchCart.pending, handlePending)
             .addCase(fetchCart.fulfilled, (state, action) => {
-                const payload = action.payload as { items: ICartItem[], shipping?: number };
-                const items = payload.items || [];
-
-                state.items = items;
-                state.totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-                state.subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                state.shipping = payload.shipping || 0; // Keep shipping from backend if available
-                state.total = state.subtotal + state.shipping;
+                const payload = action.payload as ICartResponse;
+                const items = payload.data?.items || [];
+                applyCartTotals(state, items, payload.data?.shipping);
                 state.loading = false;
             })
             .addCase(fetchCart.rejected, handleRejected);
@@ -168,14 +172,9 @@ const cartSlice = createSlice({
                 state.error = null;
             })
             .addCase(addToCart.fulfilled, (state, action) => {
-                const payload = action.payload as { items: ICartItem[], shipping?: number };
-                const items = payload.items || [];
-
-                state.items = items;
-                state.totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-                state.subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                state.shipping = payload.shipping || 0;
-                state.total = state.subtotal + state.shipping;
+                const payload = action.payload as ICartResponse;
+                const items = payload.data?.items || [];
+                applyCartTotals(state, items, payload.data?.shipping);
                 state.loading = false;
             })
             .addCase(addToCart.rejected, handleRejected);
@@ -187,14 +186,9 @@ const cartSlice = createSlice({
                 state.error = null;
             })
             .addCase(updateCartItem.fulfilled, (state, action) => {
-                const payload = action.payload as { items: ICartItem[], shipping?: number };
-                const items = payload.items || [];
-
-                state.items = items;
-                state.totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-                state.subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                state.shipping = payload.shipping || 0;
-                state.total = state.subtotal + state.shipping;
+                const payload = action.payload as ICartResponse;
+                const items = payload.data?.items || [];
+                applyCartTotals(state, items, payload.data?.shipping);
                 state.loading = false;
             })
             .addCase(updateCartItem.rejected, handleRejected);
@@ -202,14 +196,9 @@ const cartSlice = createSlice({
         builder
             .addCase(removeFromCart.pending, handlePending)
             .addCase(removeFromCart.fulfilled, (state, action) => {
-                const payload = action.payload as { items: ICartItem[], shipping?: number };
-                const items = payload.items || [];
-
-                state.items = items;
-                state.totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-                state.subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                state.shipping = payload.shipping || 0;
-                state.total = state.subtotal + state.shipping;
+                const payload = action.payload as ICartResponse;
+                const items = payload.data?.items || [];
+                applyCartTotals(state, items, payload.data?.shipping);
                 state.loading = false;
             })
             .addCase(removeFromCart.rejected, handleRejected);
@@ -217,11 +206,10 @@ const cartSlice = createSlice({
         // Clear cart can be an exception where we optimistically clear the state
         builder
             .addCase(clearCart.pending, handlePending)
-            .addCase(clearCart.fulfilled, (state) => {
-                state.items = [];
-                state.totalItems = 0;
-                state.subtotal = 0;
-                state.total = 0;
+            .addCase(clearCart.fulfilled, (state, action) => {
+                const payload = action.payload as ICartResponse;
+                const items = payload.data?.items || [];
+                applyCartTotals(state, items, payload.data?.shipping);
                 state.loading = false;
             })
             .addCase(clearCart.rejected, handleRejected);
@@ -235,4 +223,4 @@ export const {
     decrementQuantity
 } = cartSlice.actions;
 
-export default cartSlice.reducer; 
+export default cartSlice.reducer;
