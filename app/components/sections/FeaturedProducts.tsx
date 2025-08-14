@@ -44,8 +44,12 @@ export default function FeaturedProducts() {
         {products.map((product: IProduct) => (
           <ProductCard
             key={product.id}
-            {...product}
-            images={product.images || []}
+            id={product.id}
+            name={product.name}
+            price={product.price}
+            discountedPrice={product.discountedPrice}
+            images={product.images}
+            category={product.category}
           />
         ))}
       </div>

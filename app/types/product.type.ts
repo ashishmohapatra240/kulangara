@@ -102,6 +102,16 @@ export interface IProductListResponse {
     };
 }
 
+export interface ICategory {
+    id: string;
+    name: string;
+    slug: string;
+}
+
+export interface ICategoryListResponse {
+    data: ICategory[];
+}
+
 export interface IProductSearchParams {
     page?: number;
     limit?: number;
@@ -139,6 +149,7 @@ export interface IUpdateProductData {
     care?: string[];
     material?: string;
     gender?: string;
+    isFeatured?: boolean;
 }
 
 export interface ICreateVariantData {

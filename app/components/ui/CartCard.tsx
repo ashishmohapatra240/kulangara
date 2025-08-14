@@ -56,12 +56,21 @@ export default function CartCard({
             {item.product.name}
           </h2>
         </Link>
-        <p className="text-base mt-1">₹{item.price.toLocaleString()}.00</p>
+        <p className="text-base mt-1">
+          {item.product.discountedPrice && item.product.discountedPrice < item.price ? (
+            <>
+              ₹{item.product.discountedPrice.toLocaleString()}.00{' '}
+              <span className="text-gray-500 line-through text-sm">₹{item.price.toLocaleString()}.00</span>
+            </>
+          ) : (
+            <>₹{item.price.toLocaleString()}.00</>
+          )}
+        </p>
 
         {/* Show variant info if available */}
-        {item.variant && (
+        {item.variant && typeof item.variant === 'object' && (
           <p className="text-sm text-gray-500 mt-1">
-            Size: {item.variant.size} | Color: {item.variant.color}
+            Size: {item.variant?.size || "N/A"} | Color: {item.variant?.color || "Standard"}
           </p>
         )}
 
@@ -96,7 +105,14 @@ export default function CartCard({
 
       <div className="text-right">
         <p className="font-medium">
-          ₹{(item.price * item.quantity).toLocaleString()}.00
+          {item.product.discountedPrice && item.product.discountedPrice < item.price ? (
+            <>
+              ₹{(item.product.discountedPrice * item.quantity).toLocaleString()}.00{' '}
+              <span className="text-gray-500 line-through text-sm">₹{(item.price * item.quantity).toLocaleString()}.00</span>
+            </>
+          ) : (
+            <>₹{(item.price * item.quantity).toLocaleString()}.00</>
+          )}
         </p>
       </div>
     </div>
