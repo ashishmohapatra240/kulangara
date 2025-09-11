@@ -30,7 +30,7 @@ export default function Hero() {
             fill
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-opacity-30 flex items-center justify-center text-white z-10">
+          <div className="absolute inset-0 bg-opacity-30 flex items-center justify-center text-black z-10">
             <div className="text-center space-y-4">
               <h1 className="text-5xl font-medium">{slide.title}</h1>
               <p className="text-xl">{slide.description}</p>
