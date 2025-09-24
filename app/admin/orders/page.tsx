@@ -12,7 +12,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AdminLayout from "@/app/components/layout/AdminLayout";
 import { useAdminUsers } from "@/app/hooks/useAdminUserManagement";
-import { FiSearch, FiCalendar } from "react-icons/fi";
+import { FiSearch } from "react-icons/fi";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN", "DELIVERY_PARTNER"];
 const ORDER_STATUSES = [

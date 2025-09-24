@@ -21,7 +21,6 @@ import {
 export const useCheckout = () => {
   const queryClient = useQueryClient();
   const {
-    processRazorpayPayment,
     processRazorpayPaymentFromCart,
     paymentStatus,
     resetPaymentStatus,

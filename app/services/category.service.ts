@@ -5,8 +5,6 @@ import {
     ICategoryFilters, 
     ICategoryCreate, 
     ICategoryUpdate, 
-    ICategoryResponse,
-    ICategoryDetailsResponse 
 } from '../types/category.type';
 
 const categoryService = {
