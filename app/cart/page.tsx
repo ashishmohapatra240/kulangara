@@ -27,7 +27,7 @@ export default function CartPage() {
     isValidating
   } = useCartValidation();
 
-  const [showStockWarning, setShowStockWarning] = useState(false);
+  const [, setShowStockWarning] = useState(false);
 
   const isCartLoading =
     loading || updateLoading || removeLoading || clearLoading;

@@ -3,7 +3,6 @@
 import { useAuth } from "@/app/hooks/useAuth";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-// import AdminLayout from "@/app/components/layout/AgetGrowthIcondminLayout";
 import { useQuery } from "@tanstack/react-query";
 import adminService from "@/app/services/admin.service";
 import { useAdminOrderAnalytics } from "@/app/hooks/useAdminOrderAnalytics";
@@ -74,20 +73,6 @@ export default function AnalyticsPage() {
   const formatNumber = (num: number | undefined | null) => {
     if (typeof num !== "number" || isNaN(num)) return "0";
     return new Intl.NumberFormat("en-IN").format(num);
-  };
-
-  const getGrowthIcon = (growth: number | undefined) => {
-    if (growth === undefined || growth === null) return null;
-    return growth >= 0 ? (
-      <FiTrendingUp className="w-4 h-4 text-green-600" />
-    ) : (
-      <FiTrendingDown className="w-4 h-4 text-red-600" />
-    );
-  };
-
-  const getGrowthColor = (growth: number | undefined) => {
-    if (growth === undefined || growth === null) return "text-gray-600";
-    return growth >= 0 ? "text-green-600" : "text-red-600";
   };
 
   const formatGrowth = (growth: number | undefined) => {
