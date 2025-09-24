@@ -27,7 +27,7 @@ const SystemHealth = ({ stats, isLoading }: SystemHealthProps) => {
     }
   };
 
-  const getStatusBorder = (status: "healthy" | "warning" | "critical") => {
+  const getStatusBorder = () => {
     return "border-2 border-black";
   };
 
@@ -70,9 +70,7 @@ const SystemHealth = ({ stats, isLoading }: SystemHealthProps) => {
       {/* Overall Status */}
       {stats.systemHealth && (
         <div
-          className={`flex items-center space-x-4 p-6 ${getStatusBorder(
-            stats.systemHealth.status
-          )} mb-8 bg-white`}
+          className={`flex items-center space-x-4 p-6 ${getStatusBorder()} mb-8 bg-white`}
         >
           {getStatusIcon(stats.systemHealth.status)}
           <div>
