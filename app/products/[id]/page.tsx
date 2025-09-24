@@ -13,7 +13,6 @@ import {
   FaShieldAlt,
   FaHeart,
   FaRegHeart,
-  FaShare,
   FaChevronLeft,
   FaChevronRight,
   FaStar,

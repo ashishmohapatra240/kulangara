@@ -3,7 +3,7 @@
 import { useAuth } from "@/app/hooks/useAuth";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import AdminLayout from "@/app/components/layout/AdminLayout";
+// import AdminLayout from "@/app/components/layout/AgetGrowthIcondminLayout";
 import { useQuery } from "@tanstack/react-query";
 import adminService from "@/app/services/admin.service";
 import { useAdminOrderAnalytics } from "@/app/hooks/useAdminOrderAnalytics";
@@ -14,6 +14,7 @@ import {
   FiShoppingCart,
   FiDollarSign,
 } from "react-icons/fi";
+import AdminLayout from "@/app/components/layout/AdminLayout";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN"];
 
@@ -118,6 +119,7 @@ export default function AnalyticsPage() {
             <div className="flex-shrink-0">
               <select
                 value={dateRange}
+
                 onChange={(e) => setDateRange(e.target.value)}
                 className="px-6 py-3 border-2 border-black bg-white text-black font-bold focus:outline-none min-w-[160px] tracking-wide"
               >

@@ -4,6 +4,7 @@ import { useAuth } from "@/app/hooks/useAuth";
 import { useAdminCategories, useDeleteCategory } from "@/app/hooks/useCategories";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import AdminLayout from "@/app/components/layout/AdminLayout";
 import Button from "@/app/components/ui/Button";
 import CategoryManagement from "@/app/components/admin/CategoryManagement";
@@ -135,10 +136,12 @@ export default function AdminCategoriesPage() {
                                             <td className="px-8 py-6 border-r border-gray-200">
                                                 <div className="flex items-center">
                                                     {category.image && (
-                                                        <img
+                                                        <Image
                                                             src={category.image}
                                                             alt={category.name}
-                                                            className="w-12 h-12 object-cover mr-4 border-2 border-black"
+                                                            width={48}
+                                                            height={48}
+                                                            className="object-cover mr-4 border-2 border-black"
                                                         />
                                                     )}
                                                     <div>
@@ -221,7 +224,7 @@ export default function AdminCategoriesPage() {
                         <div className="p-8 border-2 border-black">
                             <h3 className="text-2xl font-bold text-black mb-6 tracking-tight">DELETE CATEGORY</h3>
                             <p className="text-black font-medium mb-6 tracking-wide">
-                                ARE YOU SURE YOU WANT TO DELETE THE CATEGORY "{deleteCategory.name.toUpperCase()}"?
+                                ARE YOU SURE YOU WANT TO DELETE THE CATEGORY &quot;{deleteCategory.name.toUpperCase()}&quot;?
                                 {deleteCategory._count?.products && deleteCategory._count.products > 0 && (
                                     <span className="block mt-4 text-black font-bold tracking-wide border-2 border-black p-4">
                                         THIS CATEGORY HAS {deleteCategory._count.products} PRODUCT(S) AND CANNOT BE DELETED.
