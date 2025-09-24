@@ -39,80 +39,84 @@ function AdminLoginContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex bg-white">
       <Toaster position="top-right" />
       {/* Image container - hidden on mobile */}
-      <div className="hidden lg:block w-1/2 h-screen mt-30">
+      <div className="hidden lg:block w-1/2 h-screen bg-black">
         <Image
           src="/images/coming-soon.jpg"
           alt="Admin Login background"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover opacity-70"
           height={1000}
           width={1000}
         />
       </div>
 
       {/* Form container */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Admin Login
-            </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
-              Only for Admins, Superadmins, and Delivery Partners
-            </p>
-          </div>
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="email" className="sr-only">
-                  Email address
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 sm:text-sm"
-                  placeholder="Email address"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <label htmlFor="password" className="sr-only">
-                  Password
-                </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 sm:text-sm"
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                />
-              </div>
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-8 py-12 bg-white">
+        <div className="max-w-md w-full">
+          <div className="border-2 border-black p-12">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-black tracking-tight mb-4">
+                ADMIN LOGIN
+              </h2>
+              <p className="text-sm font-medium text-gray-600 tracking-wide">
+                ONLY FOR ADMINS, SUPERADMINS, AND DELIVERY PARTNERS
+              </p>
             </div>
+            <form className="space-y-8" onSubmit={handleSubmit}>
+              <div className="space-y-6">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-bold text-black mb-3 tracking-widest">
+                    EMAIL ADDRESS
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    className="w-full px-4 py-4 border-2 border-black placeholder:text-gray-500 text-black font-medium focus:outline-none"
+                    placeholder="ENTER YOUR EMAIL ADDRESS"
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <label htmlFor="password" className="block text-sm font-bold text-black mb-3 tracking-widest">
+                    PASSWORD
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                    className="w-full px-4 py-4 border-2 border-black placeholder:text-gray-500 text-black font-medium focus:outline-none"
+                    placeholder="ENTER YOUR PASSWORD"
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
 
-            {error && <div className="text-red-500 text-center">{error}</div>}
+              {error && <div className="text-black font-bold text-center p-4 border-2 border-black tracking-wide">{error.toUpperCase()}</div>}
 
-            <div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign in"}
-              </Button>
+              <div>
+                <Button type="submit" className="w-full py-4 font-bold tracking-widest" disabled={isLoading}>
+                  {isLoading ? "SIGNING IN..." : "SIGN IN"}
+                </Button>
+              </div>
+            </form>
+            <div className="text-center mt-8">
+              <a href="/admin/register" className="text-black font-bold tracking-widest border-b-2 border-black hover:bg-black hover:text-white transition-colors px-2 py-1">
+                ADMIN REGISTRATION
+              </a>
             </div>
-          </form>
-          <div className="text-center mt-4">
-            <a href="/admin/register" className="text-black underline">Admin Registration</a>
           </div>
         </div>
       </div>
@@ -122,7 +126,7 @@ function AdminLoginContent() {
 
 export default function AdminLoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-white"><h1 className="text-3xl font-bold tracking-tight">LOADING...</h1></div>}>
       <AdminLoginContent />
     </Suspense>
   );

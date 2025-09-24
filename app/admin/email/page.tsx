@@ -39,27 +39,27 @@ export default function EmailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white border-0">
-        <h1 className="text-2xl font-bold">Loading...</h1>
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <h1 className="text-3xl font-bold tracking-tight">LOADING...</h1>
       </div>
     );
   }
 
   if (!isAuthenticated) {
-    return null; // Will redirect
+    return null
   }
 
   return (
     <AdminLayout>
-      <div className="pt-30">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-normal">Email Composer</h1>
+      <div className="min-h-screen bg-white">
+        <div className="flex justify-between items-center pt-30 mb-12 pb-6 border-b-2 border-black">
+          <h1 className="text-4xl font-bold tracking-tight">EMAIL COMPOSER</h1>
           <button
             onClick={() => setShowPreview(!showPreview)}
-            className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-0 hover:bg-gray-50"
+            className="flex items-center space-x-3 px-6 py-3 border-2 border-black hover:bg-black hover:text-white transition-colors font-bold tracking-widest"
           >
-            {showPreview ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
-            <span>{showPreview ? "Hide Preview" : "Show Preview"}</span>
+            {showPreview ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
+            <span>{showPreview ? "HIDE PREVIEW" : "SHOW PREVIEW"}</span>
           </button>
         </div>
 
@@ -67,12 +67,12 @@ export default function EmailPage() {
           {/* Email Form */}
           <div className="space-y-6">
             {/* Template Selection */}
-            <div className="bg-white border border-gray-200 rounded-0 p-6">
-              <h2 className="text-lg font-medium mb-4">Email Template</h2>
+            <div className="bg-white border-2 border-black p-8">
+              <h2 className="text-2xl font-bold mb-6 tracking-tight">EMAIL TEMPLATE</h2>
               <select
                 value={emailData.template}
                 onChange={(e) => handleTemplateChange(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-0 focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full px-4 py-3 border-2 border-black focus:outline-none font-medium"
               >
                 <option value="">Select a template</option>
                 {EMAIL_TEMPLATES.map((template) => (
@@ -84,15 +84,15 @@ export default function EmailPage() {
             </div>
 
             {/* Recipients */}
-            <div className="bg-white border border-gray-200 rounded-0 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-medium">Recipients</h2>
+            <div className="bg-white border-2 border-black p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold tracking-tight">RECIPIENTS</h2>
                 <button
                   onClick={addRecipient}
-                  className="flex items-center space-x-2 px-3 py-1 text-sm bg-black text-white rounded-0 hover:bg-gray-800 cursor-pointer"
+                  className="flex items-center space-x-3 px-4 py-2 text-sm bg-black text-white hover:bg-white hover:text-black border-2 border-black transition-colors cursor-pointer font-bold tracking-widest"
                 >
-                  <FiUsers className="w-4 h-4" />
-                  <span>Add Recipient</span>
+                  <FiUsers className="w-5 h-5" />
+                  <span>ADD RECIPIENT</span>
                 </button>
               </div>
               <div className="space-y-3">
@@ -102,50 +102,50 @@ export default function EmailPage() {
                       type="email"
                       value={email}
                       onChange={(e) => updateRecipient(index, e.target.value)}
-                      placeholder="Enter email address"
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-0 focus:outline-none focus:ring-2 focus:ring-black"
+                      placeholder="ENTER EMAIL ADDRESS"
+                      className="flex-1 px-4 py-3 border-2 border-black focus:outline-none font-medium placeholder:text-gray-500"
                     />
                     <button
                       onClick={() => removeRecipient(index)}
-                      className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-0"
+                      className="px-4 py-3 text-black border-2 border-black hover:bg-black hover:text-white transition-colors font-bold tracking-widest"
                     >
-                      Remove
+                      REMOVE
                     </button>
                   </div>
                 ))}
                 {emailData.to.length === 0 && (
-                  <p className="text-gray-500 text-sm">No recipients added</p>
+                  <p className="text-gray-600 text-sm font-medium tracking-wide">NO RECIPIENTS ADDED</p>
                 )}
               </div>
             </div>
 
             {/* Email Content */}
-            <div className="bg-white border border-gray-200 rounded-0 p-6">
-              <h2 className="text-lg font-medium mb-4">Email Content</h2>
+            <div className="bg-white border-2 border-black p-8">
+              <h2 className="text-2xl font-bold mb-6 tracking-tight">EMAIL CONTENT</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Subject *
+                  <label className="block text-sm font-bold text-black mb-3 tracking-widest">
+                    SUBJECT *
                   </label>
                   <input
                     type="text"
                     value={emailData.subject}
                     onChange={(e) => setEmailData({ ...emailData, subject: e.target.value })}
-                    placeholder="Enter email subject"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-0 focus:outline-none focus:ring-2 focus:ring-black"
+                    placeholder="ENTER EMAIL SUBJECT"
+                    className="w-full px-4 py-3 border-2 border-black focus:outline-none font-medium placeholder:text-gray-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Preview Text
+                  <label className="block text-sm font-bold text-black mb-3 tracking-widest">
+                    PREVIEW TEXT
                   </label>
                   <input
                     type="text"
                     value={emailData.previewText}
                     onChange={(e) => setEmailData({ ...emailData, previewText: e.target.value })}
-                    placeholder="Brief preview text (optional)"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-0 focus:outline-none focus:ring-2 focus:ring-black"
+                    placeholder="BRIEF PREVIEW TEXT (OPTIONAL)"
+                    className="w-full px-4 py-3 border-2 border-black focus:outline-none font-medium placeholder:text-gray-500"
                   />
                 </div>
 
@@ -205,47 +205,47 @@ export default function EmailPage() {
             </div>
 
             {/* Send Button */}
-            <div className="bg-white border border-gray-200 rounded-0 p-6">
+            <div className="bg-white border-2 border-black p-8">
               <button
                 onClick={handleSendEmail}
                 disabled={sendEmailMutation.isPending}
-                className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-black text-white rounded-0 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="w-full flex items-center justify-center space-x-3 px-8 py-4 bg-black text-white hover:bg-white hover:text-black border-2 border-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer font-bold tracking-widest"
               >
-                <FiSend className="w-5 h-5" />
-                <span>{sendEmailMutation.isPending ? "Sending..." : "Send Email"}</span>
+                <FiSend className="w-6 h-6" />
+                <span>{sendEmailMutation.isPending ? "SENDING..." : "SEND EMAIL"}</span>
               </button>
             </div>
           </div>
 
           {/* Email Preview */}
           {showPreview && (
-            <div className="bg-white border border-gray-200 rounded-0 p-6">
-              <h2 className="text-lg font-medium mb-4">Email Preview</h2>
-              <div className="border border-gray-300 rounded-0 p-4 bg-gray-50">
-                <div className="mb-4">
-                  <p className="text-sm text-gray-600">To: {emailData.to.join(", ") || "No recipients"}</p>
-                  <p className="text-sm text-gray-600">Subject: {emailData.subject || "No subject"}</p>
+            <div className="bg-white border-2 border-black p-8">
+              <h2 className="text-2xl font-bold mb-6 tracking-tight">EMAIL PREVIEW</h2>
+              <div className="border-2 border-black p-6 bg-white">
+                <div className="mb-6 pb-4 border-b-2 border-black">
+                  <p className="text-sm font-bold text-black tracking-wide">TO: {emailData.to.join(", ") || "NO RECIPIENTS"}</p>
+                  <p className="text-sm font-bold text-black tracking-wide">SUBJECT: {emailData.subject || "NO SUBJECT"}</p>
                   {emailData.previewText && (
-                    <p className="text-sm text-gray-600">Preview: {emailData.previewText}</p>
+                    <p className="text-sm font-medium text-gray-600 tracking-wide">PREVIEW: {emailData.previewText}</p>
                   )}
                 </div>
                 <div
-                  className="prose max-w-none"
-                  dangerouslySetInnerHTML={{ __html: emailData.body || "<p>No content</p>" }}
+                  className="prose max-w-none text-black"
+                  dangerouslySetInnerHTML={{ __html: emailData.body || "<p>NO CONTENT</p>" }}
                 />
                 {emailData.buttonText && emailData.buttonUrl && (
-                  <div className="mt-4">
+                  <div className="mt-6">
                     <a
                       href={emailData.buttonUrl}
-                      className="inline-block px-6 py-2 bg-black text-white rounded-0 hover:bg-gray-800"
+                      className="inline-block px-6 py-3 bg-black text-white hover:bg-white hover:text-black border-2 border-black transition-colors font-bold tracking-widest"
                     >
-                      {emailData.buttonText}
+                      {emailData.buttonText.toUpperCase()}
                     </a>
                   </div>
                 )}
                 {emailData.footerText && (
-                  <div className="mt-4 pt-4 border-t border-gray-300">
-                    <p className="text-sm text-gray-600">{emailData.footerText}</p>
+                  <div className="mt-6 pt-4 border-t-2 border-black">
+                    <p className="text-sm font-medium text-gray-600 tracking-wide">{emailData.footerText}</p>
                   </div>
                 )}
               </div>

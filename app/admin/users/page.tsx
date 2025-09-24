@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import AdminLayout from "@/app/components/layout/AdminLayout";
 import { IUser, IUserFilters } from "@/app/types/admin.type";
-import { FiSearch, FiEdit, FiEye, FiUserCheck, FiUserX } from "react-icons/fi";
+import { FiSearch, FiUserCheck, FiUserX } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { useAdminUsers, useUpdateUserRole, useUpdateUserStatus } from "@/app/hooks/useAdminUserManagement";
 
@@ -97,35 +97,35 @@ export default function UsersPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "ACTIVE":
-        return "text-green-600 bg-green-100";
+        return "bg-black text-white";
       case "INACTIVE":
-        return "text-gray-600 bg-gray-100";
+        return "bg-white text-black border border-black";
       case "SUSPENDED":
-        return "text-red-600 bg-red-100";
+        return "bg-white text-black border border-black";
       default:
-        return "text-gray-600 bg-gray-100";
+        return "bg-gray-200 text-black";
     }
   };
 
   const getRoleColor = (role: string) => {
     switch (role) {
       case "SUPER_ADMIN":
-        return "text-purple-600 bg-purple-100";
+        return "bg-black text-white";
       case "ADMIN":
-        return "text-blue-600 bg-blue-100";
+        return "bg-gray-800 text-white";
       case "DELIVERY_PARTNER":
-        return "text-orange-600 bg-orange-100";
+        return "bg-gray-600 text-white";
       case "CUSTOMER":
-        return "text-green-600 bg-green-100";
+        return "bg-white text-black border border-black";
       default:
-        return "text-gray-600 bg-gray-100";
+        return "bg-gray-200 text-black";
     }
   };
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white border-0">
-        <h1 className="text-2xl font-bold">Loading...</h1>
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <h1 className="text-3xl font-bold tracking-tight">LOADING...</h1>
       </div>
     );
   }
@@ -136,42 +136,42 @@ export default function UsersPage() {
 
   return (
     <AdminLayout>
-      <div className="pt-30">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-normal">User Management</h1>
+      <div className="min-h-screen bg-white">
+        <div className="flex justify-between items-center pt-30 mb-12 pb-6 border-b-2 border-black">
+          <h1 className="text-4xl font-bold tracking-tight">USER MANAGEMENT</h1>
         </div>
 
         {usersError && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-0">
-            <p className="text-red-800">Error loading users. Please try refreshing.</p>
+          <div className="mb-8 p-6 border-2 border-black bg-white">
+            <p className="text-black font-bold tracking-wide">ERROR LOADING USERS. PLEASE TRY REFRESHING.</p>
           </div>
         )}
 
-        <div className="space-y-6">
+        <div className="space-y-12">
           {/* Filters */}
-          <div className="bg-white border border-gray-200 rounded-0 p-6">
-            <h2 className="text-lg font-medium mb-4">Filters</h2>
+          <div className="bg-white border-2 border-black p-8">
+            <h2 className="text-2xl font-bold mb-8 tracking-tight">FILTERS</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                <label className="block text-sm font-bold text-black mb-3 tracking-widest">SEARCH</label>
                 <div className="relative">
-                  <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
                   <input
                     type="text"
                     value={filters.search}
                     onChange={(e) => handleFilterChange("search", e.target.value)}
-                    placeholder="Search by name or email"
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="SEARCH BY NAME OR EMAIL"
+                    className="w-full pl-12 pr-4 py-3 border-2 border-black focus:outline-none font-medium placeholder:text-gray-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                <label className="block text-sm font-bold text-black mb-3 tracking-widest">ROLE</label>
                 <select
                   value={filters.role}
                   onChange={(e) => handleFilterChange("role", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border-2 border-black focus:outline-none font-medium"
                 >
                   <option value="">All Roles</option>
                   {ROLES.map((role) => (
@@ -183,11 +183,11 @@ export default function UsersPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                <label className="block text-sm font-bold text-black mb-3 tracking-widest">STATUS</label>
                 <select
                   value={filters.status}
                   onChange={(e) => handleFilterChange("status", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border-2 border-black focus:outline-none font-medium"
                 >
                   <option value="">All Statuses</option>
                   {STATUSES.map((status) => (
@@ -199,11 +199,11 @@ export default function UsersPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Limit</label>
+                <label className="block text-sm font-bold text-black mb-3 tracking-widest">LIMIT</label>
                 <select
                   value={filters.limit}
                   onChange={(e) => handleFilterChange("limit", parseInt(e.target.value))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border-2 border-black focus:outline-none font-medium"
                 >
                   <option value={10}>10 per page</option>
                   <option value={25}>25 per page</option>
@@ -222,21 +222,21 @@ export default function UsersPage() {
                       search: "",
                     })
                   }
-                  className="w-full px-4 py-2 bg-gray-600 text-white rounded-0 hover:bg-gray-700"
+                  className="w-full px-4 py-3 bg-black text-white border-2 border-black font-bold tracking-widest hover:bg-white hover:text-black transition-colors"
                 >
-                  Clear Filters
+                  CLEAR FILTERS
                 </button>
               </div>
             </div>
           </div>
 
           {/* Users Table */}
-          <div className="bg-white border border-gray-200 rounded-0 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-medium">Users</h2>
+          <div className="bg-white border-2 border-black overflow-hidden">
+            <div className="px-8 py-6 border-b-2 border-black bg-white">
+              <h2 className="text-2xl font-bold text-black tracking-tight">USERS</h2>
               {usersData && usersData.meta && (
-                <p className="text-sm text-gray-600 mt-1">
-                  Showing {((usersData?.meta?.page ?? 1) - 1) * (usersData?.meta?.limit ?? 10) + 1} to {Math.min((usersData?.meta?.page ?? 1) * (usersData?.meta?.limit ?? 10), usersData?.meta?.total ?? 0)} of {usersData?.meta?.total ?? 0} users
+                <p className="text-sm font-medium text-black mt-2 tracking-wide">
+                  SHOWING {((usersData?.meta?.page ?? 1) - 1) * (usersData?.meta?.limit ?? 10) + 1} TO {Math.min((usersData?.meta?.page ?? 1) * (usersData?.meta?.limit ?? 10), usersData?.meta?.total ?? 0)} OF {usersData?.meta?.total ?? 0} USERS
                 </p>
               )}
             </div>
@@ -263,14 +263,10 @@ export default function UsersPage() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Joined
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {users.map((userItem) => {
-                        // Use status field directly
                         const status = userItem.status;
                         return (
                           <tr key={userItem.id} className="hover:bg-gray-50">
@@ -318,22 +314,6 @@ export default function UsersPage() {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {new Date(userItem.createdAt).toLocaleDateString()}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                              <div className="flex space-x-2">
-                                <button
-                                  onClick={() => router.push(`/admin/users/${userItem.id}`)}
-                                  className="text-blue-600 hover:text-blue-900"
-                                >
-                                  <FiEye className="w-4 h-4" />
-                                </button>
-                                <button
-                                  onClick={() => router.push(`/admin/users/${userItem.id}/edit`)}
-                                  className="text-green-600 hover:text-green-900"
-                                >
-                                  <FiEdit className="w-4 h-4" />
-                                </button>
-                              </div>
                             </td>
                           </tr>
                         );

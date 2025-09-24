@@ -17,7 +17,16 @@ const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN", "DELIVERY_PARTNER"];
 export default function AdminPage() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
-  const { dashboardStats, activityLog, isLoading: dashboardLoading, hasError, refreshAll, lastUpdated } = useAdminDashboard();
+  const {
+    dashboardStats,
+    orderAnalytics,
+    userAnalytics,
+    activityLog,
+    isLoading: dashboardLoading,
+    hasError,
+    refreshAll,
+    lastUpdated,
+  } = useAdminDashboard();
 
   useEffect(() => {
     if (!isLoading) {
@@ -34,90 +43,100 @@ export default function AdminPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white border-0">
-        <h1 className="text-2xl font-bold">Loading...</h1>
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <h1 className="text-3xl font-bold tracking-tight">LOADING...</h1>
       </div>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-white border-0">
-        <h1 className="text-2xl font-bold mb-4">Admin Panel</h1>
-        <p className="mb-6">You must be an admin, superadmin, or delivery partner to access this page.</p>
-        <Link href="/admin/login" className="px-6 py-2 bg-black text-white border-2 border-black font-medium">Admin Login</Link>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white">
+        <h1 className="text-4xl font-bold mb-8 tracking-tight">ADMIN PANEL</h1>
+        <p className="mb-8 text-gray-600 font-medium tracking-wide text-center max-w-md">
+          YOU MUST BE AN ADMIN, SUPERADMIN, OR DELIVERY PARTNER TO ACCESS THIS
+          PAGE.
+        </p>
+        <Link
+          href="/admin/login"
+          className="px-8 py-4 bg-black text-white border-2 border-black font-bold tracking-widest hover:bg-white hover:text-black transition-colors"
+        >
+          ADMIN LOGIN
+        </Link>
       </div>
     );
   }
 
   return (
     <AdminLayout>
-      <div className="pt-30">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-normal">Dashboard</h1>
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
-            <FiClock className="w-4 h-4" />
-            <span>Last updated: {lastUpdated?.toLocaleTimeString?.() ?? "—"}</span>
+      <div className="min-h-screen bg-white">
+        <div className="flex justify-between items-center pt-30 mb-12 pb-6 border-b-2 border-black">
+          <h1 className="text-4xl font-bold tracking-tight">DASHBOARD</h1>
+          <div className="flex items-center space-x-3 text-sm text-gray-600">
+            <FiClock className="w-5 h-5" />
+            <span className="font-medium tracking-wide">
+              LAST UPDATED: {lastUpdated?.toLocaleTimeString?.() ?? "—"}
+            </span>
           </div>
         </div>
 
         {hasError && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-0">
-            <p className="text-red-800">Error loading dashboard data. Please try refreshing.</p>
+          <div className="mb-8 p-6 border-2 border-black bg-white">
+            <p className="text-black font-bold tracking-wide">
+              ERROR LOADING DASHBOARD DATA. PLEASE TRY REFRESHING.
+            </p>
           </div>
         )}
 
-        <div className="space-y-8">
-          {/* Welcome Section */}
-          <div className="border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-normal">Welcome</h2>
-            </div>
-            <div className="p-6">
-              <p className="text-gray-900 mb-4">
-                Welcome back, {user ? `${user.firstName} (${user.role})` : ""}!
+        <div className="space-y-12">
+          <section className="border-2 border-black bg-white">
+            <div className="p-8">
+              <p className="text-xl font-bold text-black mb-6 tracking-wide">
+                WELCOME BACK,{" "}
+                {user ? `${user.firstName.toUpperCase()} (${user.role})` : ""}!
               </p>
-              <p className="text-gray-600">
-                Use the navigation menu to manage orders, users, view analytics, and send emails.
+              <p className="text-gray-600 font-medium tracking-wide leading-relaxed">
+                Use the navigation menu to manage orders, users, view analytics,
+                and send emails.
               </p>
             </div>
-          </div>
+          </section>
 
-          {/* Key Metrics */}
-          <div className="border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-normal">Key Metrics</h2>
+          <section>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold tracking-tight border-b-2 border-black pb-4">
+                KEY METRICS
+              </h2>
             </div>
-            <div className="p-6">
-              {dashboardStats ? (
-                <MetricsCards stats={dashboardStats} isLoading={dashboardLoading} />
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">No metrics available</p>
-                </div>
-              )}
-            </div>
-          </div>
+            <MetricsCards
+              stats={dashboardStats}
+              orderAnalytics={orderAnalytics}
+              userAnalytics={userAnalytics}
+              isLoading={dashboardLoading}
+            />
+          </section>
 
-          {/* Quick Actions and System Health */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <QuickActions onRefresh={refreshAll} isRefreshing={dashboardLoading} />
+          <section className="grid grid-cols-1 xl:grid-cols-2 gap-12">
+            <QuickActions
+              onRefresh={refreshAll}
+              isRefreshing={dashboardLoading}
+            />
             {dashboardStats && (
-              <SystemHealth stats={dashboardStats} isLoading={dashboardLoading} />
+              <SystemHealth
+                stats={dashboardStats}
+                isLoading={dashboardLoading}
+              />
             )}
-          </div>
+          </section>
 
-          {/* Recent Activity */}
-          <div className="border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-normal">Recent Activity</h2>
-            </div>
-            <div className="p-6">
-              <ActivityFeed activities={activityLog} isLoading={dashboardLoading} />
-            </div>
-          </div>
+          <section>
+            <ActivityFeed
+              activities={activityLog}
+              isLoading={dashboardLoading}
+            />
+          </section>
         </div>
       </div>
     </AdminLayout>
   );
-} 
+}
