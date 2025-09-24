@@ -41,7 +41,7 @@ export interface IOrder {
         phone: string;
     };
     paymentMethod: string;
-    paymentStatus: 'PENDING' | 'COMPLETED' | 'FAILED';
+    paymentStatus: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED' | 'PARTIAL_REFUND';
     subtotal: number;
     shippingFee: number;
     taxAmount: number;
@@ -65,6 +65,8 @@ export interface IOrderRequest {
         quantity: number;
     }>;
     couponCode?: string;
+    status?: 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'CANCELLED' | 'RETURNED' | 'REFUNDED';
+    paymentStatus?: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED' | 'PARTIAL_REFUND';
 }
 
 export interface IOrderResponse {
@@ -97,6 +99,17 @@ export interface ITrackingHistoryItem {
     note: string;
     updatedBy: string | null;
     createdAt: string;
+}
+
+export interface IOrderFilters {
+    page?: number;
+    limit?: number;
+    status?: string;
+    paymentStatus?: string;
+    paymentMethod?: string;
+    search?: string;
+    startDate?: string;
+    endDate?: string;
 }
 
 export interface IOrderTrackingServiceResponse {
