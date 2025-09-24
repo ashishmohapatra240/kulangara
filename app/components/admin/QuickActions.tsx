@@ -24,40 +24,40 @@ const QuickActions = ({ onRefresh, isRefreshing }: QuickActionsProps) => {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-0 p-6">
-      <h2 className="text-xl font-normal mb-4">Quick Actions</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="bg-white border-2 border-black p-8">
+      <h2 className="text-2xl font-bold mb-8 tracking-tight">QUICK ACTIONS</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <button
           onClick={handleSendEmail}
-          className="flex items-center justify-center p-4 border border-gray-200 rounded-0 hover:bg-gray-50 transition-colors"
+          className="flex items-center p-6 border-2 border-black hover:bg-black hover:text-white transition-colors group"
         >
-          <FiMail className="w-5 h-5 text-blue-600 mr-3" />
-          <span className="font-medium">Send Email</span>
+          <FiMail className="w-6 h-6 text-black group-hover:text-white mr-4" />
+          <span className="font-bold text-sm tracking-widest">SEND EMAIL</span>
         </button>
 
         <button
           onClick={handleViewUsers}
-          className="flex items-center justify-center p-4 border border-gray-200 rounded-0 hover:bg-gray-50 transition-colors"
+          className="flex items-center p-6 border-2 border-black hover:bg-black hover:text-white transition-colors group"
         >
-          <FiUsers className="w-5 h-5 text-green-600 mr-3" />
-          <span className="font-medium">View Users</span>
+          <FiUsers className="w-6 h-6 text-black group-hover:text-white mr-4" />
+          <span className="font-bold text-sm tracking-widest">VIEW USERS</span>
         </button>
 
         <button
           onClick={handleViewAnalytics}
-          className="flex items-center justify-center p-4 border border-gray-200 rounded-0 hover:bg-gray-50 transition-colors"
+          className="flex items-center p-6 border-2 border-black hover:bg-black hover:text-white transition-colors group"
         >
-          <FiBarChart className="w-5 h-5 text-purple-600 mr-3" />
-          <span className="font-medium">View Analytics</span>
+          <FiBarChart className="w-6 h-6 text-black group-hover:text-white mr-4" />
+          <span className="font-bold text-sm tracking-widest">VIEW ANALYTICS</span>
         </button>
 
         <button
           onClick={onRefresh}
           disabled={isRefreshing}
-          className="flex items-center justify-center p-4 border border-gray-200 rounded-0 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center p-6 border-2 border-black hover:bg-black hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
         >
-          <FiRefreshCw className={`w-5 h-5 text-orange-600 mr-3 ${isRefreshing ? 'animate-spin' : ''}`} />
-          <span className="font-medium">Refresh Data</span>
+          <FiRefreshCw className={`w-6 h-6 text-black group-hover:text-white mr-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          <span className="font-bold text-sm tracking-widest">REFRESH DATA</span>
         </button>
       </div>
     </div>

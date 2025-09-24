@@ -12,31 +12,20 @@ const ActivityFeed = ({ activities, isLoading }: ActivityFeedProps) => {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'user':
-        return <FiUser className="w-4 h-4 text-blue-600" />;
+        return <FiUser className="w-5 h-5 text-black" />;
       case 'order':
-        return <FiShoppingCart className="w-4 h-4 text-green-600" />;
+        return <FiShoppingCart className="w-5 h-5 text-black" />;
       case 'product':
-        return <FiPackage className="w-4 h-4 text-orange-600" />;
+        return <FiPackage className="w-5 h-5 text-black" />;
       case 'system':
-        return <FiSettings className="w-4 h-4 text-purple-600" />;
+        return <FiSettings className="w-5 h-5 text-black" />;
       default:
-        return <FiClock className="w-4 h-4 text-gray-600" />;
+        return <FiClock className="w-5 h-5 text-black" />;
     }
   };
 
-  const getActivityColor = (type: string) => {
-    switch (type) {
-      case 'user':
-        return 'bg-blue-50 border-blue-200';
-      case 'order':
-        return 'bg-green-50 border-green-200';
-      case 'product':
-        return 'bg-orange-50 border-orange-200';
-      case 'system':
-        return 'bg-purple-50 border-purple-200';
-      default:
-        return 'bg-gray-50 border-gray-200';
-    }
+  const getActivityBorder = (type: string) => {
+    return 'border-b border-gray-200';
   };
 
   const formatTimestamp = (timestamp: string) => {
@@ -59,15 +48,15 @@ const ActivityFeed = ({ activities, isLoading }: ActivityFeedProps) => {
 
   if (isLoading) {
     return (
-      <div className="bg-white border border-gray-200 rounded-0 p-6">
-        <h2 className="text-xl font-normal mb-4">Recent Activity</h2>
-        <div className="space-y-4">
+      <div className="bg-white border-2 border-black p-8">
+        <h2 className="text-2xl font-bold mb-8 tracking-tight">RECENT ACTIVITY</h2>
+        <div className="space-y-6">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-start space-x-3 animate-pulse">
-              <div className="w-8 h-8 bg-gray-200 rounded-0"></div>
+            <div key={i} className="flex items-start space-x-4 py-4 border-b border-gray-200 animate-pulse">
+              <div className="w-6 h-6 bg-gray-300"></div>
               <div className="flex-1">
-                <div className="w-32 h-4 bg-gray-200 rounded-0 mb-2"></div>
-                <div className="w-48 h-3 bg-gray-200 rounded-0"></div>
+                <div className="w-32 h-4 bg-gray-300 mb-2"></div>
+                <div className="w-48 h-3 bg-gray-300"></div>
               </div>
             </div>
           ))}
@@ -78,44 +67,44 @@ const ActivityFeed = ({ activities, isLoading }: ActivityFeedProps) => {
 
   if (!activities || activities.length === 0) {
     return (
-      <div className="bg-white border border-gray-200 rounded-0 p-6">
-        <h2 className="text-xl font-normal mb-4">Recent Activity</h2>
-        <div className="text-center py-8">
-          <FiClock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">No recent activity</p>
+      <div className="bg-white border-2 border-black p-8">
+        <h2 className="text-2xl font-bold mb-8 tracking-tight">RECENT ACTIVITY</h2>
+        <div className="text-center py-12">
+          <FiClock className="w-16 h-16 text-black mx-auto mb-6" />
+          <p className="text-gray-600 font-medium tracking-wide">NO RECENT ACTIVITY</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-0 p-6">
-      <h2 className="text-xl font-normal mb-4">Recent Activity</h2>
-      <div className="space-y-4">
+    <div className="bg-white border-2 border-black p-8">
+      <h2 className="text-2xl font-bold mb-8 tracking-tight">RECENT ACTIVITY</h2>
+      <div className="space-y-0">
         {activities.slice(0, 10).map((activity) => (
           <div
             key={activity.id}
-            className={`flex items-start space-x-3 p-3 rounded-0 border ${getActivityColor(activity.type)}`}
+            className="flex items-start space-x-4 py-4 border-b border-gray-200 last:border-b-0"
           >
-            <div className="flex-shrink-0 mt-1">
+            <div className="flex-shrink-0 mt-1 p-2 border border-black">
               {getActivityIcon(activity.type)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900">
-                {activity.action}
+              <p className="text-sm font-bold text-black mb-1 tracking-wide">
+                {activity.action.toUpperCase()}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 mb-2">
                 {activity.description}
               </p>
               {activity.userName && (
-                <p className="text-xs text-gray-500">
-                  by {activity.userName}
+                <p className="text-xs text-gray-500 font-medium tracking-widest">
+                  BY {activity.userName.toUpperCase()}
                 </p>
               )}
             </div>
             <div className="flex-shrink-0">
-              <span className="text-xs text-gray-500">
-                {formatTimestamp(activity.timestamp)}
+              <span className="text-xs text-gray-500 font-bold tracking-widest">
+                {formatTimestamp(activity.timestamp).toUpperCase()}
               </span>
             </div>
           </div>

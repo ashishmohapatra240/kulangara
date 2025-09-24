@@ -20,9 +20,15 @@ import {
 } from "react-icons/fa";
 import { IoMdArrowDropdown } from "react-icons/io";
 import Image from "next/image";
-import { useWishlist, useCreateWishlistItems, useDeleteWishlistItems } from "@/app/hooks/useWishlist";
+import {
+  useWishlist,
+  useCreateWishlistItems,
+  useDeleteWishlistItems,
+} from "@/app/hooks/useWishlist";
+import { useSingleProductStock } from "@/app/hooks/useCartValidation";
 import { toast } from "react-hot-toast";
 import { IWishlistItem } from "@/app/types/wishlist.type";
+import SizeGuideModal from "@/app/components/ui/SizeGuideModal";
 
 type Params = { id: string };
 
@@ -34,15 +40,20 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
   const createWishlistMutation = useCreateWishlistItems();
   const deleteWishlistMutation = useDeleteWishlistItems();
   const { addItemToCart, loading: cartLoading } = useAddToCart();
+  const { data: stockInfo, isLoading: stockLoading } =
+    useSingleProductStock(id);
 
   // State management
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
 
   // Check if product is in wishlist
   const wishlistItems = wishlistResponse?.data || [];
-  const isWishlisted = wishlistItems.some((item: IWishlistItem) => item.product.id === id);
+  const isWishlisted = wishlistItems.some(
+    (item: IWishlistItem) => item.product.id === id
+  );
 
   // Derive sizes from variants if not available
   const sizes = product?.sizes || [
@@ -102,6 +113,33 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
     }
   };
 
+  const getStockDisplay = () => {
+    if (stockLoading)
+      return <span className="text-gray-500">Checking stock...</span>;
+    if (!stockInfo)
+      return <span className="text-gray-500">Stock info unavailable</span>;
+
+    const { stockQuantity, lowStockThreshold } = stockInfo;
+
+    if (stockQuantity === 0) {
+      return <span className="text-red-500 font-semibold">Out of Stock</span>;
+    } else if (stockQuantity <= lowStockThreshold) {
+      return (
+        <span className="text-orange-500 font-medium">
+          Only {stockQuantity} left!
+        </span>
+      );
+    } else if (stockQuantity <= 10) {
+      return (
+        <span className="text-yellow-600 font-medium">
+          Low stock ({stockQuantity} available)
+        </span>
+      );
+    }
+
+    return <span className="text-green-600 font-medium">In Stock</span>;
+  };
+
   const handleAddToCart = async () => {
     if (!selectedSize) {
       toast.error("Please select a size");
@@ -113,17 +151,39 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
       return;
     }
 
+    // Check stock availability before adding to cart
+    if (stockInfo && stockInfo.stockQuantity === 0) {
+      toast.error("This item is out of stock");
+      return;
+    }
+
+    if (stockInfo && quantity > stockInfo.stockQuantity) {
+      toast.error(`Only ${stockInfo.stockQuantity} items available`);
+      return;
+    }
+
     try {
       // Find the variant for the selected size
-      const selectedVariant = product.variants?.find(v => v.size === selectedSize);
-      
+      const selectedVariant = product.variants?.find(
+        (v) => v.size === selectedSize
+      );
+
       await addItemToCart({
         productId: product.id,
         quantity: quantity,
-        variantId: selectedVariant?.id
+        variantId: selectedVariant?.id,
       });
     } catch (error) {
-      console.error("Failed to add to cart:", error);
+      if (
+        error instanceof Error &&
+        error.message?.includes("Insufficient stock")
+      ) {
+        toast.error(
+          "This item is no longer available in the requested quantity."
+        );
+      } else {
+        console.error("Failed to add to cart:", error);
+      }
     }
   };
 
@@ -138,20 +198,42 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
       return;
     }
 
+    // Check stock availability before buying
+    if (stockInfo && stockInfo.stockQuantity === 0) {
+      toast.error("This item is out of stock");
+      return;
+    }
+
+    if (stockInfo && quantity > stockInfo.stockQuantity) {
+      toast.error(`Only ${stockInfo.stockQuantity} items available`);
+      return;
+    }
+
     try {
       // Find the variant for the selected size
-      const selectedVariant = product.variants?.find(v => v.size === selectedSize);
-      
+      const selectedVariant = product.variants?.find(
+        (v) => v.size === selectedSize
+      );
+
       await addItemToCart({
         productId: product.id,
         quantity: quantity,
-        variantId: selectedVariant?.id
+        variantId: selectedVariant?.id,
       });
-      
+
       // Redirect to checkout
-      window.location.href = '/checkout';
+      window.location.href = "/checkout";
     } catch (error) {
-      console.error("Failed to buy now:", error);
+      if (
+        error instanceof Error &&
+        error.message?.includes("Insufficient stock")
+      ) {
+        toast.error(
+          "This item is no longer available in the requested quantity."
+        );
+      } else {
+        console.error("Failed to buy now:", error);
+      }
     }
   };
 
@@ -224,21 +306,16 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
               onClick={handleWishlistToggle}
               className="absolute top-4 right-4 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-200 hover:scale-110"
               aria-label="Add to wishlist"
-              disabled={createWishlistMutation.isPending || deleteWishlistMutation.isPending}
+              disabled={
+                createWishlistMutation.isPending ||
+                deleteWishlistMutation.isPending
+              }
             >
               {isWishlisted ? (
                 <FaHeart className="w-5 h-5 text-red-500" />
               ) : (
                 <FaRegHeart className="w-5 h-5 text-gray-600" />
               )}
-            </button>
-
-            {/* Share Button */}
-            <button
-              className="absolute top-4 left-4 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-200 hover:scale-110"
-              aria-label="Share product"
-            >
-              <FaShare className="w-5 h-5 text-gray-600" />
             </button>
 
             {/* Discount Badge */}
@@ -309,7 +386,8 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
 
             {/* Price Section */}
             <div className="flex items-center gap-3 mb-4">
-              {product.discountedPrice && product.discountedPrice < product.price ? (
+              {product.discountedPrice &&
+              product.discountedPrice < product.price ? (
                 <>
                   <p className="text-3xl font-bold text-gray-900">
                     ₹{product.discountedPrice.toLocaleString()}
@@ -319,7 +397,10 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
                   </p>
                   {discountPercentage > 0 && (
                     <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm font-semibold">
-                      Save ₹{(product.price - product.discountedPrice).toLocaleString()}
+                      Save ₹
+                      {(
+                        product.price - product.discountedPrice
+                      ).toLocaleString()}
                     </span>
                   )}
                 </>
@@ -350,9 +431,7 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
                 </div>
               </div>
               <span className="text-sm text-gray-500">•</span>
-              <span className="text-sm text-gray-500">
-                {product.stockQuantity || 0} in stock
-              </span>
+              <div className="text-sm">{getStockDisplay()}</div>
             </div>
           </div>
 
@@ -366,7 +445,10 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
               <label className="block font-semibold text-gray-900">
                 Select Size
               </label>
-              <button className="text-sm text-blue-600 hover:text-blue-800 underline">
+              <button
+                onClick={() => setIsSizeGuideOpen(true)}
+                className="text-sm text-blue-600 hover:text-blue-800 underline"
+              >
                 Size Guide
               </button>
             </div>
@@ -422,17 +504,29 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
               <Button
                 onClick={handleAddToCart}
                 className="flex-1 py-4 text-lg font-semibold"
-                disabled={!selectedSize || cartLoading}
+                disabled={
+                  !selectedSize || cartLoading || stockInfo?.stockQuantity === 0
+                }
               >
-                {cartLoading ? "Adding..." : "Add to Cart"}
+                {cartLoading
+                  ? "Adding..."
+                  : stockInfo?.stockQuantity === 0
+                  ? "Out of Stock"
+                  : "Add to Cart"}
               </Button>
               <Button
                 variant="outline"
                 onClick={handleBuyNow}
                 className="flex-1 py-4 text-lg font-semibold"
-                disabled={!selectedSize || cartLoading}
+                disabled={
+                  !selectedSize || cartLoading || stockInfo?.stockQuantity === 0
+                }
               >
-                {cartLoading ? "Processing..." : "Buy Now"}
+                {cartLoading
+                  ? "Processing..."
+                  : stockInfo?.stockQuantity === 0
+                  ? "Out of Stock"
+                  : "Buy Now"}
               </Button>
             </div>
             {!selectedSize && (
@@ -443,12 +537,12 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
           </div>
 
           {/* Company Features */}
-          <div className="bg-gray-50 rounded-xl p-6">
+          <div className="bg-gray-50 p-6">
             <h2 className="text-xl font-semibold mb-4">Why Shop With Us</h2>
             <div className="grid grid-cols-1 gap-4">
               {companyFeatures.map((feature, index) => (
                 <div key={index} className="flex items-start gap-4">
-                  <div className="p-3 bg-white rounded-lg shadow-sm">
+                  <div className="p-3 bg-white shadow-sm">
                     {feature.icon === "truck" && (
                       <FaTruck className="w-5 h-5 text-gray-600" />
                     )}
@@ -472,22 +566,21 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
             </div>
           </div>
 
-          {/* Collapsible Sections */}
           <div className="space-y-4">
-            <details className="group bg-white border border-gray-200 rounded-lg">
+            <details className="group bg-white border border-gray-200">
               <summary className="flex items-center justify-between cursor-pointer p-6 hover:bg-gray-50 transition-colors">
                 <h2 className="text-xl font-semibold">Delivery & Returns</h2>
                 <IoMdArrowDropdown className="w-6 h-6 transition-transform group-open:rotate-180" />
               </summary>
               <div className="px-6 pb-6 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-gray-100 p-4 rounded-lg">
+                  <div className="bg-gray-100 p-4">
                     <h3 className="font-semibold mb-1">Estimated Delivery</h3>
                     <p className="text-sm">
                       {deliveryInfo.estimatedDays} business days
                     </p>
                   </div>
-                  <div className="bg-gray-100 p-4 rounded-lg">
+                  <div className="bg-gray-100 p-4">
                     <h3 className="font-semibold mb-1">Shipping</h3>
                     <p className="text-sm">
                       {deliveryInfo.shippingFee === 0
@@ -495,7 +588,7 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
                         : `₹${deliveryInfo.shippingFee} shipping fee`}
                     </p>
                   </div>
-                  <div className="bg-gray-100 p-4 rounded-lg">
+                  <div className="bg-gray-100 p-4">
                     <h3 className="font-semibold mb-1">Returns</h3>
                     <p className="text-sm">
                       {deliveryInfo.returnPeriod} days return policy
@@ -505,7 +598,7 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
               </div>
             </details>
 
-            <details className="group bg-white border border-gray-200 rounded-lg">
+            <details className="group bg-white border border-gray-200">
               <summary className="flex items-center justify-between cursor-pointer p-6 hover:bg-gray-50 transition-colors">
                 <h2 className="text-xl font-semibold">Product Details</h2>
                 <IoMdArrowDropdown className="w-6 h-6 transition-transform group-open:rotate-180" />
@@ -537,7 +630,7 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
                     <ul className="text-gray-600 space-y-1">
                       {product.care.map((instruction, index) => (
                         <li key={index} className="flex items-start gap-2">
-                          <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 flex-shrink-0"></span>
+                          <span className="w-1.5 h-1.5 bg-gray-400 mt-2 flex-shrink-0"></span>
                           {instruction}
                         </li>
                       ))}
@@ -547,7 +640,7 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
               </div>
             </details>
 
-            <details className="group bg-white border border-gray-200 rounded-lg">
+            <details className="group bg-white border border-gray-200">
               <summary className="flex items-center justify-between cursor-pointer p-6 hover:bg-gray-50 transition-colors">
                 <h2 className="text-xl font-semibold">Features</h2>
                 <IoMdArrowDropdown className="w-6 h-6 transition-transform group-open:rotate-180" />
@@ -557,7 +650,7 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
                   <ul className="text-gray-600 space-y-2">
                     {product.features.map((feature, index) => (
                       <li key={index} className="flex items-start gap-2">
-                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 flex-shrink-0"></span>
+                        <span className="w-1.5 h-1.5 bg-gray-400 mt-2 flex-shrink-0"></span>
                         {feature}
                       </li>
                     ))}
@@ -577,6 +670,12 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
           />
         </div>
       </div>
+
+      {/* Size Guide Modal */}
+      <SizeGuideModal
+        isOpen={isSizeGuideOpen}
+        onClose={() => setIsSizeGuideOpen(false)}
+      />
     </div>
   );
 }

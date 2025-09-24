@@ -26,7 +26,7 @@ export const useCart = () => {
     return cart;
 };
 
-// Hook to add item to cart
+// Hook to add item to cart with enhanced error handling
 export const useAddToCart = () => {
     const dispatch = useAppDispatch();
     const { loading } = useAppSelector((state) => state.cart);
@@ -36,7 +36,20 @@ export const useAddToCart = () => {
             await dispatch(handleAddToCart(data)).unwrap();
             toast.success('Item added to cart successfully!');
         } catch (error) {
-            toast.error(error as string || 'Failed to add item to cart');
+            const errorMessage = error as string;
+            
+            // Handle specific stock errors
+            if (errorMessage?.includes('Insufficient stock') || 
+                errorMessage?.includes('out of stock') ||
+                errorMessage?.includes('not available')) {
+                toast.error('This item is no longer available in the requested quantity.');
+            } else if (errorMessage?.includes('Product not found')) {
+                toast.error('This product is no longer available.');
+            } else {
+                toast.error(errorMessage || 'Failed to add item to cart');
+            }
+            
+            throw error; // Re-throw for component handling
         }
     };
 

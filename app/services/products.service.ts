@@ -1,5 +1,6 @@
 import axiosInstance, { publicAxios } from '../lib/axios';
-import { IProduct, IProductListResponse, IProductSearchParams, ICreateProductData, IUpdateProductData, ICreateVariantData, IUpdateVariantData, ICategoryListResponse } from '../types/product.type';
+import { IProduct, IProductListResponse, IProductSearchParams, ICreateProductData, IUpdateProductData, ICreateVariantData, IUpdateVariantData } from '../types/product.type';
+import { ICategoryListResponse } from '../types/category.type';
 
 const productsService = {
     // Get all products

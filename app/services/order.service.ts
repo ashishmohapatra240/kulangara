@@ -1,5 +1,5 @@
 import axiosInstance from '../lib/axios';
-import { IOrderRequest, IOrderResponse, IOrderListResponse, IOrderTrackingServiceResponse } from '../types/order.type';
+import { IOrderRequest, IOrderResponse, IOrderListResponse, IOrderTrackingServiceResponse, IOrderFilters } from '../types/order.type';
 
 const orderService = {
     // Create a new order
@@ -33,14 +33,20 @@ const orderService = {
     },
 
     // Get all orders (for admin)
-    getAllOrders: async (): Promise<IOrderListResponse> => {
-        const response = await axiosInstance.get('/api/v1/orders/admin/list');
+    getAllOrders: async (filters?: IOrderFilters): Promise<IOrderListResponse> => {
+        const response = await axiosInstance.get('/api/v1/orders/admin/list', { params: filters });
         return response.data;
     },
 
     // Update order status (for admin)
     updateOrderStatus: async (orderId: string, status: string): Promise<IOrderResponse> => {
         const response = await axiosInstance.put(`/api/v1/orders/admin/${orderId}/status`, { status });
+        return response.data;
+    },
+
+    // Update payment status (for admin)
+    updatePaymentStatus: async (orderId: string, paymentStatus: string): Promise<IOrderResponse> => {
+        const response = await axiosInstance.put(`/api/v1/orders/admin/${orderId}/payment-status`, { paymentStatus });
         return response.data;
     },
 

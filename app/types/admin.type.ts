@@ -59,8 +59,7 @@ export interface IOrderAnalytics {
   };
   paymentAnalytics: {
     methodDistribution: {
-      card: number;
-      upi: number;
+      razorpay: number;
       cod: number;
     };
     successRate: number;
@@ -87,7 +86,6 @@ export interface IOrderAnalytics {
     name: string;
     orders: number;
     revenue: number;
-    image: string;
   }>;
 }
 

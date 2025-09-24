@@ -1,9 +1,15 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import adminService from '../services/admin.service';
+import { useAdminOrderAnalytics } from './useAdminOrderAnalytics';
 
 export const useAdminDashboard = () => {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
+  // Memoize the date calculation to prevent infinite re-renders
+  const dashboardFilters = useMemo(() => ({
+    startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  }), []);
 
   // Dashboard Stats with 5-minute cache
   const {
@@ -18,28 +24,22 @@ export const useAdminDashboard = () => {
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
-  // Order Analytics
+  // Order Analytics - Use the same hook as analytics page for consistency
   const {
     data: orderAnalytics,
     isLoading: orderAnalyticsLoading,
     error: orderAnalyticsError,
     refetch: refetchOrderAnalytics
-  } = useQuery({
-    queryKey: ['admin-order-analytics'],
-    queryFn: () => adminService.getOrderAnalytics(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
-  });
+  } = useAdminOrderAnalytics(dashboardFilters);
 
-  // User Analytics
   const {
     data: userAnalytics,
     isLoading: userAnalyticsLoading,
     error: userAnalyticsError,
     refetch: refetchUserAnalytics
   } = useQuery({
-    queryKey: ['admin-user-analytics'],
-    queryFn: () => adminService.getUserAnalytics(),
+    queryKey: ['admin-user-analytics-dashboard', dashboardFilters],
+    queryFn: () => adminService.getUserAnalytics(dashboardFilters),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
