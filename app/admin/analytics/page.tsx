@@ -8,7 +8,6 @@ import adminService from "@/app/services/admin.service";
 import { useAdminOrderAnalytics } from "@/app/hooks/useAdminOrderAnalytics";
 import {
   FiTrendingUp,
-  FiTrendingDown,
   FiUsers,
   FiShoppingCart,
   FiDollarSign,
