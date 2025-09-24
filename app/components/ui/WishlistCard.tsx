@@ -7,6 +7,9 @@ import { IProduct } from "@/app/types/product.type";
 import Button from "./Button";
 import productsService from "@/app/services/products.service";
 
+const PLACEHOLDER_IMAGE =
+  "/images/coming-soon.jpg";
+
 export default function WishlistCard({
   item,
   removeFromWishlist,
@@ -34,6 +37,15 @@ export default function WishlistCard({
 
   const productData = resolvedProduct || item;
 
+  // Prefer primary image from images array, fallback to image string, then placeholder
+  let displayImage = PLACEHOLDER_IMAGE;
+  if (Array.isArray(item.images) && item.images.length > 0) {
+    const primary = item.images.find((img) => img.isPrimary) || item.images[0];
+    displayImage = primary.url || PLACEHOLDER_IMAGE;
+  } else if (item.image) {
+    displayImage = item.image;
+  }
+
   const sizeOptions = (productData.sizes && productData.sizes.length > 0)
     ? productData.sizes
     : Array.from(
@@ -52,7 +64,7 @@ export default function WishlistCard({
         href={`/products/${item.id}`}
         className="block w-24 h-24 relative flex-shrink-0"
       >
-        <Image src={item.images?.[0].url || ""} alt={item.name} fill className="object-cover" />
+        <Image src={displayImage} alt={item.name} fill className="object-cover" />
       </Link>
 
       <div className="flex-grow min-w-0">

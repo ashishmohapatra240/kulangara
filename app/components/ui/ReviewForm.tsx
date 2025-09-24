@@ -179,19 +179,9 @@ export default function ReviewForm({
         </div>
       </div>
 
-      {/* Tips Section */}
-      <div className="bg-gray-50 rounded-lg p-4">
-        <h4 className="font-semibold text-gray-900 mb-2">💡 Review Tips</h4>
-        <ul className="text-sm text-gray-700 space-y-1">
-          <li>• Be specific about what you liked or didn&apos;t like</li>
-          <li>• Mention quality, fit, comfort, and value for money</li>
-          <li>• Include details about sizing if relevant</li>
-          <li>• Share how the product compares to your expectations</li>
-        </ul>
-      </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-3 pt-4">
+      <div className="flex gap-3">
         <Button
           type="submit"
           disabled={isLoading}
