@@ -26,9 +26,8 @@ const adminService = {
 
   // User Analytics
   getUserAnalytics: async (filters?: IAnalyticsFilters): Promise<IUserAnalytics> => {
-    const response = await axiosInstance.get('/api/v1/admin/analytics', {
-      params: { ...filters, type: 'user' }
-    });
+    const params = { ...filters, type: 'user' };
+    const response = await axiosInstance.get('/api/v1/admin/analytics', { params });
     return response.data.data;
   },
 
