@@ -8,6 +8,7 @@ import Button from "@/app/components/ui/Button";
 import { PaymentMethod } from "@/app/types/checkout.type";
 import { useCheckout } from "@/app/hooks/useCheckout";
 import { useProfile } from "@/app/hooks/useProfile";
+import { useCartValidation } from "@/app/hooks/useCartValidation";
 import Modal from "@/app/components/ui/Modal";
 import { IOrder } from "@/app/types/order.type";
 import React from "react";
@@ -131,6 +132,13 @@ export default function CheckoutPage() {
     handleSetDefaultAddress,
   } = useProfile();
 
+  const {
+    validateCart,
+    validationResult,
+    clearValidationResult,
+    isValidating
+  } = useCartValidation();
+
   const typedAddresses = addresses as IAddress[];
   const defaultAddress = typedAddresses.find((a) => a.isDefault) || typedAddresses[0];
   const [selectedAddress, setSelectedAddress] = useState<IAddress | null>(defaultAddress || null);
@@ -187,14 +195,25 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
+    clearValidationResult();
 
     try {
+      const isValid = await validateCart(cartItems);
+      if (!isValid) {
+        setFormError("Some items in your cart are no longer available. Please review your cart.");
+        return;
+      }
+
       const order = await createOrder(paymentMethod) as IOrder;
       if (order && order.id) {
         router.push(`/orders/${order.id}`);
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
+        if (err.message?.includes('Insufficient stock') || err.message?.includes('out of stock')) {
+          setFormError("Some items are no longer available. Please review your cart and try again.");
+          return;
+        }
         setFormError(err.message);
       } else {
         setFormError("An unknown error occurred");
@@ -471,7 +490,7 @@ export default function CheckoutPage() {
                     onChange={() => setPaymentMethod("cod")}
                     className="mr-2"
                   />
-                  <span>GoKwik Cash on Delivery</span>
+                  <span>Cash on Delivery</span>
                 </label>
               </div>
             </div>
@@ -482,17 +501,52 @@ export default function CheckoutPage() {
               </div>
             )}
 
+            {validationResult?.available === false && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+                <div className="flex">
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-red-800">
+                      Stock Issue Detected
+                    </h3>
+                    <p className="text-sm text-red-700 mt-1">
+                      {validationResult.message}
+                    </p>
+                    {validationResult.data?.invalidItems && validationResult.data.invalidItems.length > 0 && (
+                      <div className="mt-2">
+                        <p className="text-sm font-medium text-red-800 mb-1">Items with issues:</p>
+                        <ul className="text-sm text-red-700 list-disc list-inside">
+                          {validationResult.data.invalidItems.map((item, index) => (
+                            <li key={index}>
+                              Product issue: {item.message}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    <button
+                      onClick={() => router.push('/cart')}
+                      className="mt-3 text-sm text-red-800 hover:text-red-900 underline"
+                    >
+                      Review Cart
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <Button
               onClick={handleSubmit}
               className="w-full"
-              disabled={loading || !cartItems || cartItems.length === 0}
+              disabled={loading || isValidating || !cartItems || cartItems.length === 0 || (validationResult?.available === false)}
             >
-              {loading ?
-                paymentStatus === 'creating_order' ? "Creating order..." :
-                  paymentStatus === 'payment_pending' ? "Processing payment..." :
-                    paymentStatus === 'verifying' ? "Verifying payment..." :
-                      "Processing..." :
-                "Pay now"}
+              {isValidating ? "Validating cart..." :
+                loading ?
+                  paymentStatus === 'creating_order' ? "Creating order..." :
+                    paymentStatus === 'payment_pending' ? "Processing payment..." :
+                      paymentStatus === 'verifying' ? "Verifying payment..." :
+                        "Processing..." :
+                  validationResult?.available === false ? "Resolve Stock Issues" :
+                    "Pay now"}
             </Button>
           </div>
 
@@ -615,7 +669,7 @@ export default function CheckoutPage() {
                   </div>
                 )}
                 <div className="flex justify-between text-sm text-gray-500">
-                  <span>Including ₹{tax.toLocaleString()}.17 in taxes</span>
+                  <span>Including all taxes</span>
                 </div>
                 <div className="border-t border-gray-200 pt-2 mt-2">
                   <div className="flex justify-between font-medium">
