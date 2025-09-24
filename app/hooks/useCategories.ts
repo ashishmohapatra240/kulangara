@@ -73,8 +73,8 @@ export function useCreateCategory() {
             
             toast.success('Category created successfully!');
         },
-        onError: (error: any) => {
-            const errorMessage = error?.response?.data?.message || error?.message || 'Failed to create category';
+        onError: (error: Error) => {
+            const errorMessage = (error as any)?.response?.data?.message || error?.message || 'Failed to create category';
             toast.error(errorMessage);
             console.error('Create category error:', error);
         },
@@ -94,7 +94,7 @@ export function useUpdateCategory() {
             }
             return categoryService.updateCategory(id, data);
         },
-        onSuccess: (data, variables) => {
+        onSuccess: (_, variables) => {
             // Invalidate and refetch categories
             queryClient.invalidateQueries({ queryKey: [CATEGORY_QUERY_KEYS.CATEGORIES] });
             queryClient.invalidateQueries({ queryKey: [CATEGORY_QUERY_KEYS.ADMIN_CATEGORIES] });
@@ -102,8 +102,8 @@ export function useUpdateCategory() {
             
             toast.success('Category updated successfully!');
         },
-        onError: (error: any) => {
-            const errorMessage = error?.response?.data?.message || error?.message || 'Failed to update category';
+        onError: (error: Error) => {
+            const errorMessage = (error as any)?.response?.data?.message || error?.message || 'Failed to update category';
             toast.error(errorMessage);
             console.error('Update category error:', error);
         },
@@ -130,8 +130,8 @@ export function useDeleteCategory() {
             
             toast.success('Category deleted successfully!');
         },
-        onError: (error: any) => {
-            const errorMessage = error?.response?.data?.message || error?.message || 'Failed to delete category';
+        onError: (error: Error) => {
+            const errorMessage = (error as any)?.response?.data?.message || error?.message || 'Failed to delete category';
             toast.error(errorMessage);
             console.error('Delete category error:', error);
         },

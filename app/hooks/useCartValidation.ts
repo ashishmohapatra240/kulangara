@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import stockService, { ICartValidationItem, ICartValidationResponse, IStockInfo } from '../services/stock.service';
+import stockService, { ICartValidationItem, ICartValidationResponse } from '../services/stock.service';
 import { ICartItem } from '../types/cart.type';
 import { toast } from 'react-hot-toast';
 import { getErrorMessage } from '../lib/utils';
@@ -8,7 +8,7 @@ import { AxiosError } from 'axios';
 
 export const useCartValidation = () => {
   const [validationResult, setValidationResult] = useState<ICartValidationResponse | null>(null);
-  const mutationRef = useRef<any>(null);
+  const mutationRef = useRef<ReturnType<typeof useMutation<ICartValidationResponse, AxiosError, ICartItem[]>> | null>(null);
 
   const validateCartMutation = useMutation({
     mutationFn: async (cartItems: ICartItem[]) => {
@@ -43,6 +43,7 @@ export const useCartValidation = () => {
 
   const validateCart = useCallback(async (cartItems: ICartItem[]): Promise<boolean> => {
     try {
+      if (!mutationRef.current) return false;
       const result = await mutationRef.current.mutateAsync(cartItems);
       return result.available;
     } catch {
@@ -71,8 +72,8 @@ export const useStockInfo = (productIds: string[]) => {
       return await stockService.getStockInfo(productIds);
     },
     enabled: productIds.length > 0,
-    staleTime: 30000, // 30 seconds
-    refetchInterval: 60000, // Refetch every minute
+    staleTime: 30000, 
+    refetchInterval: 60000,
   });
 };
 

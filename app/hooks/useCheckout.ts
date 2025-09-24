@@ -233,7 +233,7 @@ export const useCheckout = () => {
           throw new Error("Your cart is empty");
         }
 
-        let userEmail = formData?.email || "";
+        const userEmail = formData?.email || "";
         let userPhone = formData?.phone || "";
 
         if (!userPhone && selectedAddressId) {
