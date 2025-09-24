@@ -1,11 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
+import { AxiosError } from 'axios';
 import categoryService from '../services/category.service';
 import { 
     ICategoryFilters, 
     ICategoryCreate, 
     ICategoryUpdate 
 } from '../types/category.type';
+
+interface ApiErrorResponse {
+    message?: string;
+}
 
 // Query keys
 const CATEGORY_QUERY_KEYS = {
@@ -59,7 +64,7 @@ export function useCreateCategory() {
             }
             return categoryService.createCategory(categoryData);
         },
-        onSuccess: (data) => {
+        onSuccess: () => {
             // Remove all category-related queries from cache
             queryClient.removeQueries({ queryKey: [CATEGORY_QUERY_KEYS.CATEGORIES] });
             queryClient.removeQueries({ queryKey: [CATEGORY_QUERY_KEYS.ADMIN_CATEGORIES] });
@@ -73,8 +78,8 @@ export function useCreateCategory() {
             
             toast.success('Category created successfully!');
         },
-        onError: (error: Error) => {
-            const errorMessage = (error as any)?.response?.data?.message || error?.message || 'Failed to create category';
+        onError: (error: AxiosError<ApiErrorResponse>) => {
+            const errorMessage = error?.response?.data?.message || error?.message || 'Failed to create category';
             toast.error(errorMessage);
             console.error('Create category error:', error);
         },
@@ -102,8 +107,8 @@ export function useUpdateCategory() {
             
             toast.success('Category updated successfully!');
         },
-        onError: (error: Error) => {
-            const errorMessage = (error as any)?.response?.data?.message || error?.message || 'Failed to update category';
+        onError: (error: AxiosError<ApiErrorResponse>) => {
+            const errorMessage = error?.response?.data?.message || error?.message || 'Failed to update category';
             toast.error(errorMessage);
             console.error('Update category error:', error);
         },
@@ -130,8 +135,8 @@ export function useDeleteCategory() {
             
             toast.success('Category deleted successfully!');
         },
-        onError: (error: Error) => {
-            const errorMessage = (error as any)?.response?.data?.message || error?.message || 'Failed to delete category';
+        onError: (error: AxiosError<ApiErrorResponse>) => {
+            const errorMessage = error?.response?.data?.message || error?.message || 'Failed to delete category';
             toast.error(errorMessage);
             console.error('Delete category error:', error);
         },

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { IProduct, IProductImage } from "@/app/types/product.type";
 import productsService from "@/app/services/products.service";
@@ -175,9 +176,11 @@ export default function ProductImagesManagement({
             {images.map((img) => (
               <tr key={img.id} className="border-b border-gray-200">
                 <td className="px-4 py-2">
-                  <img
+                  <Image
                     src={img.url}
                     alt={img.alt}
+                    width={64}
+                    height={64}
                     className="h-16 w-16 object-cover border"
                   />
                 </td>
