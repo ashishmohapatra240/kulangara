@@ -29,59 +29,80 @@ function adaptOrderAnalytics(apiData: any): IOrderAnalytics {
         cancelled: 0,
     };
     (apiData.statusDistribution || []).forEach((s: { status: string; count: number }) => {
-        const key = (s.status || '').toLowerCase();
+        const key = (s.status || '').toLowerCase().trim();
         if (statusKeys.includes(key)) {
             (statusObj as Record<string, number>)[key] = s.count || 0;
         }
+        else if (key && s.count > 0) {
+            console.warn(`Unmapped order status: ${key} with count: ${s.count}`);
+        }
     });
 
-    // Ensure all required payment method keys are present
-    const paymentKeys = ["card", "upi", "cod"];
-    const paymentObj: { card: number; upi: number; cod: number } = {
-        card: 0,
-        upi: 0,
+    const paymentObj: { razorpay: number; cod: number } = {
+        razorpay: 0,
         cod: 0,
     };
     (apiData.paymentAnalytics?.methodDistribution || []).forEach((m: { method: string; count: number }) => {
-        const key = (m.method || '').toLowerCase();
-        if (paymentKeys.includes(key)) {
-            (paymentObj as Record<string, number>)[key] = m.count || 0;
+        const key = (m.method || '').toLowerCase().trim();
+        
+        // Map various payment methods to simplified categories
+        if (key === 'razorpay' || key === 'card' || key === 'upi' || key === 'netbanking' || key === 'wallet') {
+            paymentObj.razorpay += m.count || 0;
+        } else if (key === 'cod' || key === 'cash_on_delivery') {
+            paymentObj.cod += m.count || 0;
+        }
+        // Log unmapped payment methods for debugging
+        else if (key && m.count > 0) {
+            console.warn(`Unmapped payment method: ${key} with count: ${m.count}`);
         }
     });
 
     // Adapt topProducts
-    const topProducts = (apiData.topProducts || []).map((p: { productId?: string; productDetails?: { id?: string; name?: string; image?: string }; quantity?: number; revenue?: number }) => ({
-        id: p.productId || p.productDetails?.id,
+    const topProducts = (apiData.topProducts || []).map((p: { 
+        productId?: string; 
+        productDetails?: { 
+            id?: string; 
+            name?: string; 
+        }; 
+        quantity?: number; 
+        revenue?: number 
+    }) => ({
+        id: p.productId || p.productDetails?.id || 'unknown',
         name: p.productDetails?.name || "Unknown Product",
         orders: p.quantity || 0,
         revenue: p.revenue || 0,
-        image: p.productDetails?.image || "/images/placeholder.jpg",
     }));
 
     // Adapt location analytics
-    const topCities = (apiData.locationAnalytics?.topCities || []).map((c: { city: string; orders: number; revenue: number }) => ({
-        city: c.city,
-        orders: c.orders,
-        revenue: c.revenue,
+    const topCities = (apiData.locationAnalytics?.topCities || []).map((c: { city?: string; orders?: number; revenue?: number }) => ({
+        city: c.city || "Unknown City",
+        orders: c.orders || 0,
+        revenue: c.revenue || 0,
     }));
 
     return {
         revenue: {
-            total: apiData.totalRevenue,
+            total: apiData.totalRevenue || 0,
             daily: [], // Adapt dailyOrders if needed
-            growth: apiData.growthAnalytics?.revenueGrowth,
+            growth: apiData.growthAnalytics?.revenueGrowth || 0,
         },
         orders: {
-            total: apiData.totalOrders,
+            total: apiData.totalOrders || 0,
             daily: [], // Adapt dailyOrders if needed
-            growth: apiData.growthAnalytics?.orderGrowth,
+            growth: apiData.growthAnalytics?.orderGrowth || 0,
         },
         aov: {
-            current: apiData.averageOrderValue,
-            previous: apiData.growthAnalytics?.previousPeriodRevenue
+            current: apiData.averageOrderValue || 0,
+            previous: apiData.growthAnalytics?.previousPeriodRevenue && apiData.growthAnalytics?.previousPeriodOrders
                 ? apiData.growthAnalytics.previousPeriodRevenue / apiData.growthAnalytics.previousPeriodOrders
                 : 0,
-            growth: 0, // Calculate if needed
+            growth: (() => {
+                const current = apiData.averageOrderValue || 0;
+                const previous = apiData.growthAnalytics?.previousPeriodRevenue && apiData.growthAnalytics?.previousPeriodOrders
+                    ? apiData.growthAnalytics.previousPeriodRevenue / apiData.growthAnalytics.previousPeriodOrders
+                    : 0;
+                return previous > 0 ? ((current - previous) / previous) * 100 : 0;
+            })(),
         },
         statusDistribution: statusObj,
         paymentAnalytics: {
@@ -89,16 +110,16 @@ function adaptOrderAnalytics(apiData: any): IOrderAnalytics {
             successRate: 0, // Not provided
         },
         customerAnalytics: {
-            newCustomers: apiData.customerAnalytics?.totalCustomers,
-            returningCustomers: apiData.customerAnalytics?.repeatCustomers,
-            averageOrderValue: apiData.customerAnalytics?.customerLifetimeValue,
+            newCustomers: apiData.customerAnalytics?.totalCustomers || 0,
+            returningCustomers: apiData.customerAnalytics?.repeatCustomers || 0,
+            averageOrderValue: apiData.customerAnalytics?.customerLifetimeValue || 0,
         },
         locationAnalytics: {
             topCities,
         },
         growthAnalytics: {
-            revenueGrowth: apiData.growthAnalytics?.revenueGrowth,
-            orderGrowth: apiData.growthAnalytics?.orderGrowth,
+            revenueGrowth: apiData.growthAnalytics?.revenueGrowth || 0,
+            orderGrowth: apiData.growthAnalytics?.orderGrowth || 0,
             customerGrowth: 0, // Not provided
         },
         topProducts,

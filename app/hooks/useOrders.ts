@@ -4,6 +4,7 @@ import orderService from "@/app/services/order.service";
 import { getErrorMessage } from "@/app/lib/utils";
 import { AxiosError } from "axios";
 import { useEffect } from "react";
+import { IOrderFilters } from "@/app/types/order.type";
 
 
 // Fetch all orders
@@ -97,13 +98,13 @@ export function useCancelOrder() {
 }
 
 // Fetch all orders (admin)
-export function useAdminOrders() {
+export function useAdminOrders(filters?: IOrderFilters) {
     const query = useQuery({
-        queryKey: ["admin-orders"],
+        queryKey: ["admin-orders", filters],
         queryFn: async () => {
-            const response = await orderService.getAllOrders();
+            const response = await orderService.getAllOrders(filters);
             if (response.status === "success") {
-                return response.data.data;
+                return response.data;
             } else {
                 throw new Error(response.message || "Failed to load admin orders");
             }
@@ -133,6 +134,27 @@ export function useUpdateOrderStatus() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
             toast.success("Order status updated successfully!");
+        },
+        onError: (error: Error | AxiosError) => {
+            toast.error(getErrorMessage(error as AxiosError));
+        },
+    });
+}
+
+export function useUpdatePaymentStatus() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ orderId, paymentStatus }: { orderId: string; paymentStatus: string }) => {
+            const response = await orderService.updatePaymentStatus(orderId, paymentStatus);
+            if (response.status === "success" || response.success) {
+                return response.data;
+            } else {
+                throw new Error(response.message || "Failed to update payment status");
+            }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+            toast.success("Payment status updated successfully!");
         },
         onError: (error: Error | AxiosError) => {
             toast.error(getErrorMessage(error as AxiosError));
