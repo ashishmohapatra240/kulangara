@@ -23,7 +23,6 @@ export default function CheckoutPage() {
     loading,
     error,
     subtotal,
-    tax,
     discount,
     total,
     paymentStatus,

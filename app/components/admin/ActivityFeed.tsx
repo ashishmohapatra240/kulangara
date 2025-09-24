@@ -24,9 +24,6 @@ const ActivityFeed = ({ activities, isLoading }: ActivityFeedProps) => {
     }
   };
 
-  const getActivityBorder = (type: string) => {
-    return 'border-b border-gray-200';
-  };
 
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
