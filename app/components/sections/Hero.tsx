@@ -32,8 +32,8 @@ export default function Hero() {
           />
           <div className="absolute inset-0 bg-opacity-30 flex items-center justify-center text-black z-10">
             <div className="text-center space-y-4">
-              <h1 className="text-5xl font-medium">{slide.title}</h1>
-              <p className="text-xl">{slide.description}</p>
+              <h1 className="text-5xl text-white font-medium">{slide.title}</h1>
+              <p className="text-xl text-white">{slide.description}</p>
               <Link href="/products">
               <Button variant="primary" size="lg" className="mt-6">
                 Shop Now
