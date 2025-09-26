@@ -40,7 +40,7 @@ export default function Footer() {
                   <Link href="/size-guide">Size Guide</Link>
                 </li>
                 <li>
-                  <Link href="/track-order">Track Order</Link>
+                  <Link href="/profile/orders">Track Order</Link>
                 </li>
               </ul>
             </div>
@@ -48,13 +48,13 @@ export default function Footer() {
               <h3 className="text-lg font-bold mb-4">Follow Us</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/instagram">Instagram</Link>
+                  <Link href="https://www.instagram.com/">Instagram</Link>
                 </li>
                 <li>
-                  <Link href="/facebook">Facebook</Link>
+                  <Link href="https://www.facebook.com/">Facebook</Link>
                 </li>
                 <li>
-                  <Link href="/twitter">Twitter</Link>
+                  <Link href="https://x.com/">Twitter</Link>
                 </li>
               </ul>
             </div>
