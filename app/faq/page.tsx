@@ -64,9 +64,12 @@ export default function FaqPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-16 font-sans">
-      <h1 className="text-3xl md:text-4xl font-bold text-center mb-10">
+      {/* Page Title */}
+      <div className="mt-14">
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-6 underline">
         Frequently Asked Questions
       </h1>
+      </div>
       <div className="space-y-4">
         {faqs.map((faq, index) => (
           <div

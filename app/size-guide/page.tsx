@@ -200,7 +200,12 @@ export default function SizeGuidePage() {
     <div className="max-w-5xl mt-4 mx-auto px-6 py-16 font-sans">
       {/* Header */}
       <div className="mb-10 text-center">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2">Size Guide</h1>
+        {/* Page Title */}
+      <div className="mt-14">
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-6 underline">
+        Size Guide
+      </h1>
+      </div>
         <p className="text-gray-600">
           Find your perfect fit with our clothing size chart.
         </p>
