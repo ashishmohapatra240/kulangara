@@ -6,7 +6,7 @@ export const ContactSection = () => (
         <div>
           <h2 className="text-lg font-medium mb-2">Customer Support</h2>
           <p className="text-gray-600">
-            Email: support@westside.com
+            Email: support@kulangara.com
             <br />
             Phone: 1800-123-1555
           </p>
@@ -29,7 +29,7 @@ export const AboutSection = () => (
     <h1 className="text-2xl font-normal mb-8">About Us</h1>
     <div className="border border-gray-200 p-6">
       <p className="text-gray-600">
-        Westside is a chain of retail stores owned by Trent Limited, a subsidiary
+        Kulangara is a chain of retail stores owned by Trent Limited, a subsidiary
         of the Tata Group. The company operates a chain of retail stores across
         India offering a wide range of apparel, accessories, cosmetics and home
         products.
@@ -45,7 +45,7 @@ export const TermsSection = () => (
       <div className="prose max-w-none">
         <p className="text-gray-600">
           These terms and conditions outline the rules and regulations for the use
-          of Westside&apos;s Website.
+          of Kulangara&apos;s Website.
         </p>
       </div>
     </div>

@@ -4,8 +4,8 @@ export default function ReturnsPage() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16 font-sans">
       {/* Page Title */}
-      <div className="mt-14">
-        <h1 className="text-3xl md:text-4xl font-bold text-center mb-6 underline">
+      <div className="mt-20">
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-6 ">
         Return & Exchange Policy
       </h1>
       </div>

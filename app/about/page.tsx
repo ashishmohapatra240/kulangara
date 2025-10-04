@@ -99,14 +99,15 @@
 //   );
 // }
 
+import Image from "next/image";
 import React from "react";
 
 export default function AboutPage() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-16 font-sans">
       {/* Page Title */}
-      <div className="mt-14">
-        <h1 className="text-3xl md:text-4xl font-bold text-center mb-6 underline">
+      <div className="mt-20">
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-6">
         About Us
       </h1>
       </div>
@@ -131,9 +132,13 @@ export default function AboutPage() {
             better, and feel softer.
           </p>
         </div>
-        <div className="bg-gray-100 h-64 rounded-lg shadow-sm flex items-center justify-center text-gray-500">
-          {/* Replace with an image */}
-          Image Placeholder
+        <div className="relative w-full h-90">
+          <Image
+                    src="/images/coming-soon.jpg"
+                    alt="Our story"
+                    fill
+                    className="object-cover"
+                  />
         </div>
       </div>
 

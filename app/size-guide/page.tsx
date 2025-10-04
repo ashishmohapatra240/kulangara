@@ -201,8 +201,8 @@ export default function SizeGuidePage() {
       {/* Header */}
       <div className="mb-10 text-center">
         {/* Page Title */}
-      <div className="mt-14">
-        <h1 className="text-3xl md:text-4xl font-bold text-center mb-6 underline">
+      <div className="mt-20">
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-6 ">
         Size Guide
       </h1>
       </div>
