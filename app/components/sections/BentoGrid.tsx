@@ -19,7 +19,7 @@ export default function BentoGrid() {
               <div className="text-white">
                 <h3 className="text-xl sm:text-2xl font-medium">Summer Essentials</h3>
                 <Link
-                  href="/collection/summer"
+                  href="/products"
                   className="underline mt-1 sm:mt-2 inline-block text-sm sm:text-base hover:text-gray-200 transition-colors"
                 >
                   Shop Now
@@ -34,13 +34,13 @@ export default function BentoGrid() {
               title: "New Arrivals",
               image:
                 "/images/home.png",
-              link: "/new-arrivals",
+              link: "/products",
             },
             {
               title: "Bestsellers",
               image:
                 "/images/home-1.png",
-              link: "/bestsellers",
+              link: "/products",
             },
           ].map((item, index) => (
             <div key={index} className="relative aspect-[4/3] sm:aspect-[3/2]">
