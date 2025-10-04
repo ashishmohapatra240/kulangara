@@ -18,7 +18,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-16 font-sans">
+    <div className="max-w-3xl mx-auto px-6 py-16 {josefin.className}">
       {/* Page Title */}
       <div className="mt-20">
         <h1 className="text-3xl md:text-4xl font-bold text-center mb-6 ">

@@ -197,7 +197,7 @@ export default function SizeGuidePage() {
   );
 
   return (
-    <div className="max-w-5xl mt-4 mx-auto px-6 py-16 font-sans">
+    <div className="max-w-5xl mt-4 mx-auto px-6 py-16 {josefin.className}">
       {/* Header */}
       <div className="mb-10 text-center">
         {/* Page Title */}
