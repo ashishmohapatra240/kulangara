@@ -5,7 +5,7 @@ import { use, useState } from "react";
 import { useProduct } from "@/app/hooks/useProducts";
 import { useReviews } from "@/app/hooks/useReviews";
 import { useAddToCart } from "@/app/hooks/useCart";
-import Button from "@/app/components/ui/Button";
+import { Button } from "@/app/components/ui/button";
 import ProductReviews from "@/app/components/ui/ProductReviews";
 import {
   FaTruck,
@@ -16,8 +16,12 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaStar,
+  FaCheck,
+  FaMinus,
+  FaPlus,
+  FaShoppingBag,
+  FaBolt,
 } from "react-icons/fa";
-import { IoMdArrowDropdown } from "react-icons/io";
 import Image from "next/image";
 import {
   useWishlist,
@@ -28,6 +32,16 @@ import { useSingleProductStock } from "@/app/hooks/useCartValidation";
 import { toast } from "react-hot-toast";
 import { IWishlistItem } from "@/app/types/wishlist.type";
 import SizeGuideModal from "@/app/components/ui/SizeGuideModal";
+import { Badge } from "@/app/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
+import { Separator } from "@/app/components/ui/separator";
+import { Skeleton } from "@/app/components/ui/skeleton";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/app/components/ui/accordion";
 
 type Params = { id: string };
 
@@ -114,29 +128,29 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
 
   const getStockDisplay = () => {
     if (stockLoading)
-      return <span className="text-gray-500">Checking stock...</span>;
+      return <Badge variant="secondary">Checking stock...</Badge>;
     if (!stockInfo)
-      return <span className="text-gray-500">Stock info unavailable</span>;
+      return <Badge variant="secondary">Stock info unavailable</Badge>;
 
     const { stockQuantity, lowStockThreshold } = stockInfo;
 
     if (stockQuantity === 0) {
-      return <span className="text-red-500 font-semibold">Out of Stock</span>;
+      return <Badge variant="destructive">Out of Stock</Badge>;
     } else if (stockQuantity <= lowStockThreshold) {
       return (
-        <span className="text-orange-500 font-medium">
+        <Badge variant="destructive" className="bg-orange-500 hover:bg-orange-600">
           Only {stockQuantity} left!
-        </span>
+        </Badge>
       );
     } else if (stockQuantity <= 10) {
       return (
-        <span className="text-yellow-600 font-medium">
+        <Badge variant="outline" className="border-yellow-500/50 bg-yellow-50 text-yellow-700">
           Low stock ({stockQuantity} available)
-        </span>
+        </Badge>
       );
     }
 
-    return <span className="text-green-600 font-medium">In Stock</span>;
+    return <Badge variant="outline" className="border-green-500/50 bg-green-50 text-green-700">In Stock</Badge>;
   };
 
   const handleAddToCart = async () => {
@@ -247,7 +261,7 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
       <FaStar
         key={i}
         className={`${sizeClasses[size]} ${
-          i < rating ? "text-yellow-400" : "text-gray-200"
+          i < rating ? "text-yellow-500" : "text-muted"
         }`}
       />
     ));
@@ -255,17 +269,44 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 mt-30">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="animate-pulse">
-            <div className="aspect-square bg-gray-200 rounded-lg"></div>
-          </div>
-          <div className="space-y-6">
-            <div className="h-8 bg-gray-200 w-3/4 rounded"></div>
-            <div className="h-6 bg-gray-200 w-1/2 rounded"></div>
-            <div className="h-4 bg-gray-200 w-full rounded"></div>
-            <div className="h-4 bg-gray-200 w-3/4 rounded"></div>
-            <div className="h-4 bg-gray-200 w-1/2 rounded"></div>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8 lg:py-12 mt-20">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
+            {/* Image Gallery Skeleton - 3 columns */}
+            <div className="lg:col-span-3 space-y-4">
+              <Skeleton className="aspect-square w-full rounded-2xl" />
+              <div className="flex gap-3">
+                {[...Array(4)].map((_, i) => (
+                  <Skeleton key={i} className="h-20 w-20 rounded-xl" />
+                ))}
+              </div>
+            </div>
+            
+            {/* Product Info Skeleton - 2 columns */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="space-y-3">
+                <Skeleton className="h-8 w-3/4" />
+                <Skeleton className="h-6 w-1/2" />
+              </div>
+              <Skeleton className="h-12 w-2/3" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-5/6" />
+              <Separator />
+              <div className="space-y-3">
+                <Skeleton className="h-6 w-24" />
+                <div className="flex gap-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Skeleton key={i} className="h-10 w-14 rounded-lg" />
+                  ))}
+                </div>
+              </div>
+              <Separator />
+              <div className="flex gap-3">
+                <Skeleton className="h-12 flex-1 rounded-lg" />
+                <Skeleton className="h-12 flex-1 rounded-lg" />
+              </div>
+              <Skeleton className="h-32 w-full rounded-xl" />
+            </div>
           </div>
         </div>
       </div>
@@ -286,227 +327,264 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
     : 0;
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-30">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Product Image Gallery */}
-        <div className="space-y-4">
-          {/* Main Image */}
-          <div className="relative aspect-square bg-gray-50 overflow-hidden group">
-            <Image
-              src={images[selectedImageIndex]?.url || "/images/coming-soon.jpg"}
-              alt={images[selectedImageIndex]?.alt || product.name}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              priority
-            />
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8 lg:py-12 mt-20">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
+          {/* Product Image Gallery - 3 columns on large screens */}
+          <div className="lg:col-span-3 space-y-4">
+            {/* Main Image */}
+            <div className="relative aspect-square overflow-hidden rounded-2xl bg-muted/20 group border border-border/40">
+              <Image
+                src={images[selectedImageIndex]?.url || "/images/coming-soon.jpg"}
+                alt={images[selectedImageIndex]?.alt || product.name}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                priority
+              />
 
-            {/* Wishlist Button */}
-            <button
-              onClick={handleWishlistToggle}
-              className="absolute top-4 right-4 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-200 hover:scale-110"
-              aria-label="Add to wishlist"
-              disabled={
-                createWishlistMutation.isPending ||
-                deleteWishlistMutation.isPending
-              }
-            >
-              {isWishlisted ? (
-                <FaHeart className="w-5 h-5 text-red-500" />
-              ) : (
-                <FaRegHeart className="w-5 h-5 text-gray-600" />
+              {/* Wishlist Button */}
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={handleWishlistToggle}
+                className={`absolute top-5 right-5 h-11 w-11 rounded-full backdrop-blur-md border transition-all duration-200 shadow-lg ${
+                  isWishlisted
+                    ? "bg-primary/90 border-primary/50 text-primary-foreground hover:bg-primary hover:scale-110"
+                    : "bg-background/80 border-border/60 text-muted-foreground hover:bg-background hover:text-foreground hover:scale-110"
+                }`}
+                aria-label="Add to wishlist"
+                disabled={
+                  createWishlistMutation.isPending ||
+                  deleteWishlistMutation.isPending
+                }
+              >
+                {isWishlisted ? (
+                  <FaHeart className="w-5 h-5" />
+                ) : (
+                  <FaRegHeart className="w-5 h-5" />
+                )}
+              </Button>
+
+              {/* Discount Badge */}
+              {discountPercentage > 0 && (
+                <Badge className="absolute top-5 left-5 bg-destructive text-destructive-foreground text-sm font-bold px-3 py-1.5 shadow-lg">
+                  -{discountPercentage}% OFF
+                </Badge>
               )}
-            </button>
 
-            {/* Discount Badge */}
-            {discountPercentage > 0 && (
-              <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                {discountPercentage}% OFF
-              </div>
-            )}
+              {/* Image Navigation */}
+              {images.length > 1 && (
+                <>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() =>
+                      handleImageChange(Math.max(0, selectedImageIndex - 1))
+                    }
+                    disabled={selectedImageIndex === 0}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/90 backdrop-blur-md border border-border/60 hover:bg-background shadow-lg disabled:opacity-40 transition-all hover:scale-110"
+                  >
+                    <FaChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() =>
+                      handleImageChange(
+                        Math.min(images.length - 1, selectedImageIndex + 1)
+                      )
+                    }
+                    disabled={selectedImageIndex === images.length - 1}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/90 backdrop-blur-md border border-border/60 hover:bg-background shadow-lg disabled:opacity-40 transition-all hover:scale-110"
+                  >
+                    <FaChevronRight className="w-4 h-4" />
+                  </Button>
+                </>
+              )}
+            </div>
 
-            {/* Image Navigation */}
+            {/* Thumbnail Images */}
             {images.length > 1 && (
-              <>
-                <button
-                  onClick={() =>
-                    handleImageChange(Math.max(0, selectedImageIndex - 1))
-                  }
-                  disabled={selectedImageIndex === 0}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <FaChevronLeft className="w-4 h-4 text-gray-600" />
-                </button>
-                <button
-                  onClick={() =>
-                    handleImageChange(
-                      Math.min(images.length - 1, selectedImageIndex + 1)
-                    )
-                  }
-                  disabled={selectedImageIndex === images.length - 1}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <FaChevronRight className="w-4 h-4 text-gray-600" />
-                </button>
-              </>
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {images.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleImageChange(index)}
+                    className={`relative flex-shrink-0 w-24 h-24 overflow-hidden rounded-xl border-2 transition-all duration-200 ${
+                      index === selectedImageIndex
+                        ? "border-primary ring-2 ring-primary/20 scale-105"
+                        : "border-border/40 hover:border-primary/50 hover:scale-105"
+                    }`}
+                  >
+                    <Image
+                      src={image.url}
+                      alt={image.alt || product.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
             )}
           </div>
 
-          {/* Thumbnail Images */}
-          {images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {images.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleImageChange(index)}
-                  className={`relative flex-shrink-0 w-20 h-20 overflow-hidden border-2 transition-all duration-200 ${
-                    index === selectedImageIndex
-                      ? "border-black"
-                      : "border-gray-200 hover:border-gray-400"
-                  }`}
-                >
-                  <Image
-                    src={image.url}
-                    alt={image.alt || product.name}
-                    fill
-                    className="object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Product Info */}
-        <div className="space-y-8">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+        {/* Product Info - 2 columns on large screens */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Header Section */}
+          <div className="space-y-4">
+            <h1 className="text-3xl lg:text-4xl font-bold tracking-tight leading-tight">
               {product.name}
             </h1>
 
             {/* Price Section */}
-            <div className="flex items-center gap-3 mb-4">
-              {product.discountedPrice &&
-              product.discountedPrice < product.price ? (
-                <>
-                  <p className="text-3xl font-bold text-gray-900">
-                    ₹{product.discountedPrice.toLocaleString()}
-                  </p>
-                  <p className="text-xl text-gray-500 line-through">
-                    ₹{product.price.toLocaleString()}
-                  </p>
-                  {discountPercentage > 0 && (
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm font-semibold">
-                      Save ₹
-                      {(
-                        product.price - product.discountedPrice
-                      ).toLocaleString()}
-                    </span>
-                  )}
-                </>
-              ) : (
-                <p className="text-3xl font-bold text-gray-900">
-                  ₹{product.price.toLocaleString()}
-                </p>
+            <div className="flex items-end justify-between gap-4 flex-wrap">
+              <div className="space-y-1">
+                {product.discountedPrice && product.discountedPrice < product.price ? (
+                  <>
+                    <div className="flex items-baseline gap-3">
+                      <p className="text-4xl font-bold text-foreground">
+                        ₹{product.discountedPrice.toLocaleString()}
+                      </p>
+                      <p className="text-xl text-muted-foreground line-through">
+                        ₹{product.price.toLocaleString()}
+                      </p>
+                    </div>
+                    <p className="text-sm text-muted-foreground">Inclusive of all taxes</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-4xl font-bold text-foreground">
+                      ₹{product.price.toLocaleString()}
+                    </p>
+                    <p className="text-sm text-muted-foreground">Inclusive of all taxes</p>
+                  </>
+                )}
+              </div>
+              {product.discountedPrice && product.discountedPrice < product.price && (
+                <Badge className="bg-green-500 hover:bg-green-600 text-white font-semibold text-sm px-3 py-1.5">
+                  Save ₹{(product.price - product.discountedPrice).toLocaleString()}
+                </Badge>
               )}
             </div>
 
-            {/* Rating Summary */}
-            <div className="flex items-center gap-3 mb-6">
-              <div className="flex items-center gap-2">
-                {renderStars(
-                  reviewsData?.meta?.stats?.averageRating || 0,
-                  "lg"
-                )}
-                <div className="text-left">
-                  <span className="text-2xl font-bold text-gray-900">
-                    {reviewsData?.meta?.stats?.averageRating?.toFixed(1) ||
-                      "0.0"}
-                  </span>
-                  <span className="text-sm text-gray-500 ml-1">out of 5</span>
-                  <div className="text-sm text-gray-600">
-                    {reviewsData?.meta?.total || 0}{" "}
-                    {reviewsData?.meta?.total === 1 ? "review" : "reviews"}
+            {/* Rating and Stock Row */}
+            <div className="flex items-center gap-4 flex-wrap">
+              {reviewsData?.meta?.stats?.averageRating && reviewsData.meta.stats.averageRating > 0 ? (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    {renderStars(reviewsData.meta.stats.averageRating, "sm")}
                   </div>
+                  <span className="text-sm font-semibold">
+                    {reviewsData.meta.stats.averageRating.toFixed(1)}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    ({reviewsData.meta.total} {reviewsData.meta.total === 1 ? "review" : "reviews"})
+                  </span>
                 </div>
-              </div>
-              <span className="text-sm text-gray-500">•</span>
-              <div className="text-sm">{getStockDisplay()}</div>
+              ) : null}
+              {getStockDisplay()}
             </div>
           </div>
 
-          <p className="text-gray-700 text-lg leading-relaxed">
-            {product.description}
-          </p>
+          <Separator />
+
+          {/* Description */}
+          <div className="space-y-2">
+            <h3 className="font-semibold text-lg">Product Description</h3>
+            <p className="text-muted-foreground leading-relaxed">
+              {product.description}
+            </p>
+          </div>
+
+          <Separator />
 
           {/* Size Selection */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <label className="block font-semibold text-gray-900">
+              <label className="text-base font-semibold">
                 Select Size
               </label>
-              <button
+              <Button
+                variant="link"
+                size="sm"
                 onClick={() => setIsSizeGuideOpen(true)}
-                className="text-sm text-blue-600 hover:text-blue-800 underline"
+                className="h-auto p-0 text-sm text-primary hover:text-primary/80"
               >
                 Size Guide
-              </button>
+              </Button>
             </div>
             <div className="flex flex-wrap gap-3">
               {sizes.map((size) => (
-                <button
+                <Button
                   key={size}
+                  variant={selectedSize === size ? "default" : "outline"}
                   onClick={() => handleSizeSelect(size)}
-                  className={`px-6 py-3 border-2 font-medium transition-all duration-200 ${
-                    selectedSize === size
-                      ? "border-black bg-black text-white"
-                      : "border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50"
+                  className={`min-w-[3.5rem] h-12 font-semibold transition-all ${
+                    selectedSize === size 
+                      ? "ring-2 ring-primary/20 shadow-md" 
+                      : "hover:border-primary/50"
                   }`}
                 >
                   {size}
-                </button>
+                </Button>
               ))}
             </div>
             {selectedSize && (
-              <p className="text-sm text-green-600 font-medium">
-                ✓ Size {selectedSize} selected
-              </p>
+              <div className="flex items-center gap-2 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                <FaCheck className="text-green-600" />
+                Size {selectedSize} selected
+              </div>
             )}
           </div>
 
+          <Separator />
+
           {/* Quantity Selection */}
           <div className="space-y-4">
-            <label className="block font-semibold text-gray-900">
+            <label className="text-base font-semibold">
               Quantity
             </label>
-            <div className="flex items-center gap-3">
-              <button
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() => handleQuantityChange(quantity - 1)}
                 disabled={quantity <= 1}
-                className="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-11 w-11 rounded-lg hover:bg-muted transition-colors"
               >
-                -
-              </button>
-              <span className="w-16 text-center font-semibold">{quantity}</span>
-              <button
+                <FaMinus className="w-3.5 h-3.5" />
+              </Button>
+              <span className="w-20 text-center text-xl font-bold">{quantity}</span>
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() => handleQuantityChange(quantity + 1)}
                 disabled={quantity >= 10}
-                className="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-11 w-11 rounded-lg hover:bg-muted transition-colors"
               >
-                +
-              </button>
+                <FaPlus className="w-3.5 h-3.5" />
+              </Button>
+              {stockInfo && stockInfo.stockQuantity > 0 && (
+                <span className="text-sm text-muted-foreground ml-2">
+                  Max {Math.min(10, stockInfo.stockQuantity)} per order
+                </span>
+              )}
             </div>
           </div>
 
-          {/* Action Buttons */}
+          <Separator />
+
           <div className="space-y-4">
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 onClick={handleAddToCart}
-                className="flex-1 py-4 text-lg font-semibold"
+                size="lg"
+                className="flex-1 h-14 text-base font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all"
                 disabled={
                   !selectedSize || cartLoading || stockInfo?.stockQuantity === 0
                 }
               >
+                <FaShoppingBag className="mr-2 h-5 w-5" />
                 {cartLoading
                   ? "Adding..."
                   : stockInfo?.stockQuantity === 0
@@ -515,12 +593,14 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
               </Button>
               <Button
                 variant="outline"
+                size="lg"
                 onClick={handleBuyNow}
-                className="flex-1 py-4 text-lg font-semibold"
+                className="flex-1 h-14 text-base font-semibold border-2 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
                 disabled={
                   !selectedSize || cartLoading || stockInfo?.stockQuantity === 0
                 }
               >
+                <FaBolt className="mr-2 h-5 w-5" />
                 {cartLoading
                   ? "Processing..."
                   : stockInfo?.stockQuantity === 0
@@ -529,142 +609,175 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
               </Button>
             </div>
             {!selectedSize && (
-              <p className="text-sm text-red-600 text-center">
-                Please select a size to continue
-              </p>
+              <div className="bg-destructive/10 border border-destructive/30 rounded-lg px-4 py-3 text-center">
+                <p className="text-sm font-medium text-destructive">
+                  Please select a size to continue
+                </p>
+              </div>
             )}
           </div>
 
+          <Separator />
+
           {/* Company Features */}
-          <div className="bg-gray-50 p-6">
-            <h2 className="text-xl font-semibold mb-4">Why Shop With Us</h2>
-            <div className="grid grid-cols-1 gap-4">
+          <Card className="border-border/60 shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg">Why Shop With Us</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
               {companyFeatures.map((feature, index) => (
-                <div key={index} className="flex items-start gap-4">
-                  <div className="p-3 bg-white shadow-sm">
+                <div key={index} className="flex items-start gap-4 group">
+                  <div className="p-3 rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all">
                     {feature.icon === "truck" && (
-                      <FaTruck className="w-5 h-5 text-gray-600" />
+                      <FaTruck className="w-5 h-5" />
                     )}
                     {feature.icon === "credit-card" && (
-                      <FaCreditCard className="w-5 h-5 text-gray-600" />
+                      <FaCreditCard className="w-5 h-5" />
                     )}
                     {feature.icon === "shield" && (
-                      <FaShieldAlt className="w-5 h-5 text-gray-600" />
+                      <FaShieldAlt className="w-5 h-5" />
                     )}
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">
+                  <div className="flex-1 pt-0.5">
+                    <h4 className="font-semibold text-sm mb-1">
                       {feature.title}
-                    </h3>
-                    <p className="text-sm text-gray-600">
+                    </h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       {feature.description}
                     </p>
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="space-y-4">
-            <details className="group bg-white border border-gray-200">
-              <summary className="flex items-center justify-between cursor-pointer p-6 hover:bg-gray-50 transition-colors">
-                <h2 className="text-xl font-semibold">Delivery & Returns</h2>
-                <IoMdArrowDropdown className="w-6 h-6 transition-transform group-open:rotate-180" />
-              </summary>
-              <div className="px-6 pb-6 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-gray-100 p-4">
-                    <h3 className="font-semibold mb-1">Estimated Delivery</h3>
-                    <p className="text-sm">
-                      {deliveryInfo.estimatedDays} business days
-                    </p>
+          {/* Additional Information Accordion */}
+          <Accordion type="single" collapsible className="w-full border border-border/60 rounded-xl overflow-hidden">
+            <AccordionItem value="delivery" className="border-b">
+              <AccordionTrigger className="text-base font-semibold px-6 hover:no-underline hover:bg-muted/50">
+                Delivery & Returns
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6">
+                <div className="grid grid-cols-1 gap-4 pt-4">
+                  <div className="flex items-start gap-3 p-4 bg-muted/30 rounded-lg">
+                    <FaTruck className="w-5 h-5 text-primary mt-0.5" />
+                    <div>
+                      <h4 className="font-semibold text-sm mb-1">Estimated Delivery</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {deliveryInfo.estimatedDays} business days
+                      </p>
+                    </div>
                   </div>
-                  <div className="bg-gray-100 p-4">
-                    <h3 className="font-semibold mb-1">Shipping</h3>
-                    <p className="text-sm">
-                      {deliveryInfo.shippingFee === 0
-                        ? "Free shipping"
-                        : `₹${deliveryInfo.shippingFee} shipping fee`}
-                    </p>
+                  <div className="flex items-start gap-3 p-4 bg-muted/30 rounded-lg">
+                    <FaCreditCard className="w-5 h-5 text-primary mt-0.5" />
+                    <div>
+                      <h4 className="font-semibold text-sm mb-1">Shipping Cost</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {deliveryInfo.shippingFee === 0
+                          ? "Free shipping on this order"
+                          : `₹${deliveryInfo.shippingFee} shipping fee`}
+                      </p>
+                    </div>
                   </div>
-                  <div className="bg-gray-100 p-4">
-                    <h3 className="font-semibold mb-1">Returns</h3>
-                    <p className="text-sm">
-                      {deliveryInfo.returnPeriod} days return policy
-                    </p>
+                  <div className="flex items-start gap-3 p-4 bg-muted/30 rounded-lg">
+                    <FaShieldAlt className="w-5 h-5 text-primary mt-0.5" />
+                    <div>
+                      <h4 className="font-semibold text-sm mb-1">Return Policy</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {deliveryInfo.returnPeriod} days hassle-free returns
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </details>
+              </AccordionContent>
+            </AccordionItem>
 
-            <details className="group bg-white border border-gray-200">
-              <summary className="flex items-center justify-between cursor-pointer p-6 hover:bg-gray-50 transition-colors">
-                <h2 className="text-xl font-semibold">Product Details</h2>
-                <IoMdArrowDropdown className="w-6 h-6 transition-transform group-open:rotate-180" />
-              </summary>
-              <div className="px-6 pb-6 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {product.material && (
-                    <div>
-                      <h3 className="font-semibold text-gray-900 mb-1">
-                        Material
-                      </h3>
-                      <p className="text-gray-600">{product.material}</p>
-                    </div>
-                  )}
-                  {product.dimensions && (
-                    <div>
-                      <h3 className="font-semibold text-gray-900 mb-1">
-                        Dimensions
-                      </h3>
-                      <p className="text-gray-600">{product.dimensions}</p>
+            <AccordionItem value="details" className="border-b">
+              <AccordionTrigger className="text-base font-semibold px-6 hover:no-underline hover:bg-muted/50">
+                Product Details
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6">
+                <div className="space-y-4 pt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {product.material && (
+                      <div className="p-4 bg-muted/30 rounded-lg">
+                        <h4 className="font-semibold text-sm mb-2">
+                          Material
+                        </h4>
+                        <p className="text-sm text-muted-foreground">{product.material}</p>
+                      </div>
+                    )}
+                    {product.dimensions && (
+                      <div className="p-4 bg-muted/30 rounded-lg">
+                        <h4 className="font-semibold text-sm mb-2">
+                          Dimensions
+                        </h4>
+                        <p className="text-sm text-muted-foreground">{product.dimensions}</p>
+                      </div>
+                    )}
+                  </div>
+                  {product.care && product.care.length > 0 && (
+                    <div className="p-4 bg-muted/30 rounded-lg">
+                      <h4 className="font-semibold text-sm mb-3">
+                        Care Instructions
+                      </h4>
+                      <ul className="text-sm text-muted-foreground space-y-2">
+                        {product.care.map((instruction, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <FaCheck className="w-3 h-3 text-primary mt-1 flex-shrink-0" />
+                            {instruction}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   )}
                 </div>
-                {product.care && product.care.length > 0 && (
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">
-                      Care Instructions
-                    </h3>
-                    <ul className="text-gray-600 space-y-1">
-                      {product.care.map((instruction, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <span className="w-1.5 h-1.5 bg-gray-400 mt-2 flex-shrink-0"></span>
-                          {instruction}
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="features" className="border-none">
+              <AccordionTrigger className="text-base font-semibold px-6 hover:no-underline hover:bg-muted/50">
+                Features & Highlights
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6">
+                <div className="pt-4">
+                  {product.features && product.features.length > 0 ? (
+                    <ul className="space-y-3">
+                      {product.features.map((feature, index) => (
+                        <li key={index} className="flex items-start gap-3 text-sm">
+                          <FaCheck className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                          <span className="text-muted-foreground">{feature}</span>
                         </li>
                       ))}
                     </ul>
-                  </div>
-                )}
-              </div>
-            </details>
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic">No features listed</p>
+                  )}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
 
-            <details className="group bg-white border border-gray-200">
-              <summary className="flex items-center justify-between cursor-pointer p-6 hover:bg-gray-50 transition-colors">
-                <h2 className="text-xl font-semibold">Features</h2>
-                <IoMdArrowDropdown className="w-6 h-6 transition-transform group-open:rotate-180" />
-              </summary>
-              <div className="px-6 pb-6">
-                {product.features && product.features.length > 0 ? (
-                  <ul className="text-gray-600 space-y-2">
-                    {product.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <span className="w-1.5 h-1.5 bg-gray-400 mt-2 flex-shrink-0"></span>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-gray-500 italic">No features listed</p>
-                )}
-              </div>
-            </details>
+        </div>
+      </div>
+
+      {/* Reviews Section - Full Width */}
+      <div className="mt-16">
+        <Separator className="mb-12" />
+        
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold tracking-tight mb-2">
+              Customer Reviews
+            </h2>
+            <p className="text-muted-foreground">
+              See what our customers are saying about this product
+            </p>
           </div>
-
-          {/* Reviews Section */}
+          
           <ProductReviews
             productId={product.id}
-            showSummary={false}
+            showSummary={true}
             showAddButton={true}
           />
         </div>
@@ -675,6 +788,7 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
         isOpen={isSizeGuideOpen}
         onClose={() => setIsSizeGuideOpen(false)}
       />
+    </div>
     </div>
   );
 }

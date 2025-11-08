@@ -3,13 +3,19 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
-import Button from "@/app/components/ui/Button";
+import { Button } from "@/app/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
+import { Badge } from "@/app/components/ui/badge";
+import { Alert, AlertDescription } from "@/app/components/ui/alert";
+import { Separator } from "@/app/components/ui/separator";
 import { IOrder, IOrderItem, ITrackingHistoryItem } from "@/app/types/order.type";
 import { OrderTrackingComponent } from "@/app/components/ui/OrderTracking";
 import ReviewModal from "@/app/components/ui/ReviewModal";
 import reviewService from "@/app/services/review.service";
 import { ICreateReviewData, IUpdateReviewData } from "@/app/types/review.type";
 import orderService from "@/app/services/order.service";
+import { FiArrowLeft } from "react-icons/fi";
+import { useRouter } from "next/navigation";
 
 interface ActualOrderApiResponse {
   data: {
@@ -19,6 +25,7 @@ interface ActualOrderApiResponse {
 
 export default function OrderConfirmationPage() {
   const params = useParams();
+  const router = useRouter();
   const orderId = params.id as string;
   const [order, setOrder] = useState<IOrder | null>(null);
   const [tracking, setTracking] = useState<ITrackingHistoryItem[]>([]);
@@ -97,13 +104,43 @@ export default function OrderConfirmationPage() {
     }
   };
 
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case "PENDING":
+        return "outline";
+      case "CONFIRMED":
+        return "secondary";
+      case "PROCESSING":
+        return "secondary";
+      case "SHIPPED":
+        return "default";
+      case "DELIVERED":
+        return "default";
+      default:
+        return "destructive";
+    }
+  };
+
+  const getPaymentStatusVariant = (status: string) => {
+    switch (status) {
+      case "PAID":
+        return "default";
+      case "PENDING":
+        return "outline";
+      default:
+        return "destructive";
+    }
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-4xl mt-30">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4">Loading order details...</p>
-        </div>
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Loading order details...</p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -111,13 +148,15 @@ export default function OrderConfirmationPage() {
   if (error || !order) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-4xl mt-30">
-        <div className="text-center">
-          <h1 className="text-2xl font-medium mb-4">Order Not Found</h1>
-          <p className="text-gray-600 mb-4">
-            {error || "The order you're looking for doesn't exist."}
-          </p>
-          <Button onClick={() => window.history.back()}>Go Back</Button>
-        </div>
+        <Card>
+          <CardContent className="text-center py-12">
+            <h1 className="text-2xl font-semibold mb-4">Order Not Found</h1>
+            <p className="text-muted-foreground mb-6">
+              {error || "The order you're looking for doesn't exist."}
+            </p>
+            <Button onClick={() => window.history.back()}>Go Back</Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -130,213 +169,220 @@ export default function OrderConfirmationPage() {
   const isReturnEligible = deliveredDate ? diffDays !== null && diffDays <= 30 : false;
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl mt-30">
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        {/* Order Header */}
-        <div className="border-b border-gray-200 pb-4 mb-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-2xl font-medium">
-                Order #{order.orderNumber}
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Placed on {new Date(order.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-            <div className="text-right">
-              <span
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  order.status === "PENDING"
-                    ? "bg-yellow-100 text-yellow-800"
-                    : order.status === "CONFIRMED"
-                    ? "bg-blue-100 text-blue-800"
-                    : order.status === "PROCESSING"
-                    ? "bg-purple-100 text-purple-800"
-                    : order.status === "SHIPPED"
-                    ? "bg-indigo-100 text-indigo-800"
-                    : order.status === "DELIVERED"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }`}
-              >
-                {order.status}
-              </span>
-            </div>
-          </div>
-        </div>
+    <div className="container mx-auto px-4 py-8 max-w-7xl mt-24">
+      {/* Back Button */}
+      <Button 
+        variant="ghost" 
+        onClick={() => router.back()} 
+        className="mb-4 -ml-2"
+      >
+        <FiArrowLeft className="mr-2 h-4 w-4" />
+        Back to Orders
+      </Button>
 
-        {/* Tracking Information */}
-        <div className="mb-6">
-          <OrderTrackingComponent
-            tracking={tracking}
-            currentStatus={order.status}
-          />
-        </div>
-
-        {/* Order Items */}
-        <div className="mb-6">
-          <h2 className="text-lg font-medium mb-4">Order Items</h2>
-          <div className="space-y-4">
-            {order.items.map((item: IOrderItem, index: number) => (
-              <div
-                key={index}
-                className="flex gap-4 p-4 border border-gray-200 rounded-lg"
-              >
-                <div className="relative w-16 h-16">
-                  <Image
-                    src={
-                      item.product?.images?.[0]?.url ||
-                      "/images/coming-soon.jpg"
-                    }
-                    alt={item.product?.name || "Product"}
-                    fill
-                    className="object-cover rounded"
-                  />
-                </div>
-                <div className="flex-grow">
-                  <h3 className="font-medium">{item.product?.name}</h3>
-                  <p className="text-sm text-gray-600">
-                    {item.variant?.size} / {item.variant?.color || "Standard"}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Quantity: {item.quantity}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column - Order Details */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Order Header with Status */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h1 className="text-3xl font-bold mb-2">Order #{order.orderNumber}</h1>
+                  <p className="text-sm text-muted-foreground">
+                    Placed on {new Date(order.createdAt).toLocaleDateString('en-US', { 
+                      weekday: 'long',
+                      month: 'long', 
+                      day: 'numeric', 
+                      year: 'numeric' 
+                    })}
                   </p>
                 </div>
-                <div className="text-right">
-                  <p className="font-medium">
-                    ₹{item.price.toLocaleString()}.00
-                  </p>
-                  {order.status === 'DELIVERED' && (
-                    <div className="mt-2">
-                      <Button size="sm" variant="outline" onClick={() => handleRateProduct(item.product?.id || item.productId)}>
-                        Rate this product
-                      </Button>
-                    </div>
-                  )}
-                </div>
+                <Badge variant={getStatusVariant(order.status)} className="text-sm px-4 py-2">
+                  {order.status}
+                </Badge>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Shipping Address */}
-        <div className="mb-6">
-          <h2 className="text-lg font-medium mb-4">Shipping Address</h2>
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <p className="font-medium">
-              {order.shippingAddress.firstName} {order.shippingAddress.lastName}
-            </p>
-            <p className="text-gray-600">{order.shippingAddress.address}</p>
-            {order.shippingAddress.apartment && (
-              <p className="text-gray-600">{order.shippingAddress.apartment}</p>
-            )}
-            <p className="text-gray-600">
-              {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
-              {order.shippingAddress.pincode}
-            </p>
-            <p className="text-gray-600">{order.shippingAddress.phone}</p>
-          </div>
-        </div>
-
-        {/* Order Summary */}
-        <div className="mb-6">
-          <h2 className="text-lg font-medium mb-4">Order Summary</h2>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span>₹{order.subtotal.toLocaleString()}.00</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Shipping</span>
-                <span>
-                  {order.shippingFee === 0
-                    ? "FREE"
-                    : `₹${order.shippingFee.toLocaleString()}.00`}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Tax</span>
-                <span>₹{order.taxAmount.toLocaleString()}.00</span>
-              </div>
-              {order.discountAmount > 0 && (
-                <div className="flex justify-between text-green-600">
-                  <span>Discount</span>
-                  <span>-₹{order.discountAmount.toLocaleString()}.00</span>
-                </div>
+              
+              {deliveredDate && (
+                <Alert className={isReturnEligible ? "border-blue-200 bg-blue-50" : "border-orange-200 bg-orange-50"}>
+                  <AlertDescription className="text-sm">
+                    <strong>Delivery Date:</strong> {deliveredDate.toLocaleDateString(undefined, { 
+                      month: 'long', 
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}
+                    {isReturnEligible ? (
+                      <span className="ml-2 text-blue-700">• Eligible for return/exchange (30 days)</span>
+                    ) : (
+                      <span className="ml-2 text-orange-700">• Return/exchange period expired</span>
+                    )}
+                  </AlertDescription>
+                </Alert>
               )}
-              <div className="border-t border-gray-200 pt-2 mt-2">
-                <div className="flex justify-between font-medium">
-                  <span>Total</span>
-                  <span>₹{order.totalAmount.toLocaleString()}.00</span>
+            </CardContent>
+          </Card>
+
+          {/* Order Items */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Order Items ({order.items.length})</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {order.items.map((item: IOrderItem, index: number) => (
+                <div key={index}>
+                  <div className="flex gap-4">
+                    <div className="relative w-24 h-24 rounded-lg border overflow-hidden flex-shrink-0 bg-muted">
+                      <Image
+                        src={item.product?.images?.[0]?.url || "/images/coming-soon.jpg"}
+                        alt={item.product?.name || "Product"}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="flex-grow">
+                      <h3 className="font-semibold text-base">{item.product?.name}</h3>
+                      <div className="flex gap-3 mt-2 text-sm text-muted-foreground">
+                        <span>Size: {item.variant?.size || "N/A"}</span>
+                        <span>•</span>
+                        <span>Color: {item.variant?.color || "Standard"}</span>
+                        <span>•</span>
+                        <span>Qty: {item.quantity}</span>
+                      </div>
+                      {order.status === 'DELIVERED' && (
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="mt-3" 
+                          onClick={() => handleRateProduct(item.product?.id || item.productId)}
+                        >
+                          Rate this product
+                        </Button>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-lg">₹{(item.price * item.quantity).toLocaleString()}</p>
+                      <p className="text-sm text-muted-foreground">₹{item.price.toLocaleString()} each</p>
+                    </div>
+                  </div>
+                  {index < order.items.length - 1 && <Separator className="mt-4" />}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Shipping & Payment Info Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Shipping Address</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-1">
+                <p className="font-semibold">{order.shippingAddress.firstName} {order.shippingAddress.lastName}</p>
+                <p className="text-sm text-muted-foreground">{order.shippingAddress.address}</p>
+                {order.shippingAddress.apartment && (
+                  <p className="text-sm text-muted-foreground">{order.shippingAddress.apartment}</p>
+                )}
+                <p className="text-sm text-muted-foreground">
+                  {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.pincode}
+                </p>
+                <p className="text-sm text-muted-foreground">{order.shippingAddress.phone}</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Payment Details</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Payment Method</span>
+                  <span className="font-medium uppercase">{order.paymentMethod}</span>
+                </div>
+                <Separator />
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Payment Status</span>
+                  <Badge variant={getPaymentStatusVariant(order.paymentStatus)}>
+                    {order.paymentStatus}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Right Column - Summary & Tracking */}
+        <div className="space-y-6">
+          {/* Order Summary */}
+          <Card className="sticky top-24">
+            <CardHeader>
+              <CardTitle>Order Summary</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="font-medium">₹{order.subtotal.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Shipping</span>
+                  <span className="font-medium text-green-600">
+                    {order.shippingFee === 0 ? "FREE" : `₹${order.shippingFee.toLocaleString()}`}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Tax</span>
+                  <span className="font-medium">₹{order.taxAmount.toLocaleString()}</span>
+                </div>
+                {order.discountAmount > 0 && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Discount</span>
+                    <span className="font-medium">-₹{order.discountAmount.toLocaleString()}</span>
+                  </div>
+                )}
+                <Separator />
+                <div className="flex justify-between pt-2">
+                  <span className="font-semibold text-lg">Total</span>
+                  <span className="font-bold text-2xl">₹{order.totalAmount.toLocaleString()}</span>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Payment Information */}
-        <div className="mb-6">
-          <h2 className="text-lg font-medium mb-4">Payment Information</h2>
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <div className="flex justify-between items-center">
-              <span>Payment Method</span>
-              <span className="font-medium">{order.paymentMethod}</span>
-            </div>
-            <div className="flex justify-between items-center mt-2">
-              <span>Payment Status</span>
-              <span
-                className={`px-2 py-1 rounded text-sm ${
-                  order.paymentStatus === "PAID"
-                    ? "bg-green-100 text-green-800"
-                    : order.paymentStatus === "PENDING"
-                    ? "bg-yellow-100 text-yellow-800"
-                    : "bg-red-100 text-red-800"
-                }`}
-              >
-                {order.paymentStatus}
-              </span>
-            </div>
-            {deliveredDate && (
-              <div className="mt-3 text-sm text-gray-700">
-                Delivered on {deliveredDate.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}
+              <Separator />
+
+              {/* Action Buttons */}
+              <div className="space-y-2">
+                <Button onClick={handleTrackOrder} variant="outline" className="w-full">
+                  Refresh Tracking
+                </Button>
+                {order.status === "PENDING" && (
+                  <Button 
+                    onClick={handleCancelOrder} 
+                    variant="destructive" 
+                    disabled={loading} 
+                    className="w-full"
+                  >
+                    {loading ? "Cancelling..." : "Cancel Order"}
+                  </Button>
+                )}
+                <Button 
+                  onClick={() => (window.location.href = "/")} 
+                  variant="outline" 
+                  className="w-full"
+                >
+                  Continue Shopping
+                </Button>
               </div>
-            )}
-          </div>
-        </div>
+            </CardContent>
+          </Card>
 
-        {/* Return/Exchange policy note */}
-        {deliveredDate && (
-          <div className={`mb-6 p-4 rounded-lg border ${isReturnEligible ? 'bg-yellow-50 border-yellow-200 text-yellow-800' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>
-            Return/Exchange is eligible for 30 days post the delivery date. {isReturnEligible ? '' : `Your order is not eligible for return/exchange as it was delivered on ${deliveredDate.toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}.`}
-          </div>
-        )}
-
-        {/* Action Buttons */}
-        <div className="flex gap-4">
-          <Button
-            onClick={() => (window.location.href = "/")}
-            variant="outline"
-          >
-            Continue Shopping
-          </Button>
-          {order.status === "PENDING" && (
-            <Button
-              onClick={handleCancelOrder}
-              variant="outline"
-              className="text-red-600 border-red-600 hover:bg-red-50"
-              disabled={loading}
-            >
-              Cancel Order
-            </Button>
-          )}
-          <Button
-            onClick={handleTrackOrder}
-            variant="outline"
-            className="text-blue-600 border-blue-600 hover:bg-blue-50"
-          >
-            Refresh Tracking
-          </Button>
+          {/* Order Tracking */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Order Tracking</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <OrderTrackingComponent tracking={tracking} currentStatus={order.status} />
+            </CardContent>
+          </Card>
         </div>
       </div>
 

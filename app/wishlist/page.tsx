@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Button from "@/app/components/ui/Button";
+import { Button } from "@/app/components/ui/button";
 import WishlistCard from "@/app/components/ui/WishlistCard";
 import { useDeleteWishlistItems, useWishlist } from "../hooks/useWishlist";
 import { useAddToCart } from "../hooks/useCart";
