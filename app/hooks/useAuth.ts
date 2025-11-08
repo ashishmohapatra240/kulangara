@@ -83,9 +83,21 @@ export const useAuth = () => {
         },
     });
 
+    const googleAuthMutation = useMutation({
+        mutationFn: authService.googleAuth,
+        onSuccess: (data) => {
+            queryClient.setQueryData(['user'], data.user);
+            toast.success('Google authentication successful!');
+            router.push('/');
+        },
+        onError: (error: AxiosError) => {
+            toast.error(getErrorMessage(error));
+        },
+    });
+
     return {
         user,
-        isLoading: isLoadingUser || loginMutation.isPending || registerMutation.isPending || logoutMutation.isPending,
+        isLoading: isLoadingUser || loginMutation.isPending || registerMutation.isPending || logoutMutation.isPending || googleAuthMutation.isPending,
         login: loginMutation.mutate,
         loginAsync: loginMutation.mutateAsync,
         register: registerMutation.mutate,
@@ -93,6 +105,7 @@ export const useAuth = () => {
         forgotPassword: forgotPasswordMutation.mutate,
         forgotPasswordAsync: forgotPasswordMutation.mutateAsync,
         forgotPasswordLoading: forgotPasswordMutation.isPending,
+        googleLogin: googleAuthMutation.mutate,
         isAuthenticated: !!user,
     };
 };
