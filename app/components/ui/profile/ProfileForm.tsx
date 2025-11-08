@@ -5,6 +5,11 @@ import {
   IProfileUpdateRequest,
   IChangePasswordRequest,
 } from "@/app/types/profile.type";
+import { Button } from "../button";
+import { Input } from "../input";
+import { Label } from "../label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "../card";
 
 export const ProfileForm = () => {
   const {
@@ -90,8 +95,8 @@ export const ProfileForm = () => {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading profile...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading profile...</p>
         </div>
       </div>
     );
@@ -101,15 +106,12 @@ export const ProfileForm = () => {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">
+          <p className="text-muted-foreground mb-4">
             Unable to load profile information
           </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-black text-white hover:bg-gray-800"
-          >
+          <Button onClick={() => window.location.reload()}>
             Retry
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -120,34 +122,27 @@ export const ProfileForm = () => {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-normal">Profile Details</h1>
         {!isEditMode && (
-          <button
-            onClick={() => setIsEditMode(true)}
-            className="px-6 py-2 bg-black text-white hover:bg-gray-800"
-          >
+          <Button onClick={() => setIsEditMode(true)}>
             Edit Profile
-          </button>
+          </Button>
         )}
       </div>
 
       <div className="space-y-8">
         {/* Profile Information */}
-        <div className="border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-normal">Personal Information</h2>
-          </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Personal Information</CardTitle>
+          </CardHeader>
+          <CardContent>
 
           {isEditMode ? (
             // Edit Form
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label
-                    htmlFor="firstName"
-                    className="block text-sm font-medium mb-2"
-                  >
-                    First Name
-                  </label>
-                  <input
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
                     id="firstName"
                     name="firstName"
                     type="text"
@@ -155,17 +150,11 @@ export const ProfileForm = () => {
                     onChange={handleInputChange}
                     disabled={isUpdating}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 focus:border-black focus:outline-none disabled:bg-gray-50"
                   />
                 </div>
-                <div>
-                  <label
-                    htmlFor="lastName"
-                    className="block text-sm font-medium mb-2"
-                  >
-                    Last Name
-                  </label>
-                  <input
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
                     id="lastName"
                     name="lastName"
                     type="text"
@@ -173,104 +162,80 @@ export const ProfileForm = () => {
                     onChange={handleInputChange}
                     disabled={isUpdating}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 focus:border-black focus:outline-none disabled:bg-gray-50"
                   />
                 </div>
               </div>
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium mb-2"
-                >
-                  Email Address
-                </label>
-                <input
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <Input
                   id="email"
                   type="email"
                   value={profile.user.email}
                   disabled
-                  className="w-full px-4 py-2 border border-gray-300 bg-gray-50"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-muted-foreground">
                   Email cannot be changed
                 </p>
               </div>
-              <div>
-                <label
-                  htmlFor="phone"
-                  className="block text-sm font-medium mb-2"
-                >
-                  Mobile Number
-                </label>
-                <input
+              <div className="space-y-2">
+                <Label htmlFor="phone">Mobile Number</Label>
+                <Input
                   id="phone"
                   name="phone"
                   type="tel"
                   value={formData.phone}
                   onChange={handleInputChange}
                   disabled={isUpdating}
-                  className="w-full px-4 py-2 border border-gray-300 focus:border-black focus:outline-none disabled:bg-gray-50"
                 />
               </div>
               <div className="flex gap-4">
-                <button
+                <Button
                   type="submit"
                   disabled={isUpdating}
-                  className="px-6 py-2 bg-black text-white hover:bg-gray-800 disabled:bg-gray-400"
                 >
                   {isUpdating ? "Saving..." : "Save Changes"}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={handleCancelEdit}
                   disabled={isUpdating}
-                  className="px-6 py-2 border border-gray-300 hover:bg-gray-50 disabled:bg-gray-50"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </form>
           ) : (
             // Read-only View
-            <div className="p-6 space-y-6">
+            <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-2">
-                    First Name
-                  </label>
-                  <p className="text-gray-900">
+                  <Label className="text-muted-foreground">First Name</Label>
+                  <p className="text-foreground mt-2">
                     {profile.user.firstName || "Not provided"}
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-2">
-                    Last Name
-                  </label>
-                  <p className="text-gray-900">
+                  <Label className="text-muted-foreground">Last Name</Label>
+                  <p className="text-foreground mt-2">
                     {profile.user.lastName || "Not provided"}
                   </p>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-2">
-                  Email Address
-                </label>
-                <p className="text-gray-900">{profile.user.email}</p>
+                <Label className="text-muted-foreground">Email Address</Label>
+                <p className="text-foreground mt-2">{profile.user.email}</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-2">
-                    Mobile Number
-                  </label>
-                  <p className="text-gray-900">
+                  <Label className="text-muted-foreground">Mobile Number</Label>
+                  <p className="text-foreground mt-2">
                     {profile.user.phone || "Not provided"}
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-2">
-                    Member Since
-                  </label>
-                  <p className="text-gray-900">
+                  <Label className="text-muted-foreground">Member Since</Label>
+                  <p className="text-foreground mt-2">
                     {new Date(profile.user.createdAt).toLocaleDateString(
                       "en-US",
                       {
@@ -284,141 +249,128 @@ export const ProfileForm = () => {
               </div>
             </div>
           )}
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Account Actions */}
-        <div className="border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-normal">Account Actions</h2>
-          </div>
-          <div className="p-6 space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Account Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-medium">Change Password</h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Update your account password
                 </p>
               </div>
-              <button
+              <Button
+                variant="outline"
                 onClick={handleOpenChangePassword}
-                className="px-4 py-2 border border-gray-300 hover:bg-gray-50"
               >
                 Change Password
-              </button>
+              </Button>
             </div>
-            <div className="border-t border-gray-200 pt-4">
+            <div className="border-t pt-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium text-red-600">Delete Account</h3>
-                  <p className="text-sm text-gray-600">
+                  <h3 className="font-medium text-destructive">Delete Account</h3>
+                  <p className="text-sm text-muted-foreground">
                     Permanently delete your account and all data
                   </p>
                 </div>
-                <button
+                <Button
+                  variant="outline"
                   onClick={() => setIsDeleteAccountModalOpen(true)}
-                  className="px-4 py-2 border border-red-300 text-red-600 hover:bg-red-50"
+                  className="border-destructive text-destructive hover:bg-destructive/10"
                 >
                   Delete Account
-                </button>
+                </Button>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Change Password Modal */}
-        {isChangePasswordModalOpen && (
-          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 pt-30 z-50">
-            <div className="bg-white w-full max-w-md p-6 rounded-lg">
-              <h3 className="text-xl font-normal mb-4">Change Password</h3>
-              <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="currentPassword"
-                    className="block text-sm font-medium mb-2"
-                  >
-                    Current Password
-                  </label>
-                  <input
-                    id="currentPassword"
-                    name="currentPassword"
-                    type="password"
-                    value={passwordData.currentPassword}
-                    onChange={handlePasswordInputChange}
-                    disabled={isChangingPassword}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 focus:border-black focus:outline-none disabled:bg-gray-50"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="newPassword"
-                    className="block text-sm font-medium mb-2"
-                  >
-                    New Password
-                  </label>
-                  <input
-                    id="newPassword"
-                    name="newPassword"
-                    type="password"
-                    value={passwordData.newPassword}
-                    onChange={handlePasswordInputChange}
-                    disabled={isChangingPassword}
-                    required
-                    minLength={6}
-                    className="w-full px-4 py-2 border border-gray-300 focus:border-black focus:outline-none disabled:bg-gray-50"
-                  />
-                </div>
-                <div className="flex justify-end gap-4 mt-6">
-                  <button
-                    type="button"
-                    onClick={() => setIsChangePasswordModalOpen(false)}
-                    className="px-6 py-2 border border-gray-300 hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isChangingPassword}
-                    className="px-6 py-2 bg-black text-white hover:bg-gray-800 disabled:bg-gray-400"
-                  >
-                    {isChangingPassword ? "Changing..." : "Change Password"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Delete Account Modal */}
-        {isDeleteAccountModalOpen && (
-          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 pt-30 z-50">
-            <div className="bg-white w-full max-w-md p-6 rounded-lg">
-              <h3 className="text-xl font-normal mb-4 text-red-600">
-                Delete Account
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Are you sure you want to delete your account? This action cannot
-                be undone and will permanently remove all your data, orders, and
-                preferences.
-              </p>
-              <div className="flex justify-end gap-4">
-                <button
-                  onClick={() => setIsDeleteAccountModalOpen(false)}
-                  className="px-6 py-2 border border-gray-300 hover:bg-gray-50"
+        <Dialog open={isChangePasswordModalOpen} onOpenChange={setIsChangePasswordModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Change Password</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handlePasswordSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="currentPassword">Current Password</Label>
+                <Input
+                  id="currentPassword"
+                  name="currentPassword"
+                  type="password"
+                  value={passwordData.currentPassword}
+                  onChange={handlePasswordInputChange}
+                  disabled={isChangingPassword}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">New Password</Label>
+                <Input
+                  id="newPassword"
+                  name="newPassword"
+                  type="password"
+                  value={passwordData.newPassword}
+                  onChange={handlePasswordInputChange}
+                  disabled={isChangingPassword}
+                  required
+                  minLength={6}
+                />
+              </div>
+              <div className="flex justify-end gap-4 mt-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsChangePasswordModalOpen(false)}
                 >
                   Cancel
-                </button>
-                <button
-                  onClick={handleDeleteAccount}
-                  disabled={isDeleting}
-                  className="px-6 py-2 bg-red-600 text-white hover:bg-red-700 disabled:bg-red-400"
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isChangingPassword}
                 >
-                  {isDeleting ? "Deleting..." : "Delete Account"}
-                </button>
+                  {isChangingPassword ? "Changing..." : "Change Password"}
+                </Button>
               </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Account Modal */}
+        <Dialog open={isDeleteAccountModalOpen} onOpenChange={setIsDeleteAccountModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="text-destructive">Delete Account</DialogTitle>
+            </DialogHeader>
+            <p className="text-muted-foreground">
+              Are you sure you want to delete your account? This action cannot
+              be undone and will permanently remove all your data, orders, and
+              preferences.
+            </p>
+            <div className="flex justify-end gap-4">
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteAccountModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteAccount}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Delete Account"}
+              </Button>
             </div>
-          </div>
-        )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
