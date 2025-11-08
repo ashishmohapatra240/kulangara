@@ -6,10 +6,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import AdminLayout from "@/app/components/layout/AdminLayout";
-import Button from "@/app/components/ui/Button";
+import { Button } from "@/app/components/ui/button";
 import CategoryManagement from "@/app/components/admin/CategoryManagement";
 import Modal from "@/app/components/ui/Modal";
 import { ICategory } from "@/app/types/category.type";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table";
+import { Badge } from "@/app/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN"];
 
@@ -35,8 +38,8 @@ export default function AdminCategoriesPage() {
 
     if (isLoading || !isAuthenticated || !user || !ALLOWED_ROLES.includes(user.role)) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-white">
-                <h1 className="text-3xl font-bold tracking-tight">LOADING...</h1>
+            <div className="flex items-center justify-center min-h-screen bg-background">
+                <p className="text-base font-medium text-muted-foreground">Loading...</p>
             </div>
         );
     }
@@ -51,14 +54,15 @@ export default function AdminCategoriesPage() {
     if (showCreate) {
         return (
             <AdminLayout>
-                <div className="min-h-screen bg-white">
-                    <div className="flex justify-between items-center mb-12 pb-6 border-b-2 border-black">
-                        <h1 className="text-4xl font-bold tracking-tight">CREATE NEW CATEGORY</h1>
-                        <Button variant="outline" onClick={() => setShowCreate(false)}>
-                            BACK TO CATEGORIES
+                <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-4 sm:pt-6 mb-6 pb-4 border-b">
+                        <h1 className="text-2xl font-bold">Create New Category</h1>
+                        <Button variant="outline" onClick={() => setShowCreate(false)} className="w-full sm:w-auto">
+                            Back to Categories
                         </Button>
                     </div>
-                    <div className="border-2 border-black p-8">
+                    <Card>
+                        <CardContent className="p-4 sm:p-6">
                         <CategoryManagement onClose={() => setShowCreate(false)} />
                     </div>
                 </div>

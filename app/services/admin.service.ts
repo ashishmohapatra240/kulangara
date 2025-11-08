@@ -1,7 +1,6 @@
 import axiosInstance from '../lib/axios';
 import {
   IDashboardStats,
-  IOrderAnalytics,
   IUserAnalytics,
   IActivityLog,
   IActivityFilters,
@@ -18,8 +17,8 @@ const adminService = {
     return response.data.data;
   },
 
-  // Order Analytics
-  getOrderAnalytics: async (filters?: IAnalyticsFilters): Promise<IOrderAnalytics> => {
+  // Order Analytics - Returns raw API response that needs to be adapted
+  getOrderAnalytics: async (filters?: IAnalyticsFilters): Promise<Record<string, unknown>> => {
     const response = await axiosInstance.get('/api/v1/admin/analytics/orders', { params: filters });
     return response.data.data;
   },

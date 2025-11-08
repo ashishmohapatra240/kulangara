@@ -13,13 +13,14 @@ import {
   FiDollarSign,
 } from "react-icons/fi";
 import AdminLayout from "@/app/components/layout/AdminLayout";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN"];
 
 export default function AnalyticsPage() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
-  const [dateRange, setDateRange] = useState("7d");
+  const [dateRange, setDateRange] = useState("all");
 
   const getStartDate = (range: string) => {
     const now = new Date();
@@ -30,6 +31,8 @@ export default function AnalyticsPage() {
         return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
       case "90d":
         return new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000).toISOString();
+      case "all":
+        return new Date("2020-01-01").toISOString();
       default:
         return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
     }
@@ -81,8 +84,8 @@ export default function AnalyticsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white">
-        <h1 className="text-3xl font-bold tracking-tight">LOADING...</h1>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <p className="text-base font-medium text-muted-foreground">Loading...</p>
       </div>
     );
   }
@@ -93,9 +96,9 @@ export default function AnalyticsPage() {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 pt-30 mb-12 pb-6 border-b-2 border-black">
+          <div className="flex flex-col gap-4 pt-4 sm:pt-6 mb-6 pb-4 border-b">
             <div>
               <h1 className="text-4xl font-bold text-black tracking-tight">ANALYTICS DASHBOARD</h1>
               <p className="text-gray-600 mt-3 font-medium tracking-wide">MONITOR YOUR BUSINESS PERFORMANCE AND KEY METRICS</p>
@@ -103,13 +106,13 @@ export default function AnalyticsPage() {
             <div className="flex-shrink-0">
               <select
                 value={dateRange}
-
                 onChange={(e) => setDateRange(e.target.value)}
                 className="px-6 py-3 border-2 border-black bg-white text-black font-bold focus:outline-none min-w-[160px] tracking-wide"
               >
                 <option value="7d">LAST 7 DAYS</option>
                 <option value="30d">LAST 30 DAYS</option>
                 <option value="90d">LAST 90 DAYS</option>
+                <option value="all">ALL TIME</option>
               </select>
             </div>
           </div>

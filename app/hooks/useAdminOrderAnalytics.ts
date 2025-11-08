@@ -2,8 +2,40 @@ import { useQuery } from "@tanstack/react-query";
 import adminService from "@/app/services/admin.service";
 import { IOrderAnalytics, IAnalyticsFilters } from "@/app/types/admin.type";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function adaptOrderAnalytics(apiData: any): IOrderAnalytics {
+interface IOrderAnalyticsApiResponse {
+    totalRevenue?: number;
+    totalOrders?: number;
+    averageOrderValue?: number;
+    statusDistribution?: Array<{ status: string; count: number }>;
+    paymentAnalytics?: {
+        methodDistribution?: Array<{ method: string; count: number }>;
+    };
+    topProducts?: Array<{
+        productId?: string;
+        productDetails?: {
+            id?: string;
+            name?: string;
+        };
+        quantity?: number;
+        revenue?: number;
+    }>;
+    locationAnalytics?: {
+        topCities?: Array<{ city?: string; orders?: number; revenue?: number }>;
+    };
+    growthAnalytics?: {
+        revenueGrowth?: number;
+        orderGrowth?: number;
+        previousPeriodRevenue?: number;
+        previousPeriodOrders?: number;
+    };
+    customerAnalytics?: {
+        totalCustomers?: number;
+        repeatCustomers?: number;
+        customerLifetimeValue?: number;
+    };
+}
+
+function adaptOrderAnalytics(apiData: IOrderAnalyticsApiResponse): IOrderAnalytics {
     // Ensure all required status keys are present
     const statusKeys = [
         "pending",
@@ -33,7 +65,7 @@ function adaptOrderAnalytics(apiData: any): IOrderAnalytics {
         if (statusKeys.includes(key)) {
             (statusObj as Record<string, number>)[key] = s.count || 0;
         }
-        else if (key && s.count > 0) {
+        else if (key && s.count > 0 && process.env.NODE_ENV === 'development') {
             console.warn(`Unmapped order status: ${key} with count: ${s.count}`);
         }
     });
@@ -52,7 +84,7 @@ function adaptOrderAnalytics(apiData: any): IOrderAnalytics {
             paymentObj.cod += m.count || 0;
         }
         // Log unmapped payment methods for debugging
-        else if (key && m.count > 0) {
+        else if (key && m.count > 0 && process.env.NODE_ENV === 'development') {
             console.warn(`Unmapped payment method: ${key} with count: ${m.count}`);
         }
     });
@@ -127,9 +159,12 @@ function adaptOrderAnalytics(apiData: any): IOrderAnalytics {
 }
 
 export function useAdminOrderAnalytics(filters?: IAnalyticsFilters) {
-    const query = useQuery({
+    const query = useQuery<IOrderAnalyticsApiResponse>({
         queryKey: ["admin-order-analytics", filters],
-        queryFn: () => adminService.getOrderAnalytics(filters),
+        queryFn: async () => {
+            const response = await adminService.getOrderAnalytics(filters);
+            return response as IOrderAnalyticsApiResponse;
+        },
         staleTime: 5 * 60 * 1000,
     });
 

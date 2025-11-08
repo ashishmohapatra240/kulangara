@@ -1,11 +1,16 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import Button from "@/app/components/ui/Button";
+import { Button } from "@/app/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 import { useAuth } from "@/app/hooks/useAuth";
 import { Toaster } from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Card, CardContent } from "@/app/components/ui/card";
+import { Input } from "@/app/components/ui/input";
+import { Label } from "@/app/components/ui/label";
+import { Alert } from "@/app/components/ui/alert";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN", "DELIVERY_PARTNER"];
 
@@ -39,85 +44,84 @@ function AdminLoginContent() {
   };
 
   return (
-    <div className="min-h-screen flex bg-white">
+    <div className="min-h-screen flex">
       <Toaster position="top-right" />
-      {/* Image container - hidden on mobile */}
-      <div className="hidden lg:block w-1/2 h-screen bg-black">
+      {/* Left side - Image */}
+      <div className="hidden lg:flex lg:w-1/2 relative bg-muted">
         <Image
           src="/images/coming-soon.jpg"
-          alt="Admin Login background"
-          className="w-full h-full object-cover opacity-70"
-          height={1000}
-          width={1000}
+          alt="Admin Login"
+          fill
+          className="object-cover"
+          priority
         />
       </div>
 
-      {/* Form container */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-8 py-12 bg-white">
-        <div className="max-w-md w-full">
-          <div className="border-2 border-black p-12">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-black tracking-tight mb-4">
-                ADMIN LOGIN
-              </h2>
-              <p className="text-sm font-medium text-gray-600 tracking-wide">
-                ONLY FOR ADMINS, SUPERADMINS, AND DELIVERY PARTNERS
-              </p>
-            </div>
-            <form className="space-y-8" onSubmit={handleSubmit}>
-              <div className="space-y-6">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-bold text-black mb-3 tracking-widest">
-                    EMAIL ADDRESS
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    className="w-full px-4 py-4 border-2 border-black placeholder:text-gray-500 text-black font-medium focus:outline-none"
-                    placeholder="ENTER YOUR EMAIL ADDRESS"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                  />
-                </div>
-                <div>
-                  <label htmlFor="password" className="block text-sm font-bold text-black mb-3 tracking-widest">
-                    PASSWORD
-                  </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    className="w-full px-4 py-4 border-2 border-black placeholder:text-gray-500 text-black font-medium focus:outline-none"
-                    placeholder="ENTER YOUR PASSWORD"
-                    value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-
-              {error && <div className="text-black font-bold text-center p-4 border-2 border-black tracking-wide">{error.toUpperCase()}</div>}
-
-              <div>
-                <Button type="submit" className="w-full py-4 font-bold tracking-widest" disabled={isLoading}>
-                  {isLoading ? "SIGNING IN..." : "SIGN IN"}
-                </Button>
-              </div>
-            </form>
-            <div className="text-center mt-8">
-              <a href="/admin/register" className="text-black font-bold tracking-widest border-b-2 border-black hover:bg-black hover:text-white transition-colors px-2 py-1">
-                ADMIN REGISTRATION
-              </a>
-            </div>
+      {/* Right side - Form */}
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 lg:px-8">
+        <div className="w-full max-w-sm space-y-8">
+          {/* Logo/Brand */}
+          <div className="text-center space-y-2">
+            <h1 className="text-2xl font-semibold tracking-tight">Admin Portal</h1>
+            <p className="text-sm text-muted-foreground">
+              Sign in to access the admin panel
+            </p>
           </div>
+
+          {/* Form Card */}
+          <Card className="border-border/50">
+            <CardContent className="pt-6">
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      placeholder="admin@example.com"
+                      value={formData.email}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      autoComplete="current-password"
+                      required
+                      placeholder="Enter your password"
+                      value={formData.password}
+                      onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+
+                {error && (
+                  <Alert variant="destructive">
+                    <p className="text-sm">{error}</p>
+                  </Alert>
+                )}
+
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Signing in..." : "Sign in"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* Register link - Removed for security */}
+          <p className="text-center text-sm text-muted-foreground">
+            Need admin access? Contact your system administrator.
+          </p>
         </div>
       </div>
     </div>
@@ -126,7 +130,7 @@ function AdminLoginContent() {
 
 export default function AdminLoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-white"><h1 className="text-3xl font-bold tracking-tight">LOADING...</h1></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-muted-foreground">Loading...</p></div>}>
       <AdminLoginContent />
     </Suspense>
   );

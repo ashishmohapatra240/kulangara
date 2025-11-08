@@ -7,8 +7,9 @@ export const useAdminDashboard = () => {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
   // Memoize the date calculation to prevent infinite re-renders
+  // Changed to show all-time data instead of just last 7 days
   const dashboardFilters = useMemo(() => ({
-    startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+    startDate: new Date('2020-01-01').toISOString()
   }), []);
 
   // Dashboard Stats with 5-minute cache

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { IProduct, IProductImage } from "@/app/types/product.type";
 import productsService from "@/app/services/products.service";
-import Button from "../ui/Button";
+import { Button } from "../ui/button";
 
 interface ProductImagesManagementProps {
   product: IProduct;
