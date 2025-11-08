@@ -12,6 +12,11 @@ const authService = {
         return response.data.data;
     },
 
+    googleAuth: async (token: string): Promise<IAuthResponse> => {
+        const response = await axiosInstance.post(`/api/v1/auth/google`, { token });
+        return response.data.data;
+    },
+
     logout: async (): Promise<void> => {
         await axiosInstance.post(`/api/v1/auth/logout`);
     },

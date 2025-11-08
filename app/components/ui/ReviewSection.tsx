@@ -14,7 +14,7 @@ import {
   ICreateReviewData,
   IUpdateReviewData,
 } from "@/app/types/review.type";
-import Button from "./Button";
+import { Button } from "./button";
 
 interface ReviewSectionProps {
   productId: string;

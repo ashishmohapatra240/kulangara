@@ -2,6 +2,9 @@
 
 import { IDashboardStats, IOrderAnalytics, IUserAnalytics } from '@/app/types/admin.type';
 import { FiUsers, FiShoppingCart, FiDollarSign, FiPackage } from 'react-icons/fi';
+import { Card, CardContent } from '../ui/card';
+import { Skeleton } from '../ui/skeleton';
+import { Badge } from '../ui/badge';
 
 interface MetricsCardsProps {
   stats?: IDashboardStats;
@@ -13,18 +16,18 @@ interface MetricsCardsProps {
 const MetricsCards = ({ stats, orderAnalytics, userAnalytics, isLoading }: MetricsCardsProps) => {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-white border-2 border-black p-8 animate-pulse">
-            <div className="flex items-center justify-between mb-6">
-              <div className="w-14 h-14 bg-gray-300"></div>
-              <div className="w-20 h-4 bg-gray-300"></div>
-            </div>
-            <div>
-              <div className="w-24 h-10 bg-gray-300 mb-2"></div>
-              <div className="w-32 h-4 bg-gray-300"></div>
-            </div>
-          </div>
+          <Card key={i}>
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-4">
+                <Skeleton className="h-10 w-10 rounded" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+              <Skeleton className="h-8 w-24 mb-2" />
+              <Skeleton className="h-4 w-32" />
+            </CardContent>
+          </Card>
         ))}
       </div>
     );
@@ -52,89 +55,75 @@ const MetricsCards = ({ stats, orderAnalytics, userAnalytics, isLoading }: Metri
   const lowStockProducts = stats?.products?.lowStock ?? 0;
   const totalProducts = stats?.products?.total ?? 0;
 
+  const newUsersToday = stats?.users?.newToday ?? 0;
+
+  const metrics = [
+    {
+      title: 'USERS',
+      icon: FiUsers,
+      value: formatNumber(totalUsers),
+      subtitle: `${newUsersToday} new today`,
+      badge: newUsersToday > 0 ? `+${newUsersToday}` : null,
+    },
+    {
+      title: 'ORDERS',
+      icon: FiShoppingCart,
+      value: formatNumber(totalOrders),
+      subtitle: `${pendingOrders} pending`,
+      badge: pendingOrders > 0 ? `${pendingOrders}` : null,
+    },
+    {
+      title: 'REVENUE',
+      icon: FiDollarSign,
+      value: formatCurrency(totalRevenue),
+      subtitle: `${formatCurrency(avgOrderValue)} AOV`,
+      badge: null,
+    },
+    {
+      title: 'PRODUCTS',
+      icon: FiPackage,
+      value: formatNumber(totalProducts),
+      subtitle: `${lowStockProducts} low stock`,
+      badge: lowStockProducts > 0 ? `${lowStockProducts}` : null,
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-      {/* Users Card */}
-      <div className="bg-white border-2 border-black p-8">
-        <div className="flex flex-col">
-          <div className="flex items-center justify-between mb-6">
-            <div className="p-3 bg-black">
-              <FiUsers className="w-8 h-8 text-white" />
-            </div>
-            <span className="text-xs font-bold tracking-widest text-black">USERS</span>
-          </div>
-          <div>
-            <h3 className="text-4xl font-bold text-black mb-2">
-              {formatNumber(totalUsers)}
-            </h3>
-            <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">
-              {stats?.users?.newToday ?? 0} NEW TODAY
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Orders Card */}
-      <div className="bg-white border-2 border-black p-8">
-        <div className="flex flex-col">
-          <div className="flex items-center justify-between mb-6">
-            <div className="p-3 bg-black">
-              <FiShoppingCart className="w-8 h-8 text-white" />
-            </div>
-            <span className="text-xs font-bold tracking-widest text-black">ORDERS</span>
-          </div>
-          <div>
-            <h3 className="text-4xl font-bold text-black mb-2">
-              {formatNumber(totalOrders)}
-            </h3>
-            <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">
-              {pendingOrders} PENDING
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Revenue Card */}
-      <div className="bg-white border-2 border-black p-8">
-        <div className="flex flex-col">
-          <div className="flex items-center justify-between mb-6">
-            <div className="p-3 bg-black">
-              <FiDollarSign className="w-8 h-8 text-white" />
-            </div>
-            <span className="text-xs font-bold tracking-widest text-black">REVENUE</span>
-          </div>
-          <div>
-            <h3 className="text-4xl font-bold text-black mb-2">
-              {formatCurrency(totalRevenue)}
-            </h3>
-            <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">
-              {formatCurrency(avgOrderValue)} AOV
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Products Card */}
-      <div className="bg-white border-2 border-black p-8">
-        <div className="flex flex-col">
-          <div className="flex items-center justify-between mb-6">
-            <div className="p-3 bg-black">
-              <FiPackage className="w-8 h-8 text-white" />
-            </div>
-            <span className="text-xs font-bold tracking-widest text-black">PRODUCTS</span>
-          </div>
-          <div>
-            <h3 className="text-4xl font-bold text-black mb-2">
-              {formatNumber(totalProducts)}
-            </h3>
-            <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">
-              {lowStockProducts} LOW STOCK
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {metrics.map((metric, index) => {
+        const Icon = metric.icon;
+        return (
+          <Card key={index} className="hover:shadow-md transition-shadow">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-2 bg-primary rounded-md">
+                  <Icon className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <span className="text-xs font-semibold text-muted-foreground">
+                  {metric.title}
+                </span>
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-2xl font-bold">
+                    {metric.value}
+                  </h3>
+                  {metric.badge && (
+                    <Badge variant="secondary" className="text-xs">
+                      {metric.badge}
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {metric.subtitle}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 };
 
-export default MetricsCards; 
+export default MetricsCards;

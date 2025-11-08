@@ -8,14 +8,29 @@ import {
   useDeleteReview,
 } from "@/app/hooks/useReviews";
 import { useAuth } from "@/app/hooks/useAuth";
-import { FaStar, FaEdit, FaTrash, FaTimes } from "react-icons/fa";
-import Button from "./Button";
+import { FaStar, FaEdit, FaTrash } from "react-icons/fa";
+import { Button } from "./button";
 import ReviewModal from "./ReviewModal";
 import {
   ICreateReviewData,
   IUpdateReviewData,
   IReview,
 } from "@/app/types/review.type";
+import { Card, CardContent, CardHeader, CardTitle } from "./card";
+import { Badge } from "./badge";
+import { Separator } from "./separator";
+import { Skeleton } from "./skeleton";
+import { Avatar, AvatarFallback } from "./avatar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "./alert-dialog";
 
 interface ProductReviewsProps {
   productId: string;
@@ -42,43 +57,42 @@ export default function ProductReviews({
 
   if (isLoading) {
     return (
-      <div>
-        <div className="space-y-6">
+      <Card>
+        <CardHeader>
           <div className="flex items-center justify-between">
-            <div className="h-8 bg-gray-200 w-48 rounded animate-pulse"></div>
-            <div className="h-10 bg-gray-200 w-32 rounded animate-pulse"></div>
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-10 w-32" />
           </div>
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="border-b pb-6 last:border-b-0">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="h-6 bg-gray-200 w-32 rounded animate-pulse"></div>
-                    <div className="h-5 bg-gray-200 w-24 rounded animate-pulse"></div>
-                  </div>
-                  <div className="h-4 bg-gray-200 w-24 rounded animate-pulse"></div>
-                  <div className="h-4 bg-gray-200 w-full rounded animate-pulse"></div>
-                  <div className="h-4 bg-gray-200 w-3/4 rounded animate-pulse"></div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="space-y-3">
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-24" />
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     );
   }
 
   if (error) {
     return (
-      <div>
-        <div className="text-center py-8">
-          <div className="text-gray-600 mb-2">⚠️</div>
-          <p className="text-gray-600 font-medium">Error loading reviews</p>
-          <p className="text-gray-500 text-sm mt-1">
+      <Card>
+        <CardContent className="text-center py-8">
+          <p className="text-muted-foreground font-medium">Error loading reviews</p>
+          <p className="text-muted-foreground text-sm mt-1">
             Please try refreshing the page
           </p>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -95,7 +109,7 @@ export default function ProductReviews({
       <FaStar
         key={i}
         className={`${sizeClasses[size]} ${
-          i < rating ? "text-yellow-400" : "text-gray-200"
+          i < rating ? "text-yellow-500" : "text-muted"
         }`}
       />
     ));
@@ -169,148 +183,145 @@ export default function ProductReviews({
   const ratingDistribution = getRatingDistribution();
 
   return (
-    <div>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Customer Reviews
-            </h2>
-            {showSummary && meta && (
-              <div className="flex items-center gap-3">
-                <div className="flex items-center">
-                  {renderStars(Math.round(meta.stats.averageRating), "lg")}
-                </div>
-                <div className="text-left">
-                  <span className="text-2xl font-bold text-gray-900">
-                    {meta.stats.averageRating.toFixed(1)}
-                  </span>
-                  <span className="text-sm text-gray-500 ml-1">out of 5</span>
-                  <div className="text-sm text-gray-600">
-                    {meta.total} {meta.total === 1 ? "review" : "reviews"}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-          {showAddButton && isAuthenticated && !userReview && (
-            <Button
-              onClick={handleAddReview}
-              size="sm"
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              Write a Review
-            </Button>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Customer Reviews</h2>
+          {meta && meta.total > 0 && (
+            <p className="text-sm text-muted-foreground mt-1">
+              Based on {meta.total} {meta.total === 1 ? "review" : "reviews"}
+            </p>
           )}
         </div>
-
-        {/* Rating Distribution */}
-        {showSummary && meta && (
-          <div className="bg-gray-50 p-6">
-            <h3 className="font-semibold text-gray-900 mb-4">
-              Rating Breakdown
-            </h3>
-            <div className="space-y-2">
-              {[5, 4, 3, 2, 1].map((stars) => {
-                const count =
-                  ratingDistribution[stars as keyof typeof ratingDistribution];
-                const percentage =
-                  meta.total > 0 ? (count / meta.total) * 100 : 0;
-                return (
-                  <div key={stars} className="flex items-center gap-3">
-                    <div className="flex items-center gap-1 w-12">
-                      <span className="text-sm font-medium">{stars}</span>
-                      <FaStar className="w-3 h-3 text-yellow-400" />
-                    </div>
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-gray-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${percentage}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-sm text-gray-600 w-12 text-right">
-                      {count}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+        {showAddButton && isAuthenticated && !userReview && (
+          <Button onClick={handleAddReview} variant="outline">
+            Write a Review
+          </Button>
         )}
+      </div>
 
-        {/* User's Review */}
-        {userReview && (
-          <div className="bg-gray-50 p-6 border border-gray-200">
+      {/* Rating Summary */}
+      {showSummary && meta && meta.total > 0 && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Average Rating */}
+              <div className="flex flex-col items-center justify-center">
+                <div className="text-5xl font-bold mb-2">
+                  {meta.stats.averageRating.toFixed(1)}
+                </div>
+                <div className="flex items-center gap-1 mb-2">
+                  {renderStars(Math.round(meta.stats.averageRating), "lg")}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {meta.total} {meta.total === 1 ? "review" : "reviews"}
+                </p>
+              </div>
+
+              {/* Rating Distribution */}
+              <div className="space-y-2">
+                {[5, 4, 3, 2, 1].map((stars) => {
+                  const count =
+                    ratingDistribution[stars as keyof typeof ratingDistribution];
+                  const percentage =
+                    meta.total > 0 ? (count / meta.total) * 100 : 0;
+                  return (
+                    <div key={stars} className="flex items-center gap-3">
+                      <div className="flex items-center gap-1 w-16">
+                        <span className="text-sm font-medium">{stars}</span>
+                        <FaStar className="w-3 h-3 text-yellow-500" />
+                      </div>
+                      <div className="flex-1 bg-muted rounded-full h-2">
+                        <div
+                          className="bg-primary h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${percentage}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-sm text-muted-foreground w-12 text-right">
+                        {count}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* User's Review */}
+      {userReview && (
+        <Card className="border-primary/50 bg-muted/30">
+          <CardContent className="pt-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <h3 className="font-semibold text-gray-900">Your Review</h3>
-                  <span className="bg-gray-200 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
-                    You
-                  </span>
+                  <Badge variant="secondary">Your Review</Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => handleEditReview(userReview)}
-                    className="text-gray-600 hover:text-gray-800 transition-colors p-2 rounded-lg hover:bg-gray-100"
                     title="Edit review"
                   >
                     <FaEdit className="w-4 h-4" />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => handleDeleteClick(userReview)}
-                    className="text-gray-600 hover:text-gray-800 transition-colors p-2 rounded-lg hover:bg-gray-100"
                     title="Delete review"
                   >
                     <FaTrash className="w-4 h-4" />
-                  </button>
+                  </Button>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 {renderStars(userReview.rating, "md")}
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-muted-foreground">
                   {new Date(userReview.createdAt).toLocaleDateString()}
                 </span>
               </div>
               {userReview.title && (
-                <h4 className="font-semibold text-gray-900">
+                <h4 className="font-semibold text-foreground">
                   {userReview.title}
                 </h4>
               )}
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed">
                 {userReview.comment}
               </p>
             </div>
-          </div>
-        )}
+          </CardContent>
+        </Card>
+      )}
 
-        {/* Other Reviews */}
-        <div className="space-y-6">
-          {otherReviews.map((review: IReview) => (
-            <div
-              key={review.id}
-              className="bg-white border border-gray-200 p-6 hover:shadow-md transition-shadow"
-            >
+      {/* Other Reviews */}
+      <div className="space-y-4">
+        {otherReviews.map((review: IReview) => (
+          <Card key={review.id}>
+            <CardContent className="pt-6">
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-800 font-semibold">
-                      {review.user.firstName.charAt(0)}
-                      {review.user.lastName.charAt(0)}
-                    </div>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-3">
+                    <Avatar>
+                      <AvatarFallback>
+                        {review.user.firstName.charAt(0)}
+                        {review.user.lastName.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
                     <div>
-                      <span className="font-semibold text-gray-900">
+                      <p className="font-semibold text-foreground">
                         {review.user.firstName} {review.user.lastName}
-                      </span>
+                      </p>
                       <div className="flex items-center gap-2 mt-1">
                         {review.isVerified && (
-                          <span className="text-xs bg-gray-200 text-gray-800 px-2 py-1 rounded-full font-medium">
+                          <Badge variant="secondary" className="text-xs">
                             ✓ Verified Purchase
-                          </span>
+                          </Badge>
                         )}
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-muted-foreground">
                           {new Date(review.createdAt).toLocaleDateString()}
                         </span>
                       </div>
@@ -319,44 +330,42 @@ export default function ProductReviews({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  {renderStars(review.rating, "md")}
-                  <span className="text-sm text-gray-600">
-                    {review.rating} out of 5
+                  {renderStars(review.rating, "sm")}
+                  <span className="text-sm text-muted-foreground">
+                    {review.rating}.0
                   </span>
                 </div>
 
                 {review.title && (
-                  <h4 className="font-semibold text-gray-900">
+                  <h4 className="font-semibold text-foreground">
                     {review.title}
                   </h4>
                 )}
 
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed">
                   {review.comment}
                 </p>
               </div>
-            </div>
-          ))}
+            </CardContent>
+          </Card>
+        ))}
 
-          {reviews.length === 0 && (
-            <div className="text-center py-12">
-              <div className="text-gray-400 mb-4">📝</div>
-              <p className="text-gray-600 font-medium">No reviews yet</p>
-              <p className="text-gray-500 text-sm mt-1">
+        {reviews.length === 0 && (
+          <Card>
+            <CardContent className="text-center py-12">
+              <p className="text-4xl mb-4">📝</p>
+              <p className="text-foreground font-medium mb-2">No reviews yet</p>
+              <p className="text-muted-foreground text-sm mb-4">
                 Be the first to review this product!
               </p>
               {isAuthenticated && !userReview && (
-                <Button
-                  onClick={handleAddReview}
-                  className="mt-4"
-                  variant="outline"
-                >
+                <Button onClick={handleAddReview} variant="outline">
                   Write the First Review
                 </Button>
               )}
-            </div>
-          )}
-        </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Review Modal */}
@@ -371,53 +380,27 @@ export default function ProductReviews({
         }
       />
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/20 bg-opacity-50 backdrop-blur-sm"
-            onClick={handleDeleteCancel}
-          />
-          <div className="relative bg-white shadow-2xl max-w-md w-full border border-gray-200">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">
-                  Delete Review
-                </h3>
-                <button
-                  onClick={handleDeleteCancel}
-                  className="text-gray-400 hover:text-gray-600 transition-colors p-1"
-                >
-                  <FaTimes className="w-5 h-5" />
-                </button>
-              </div>
-              <p className="text-gray-700 mb-6">
-                Are you sure you want to delete your review? This action cannot
-                be undone.
-              </p>
-              <div className="flex gap-3">
-                <Button
-                  onClick={handleDeleteConfirm}
-                  disabled={deleteReviewMutation.isPending}
-                  className="flex-1"
-                >
-                  {deleteReviewMutation.isPending
-                    ? "Deleting..."
-                    : "Delete Review"}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleDeleteCancel}
-                  disabled={deleteReviewMutation.isPending}
-                  className="flex-1"
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Review</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete your review? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleDeleteCancel}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={deleteReviewMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteReviewMutation.isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

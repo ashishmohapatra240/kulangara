@@ -1,11 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import Button from "@/app/components/ui/Button";
+import { Button } from "@/app/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 import { useAuth } from "@/app/hooks/useAuth";
 import { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { Card, CardContent } from "@/app/components/ui/card";
+import { Input } from "@/app/components/ui/input";
+import { Label } from "@/app/components/ui/label";
+import { Alert } from "@/app/components/ui/alert";
 
 const ALLOWED_ROLES = ["ADMIN", "DELIVERY_PARTNER"];
 
@@ -37,158 +42,152 @@ export default function AdminRegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-white">
+    <div className="min-h-screen flex">
       <Toaster position="top-right" />
-      {/* Image container - hidden on mobile */}
-      <div className="hidden lg:block w-1/2 h-screen bg-black">
+      {/* Left side - Image */}
+      <div className="hidden lg:flex lg:w-1/2 relative bg-muted">
         <Image
           src="/images/coming-soon.jpg"
-          alt="Admin Registration background"
-          className="w-full h-full object-cover opacity-70"
-          height={1000}
-          width={1000}
+          alt="Admin Registration"
+          fill
+          className="object-cover"
+          priority
         />
       </div>
 
-      {/* Form container */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-8 py-12 bg-white">
-        <div className="max-w-lg w-full">
-          <div className="border-2 border-black p-12">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-black tracking-tight mb-4">
-                ADMIN REGISTRATION
-              </h2>
-              <p className="text-sm font-medium text-gray-600 tracking-wide">
-                REGISTER AS ADMIN OR DELIVERY PARTNER
-              </p>
-            </div>
-            <form className="space-y-8" onSubmit={handleSubmit}>
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="firstName" className="block text-sm font-bold text-black mb-3 tracking-widest">
-                      FIRST NAME
-                    </label>
-                    <input
-                      id="firstName"
-                      name="firstName"
-                      type="text"
-                      required
-                      className="w-full px-4 py-4 border-2 border-black placeholder:text-gray-500 text-black font-medium focus:outline-none"
-                      placeholder="FIRST NAME"
-                      value={formData.firstName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, firstName: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="lastName" className="block text-sm font-bold text-black mb-3 tracking-widest">
-                      LAST NAME
-                    </label>
-                    <input
-                      id="lastName"
-                      name="lastName"
-                      type="text"
-                      required
-                      className="w-full px-4 py-4 border-2 border-black placeholder:text-gray-500 text-black font-medium focus:outline-none"
-                      placeholder="LAST NAME"
-                      value={formData.lastName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, lastName: e.target.value })
-                      }
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-bold text-black mb-3 tracking-widest">
-                    EMAIL ADDRESS
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    className="w-full px-4 py-4 border-2 border-black placeholder:text-gray-500 text-black font-medium focus:outline-none"
-                    placeholder="EMAIL ADDRESS"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                  />
-                </div>
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-bold text-black mb-3 tracking-widest">
-                    PHONE NUMBER
-                  </label>
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    required
-                    className="w-full px-4 py-4 border-2 border-black placeholder:text-gray-500 text-black font-medium focus:outline-none"
-                    placeholder="PHONE NUMBER"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                  />
-                </div>
-                <div>
-                  <label htmlFor="role" className="block text-sm font-bold text-black mb-3 tracking-widest">
-                    ROLE
-                  </label>
-                  <select
-                    id="role"
-                    name="role"
-                    required
-                    className="w-full px-4 py-4 border-2 border-black text-black font-medium focus:outline-none"
-                    value={formData.role}
-                    onChange={(e) =>
-                      setFormData({ ...formData, role: e.target.value })
-                    }
-                  >
-                    {ALLOWED_ROLES.map((role) => (
-                      <option key={role} value={role}>
-                        {role}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="password" className="block text-sm font-bold text-black mb-3 tracking-widest">
-                    PASSWORD
-                  </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    className="w-full px-4 py-4 border-2 border-black placeholder:text-gray-500 text-black font-medium focus:outline-none"
-                    placeholder="PASSWORD"
-                    value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-
-              {error && <div className="text-black font-bold text-center p-4 border-2 border-black tracking-wide">{error.toUpperCase()}</div>}
-
-              <div>
-                <Button type="submit" className="w-full py-4 font-bold tracking-widest" disabled={isLoading}>
-                  {isLoading ? "CREATING ACCOUNT..." : "CREATE ADMIN ACCOUNT"}
-                </Button>
-              </div>
-            </form>
-            <div className="text-center mt-8">
-              <a href="/admin/login" className="text-black font-bold tracking-widest border-b-2 border-black hover:bg-black hover:text-white transition-colors px-2 py-1">
-                ALREADY HAVE AN ADMIN ACCOUNT? SIGN IN
-              </a>
-            </div>
+      {/* Right side - Form */}
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 lg:px-8">
+        <div className="w-full max-w-sm space-y-8">
+          {/* Logo/Brand */}
+          <div className="text-center space-y-2">
+            <h1 className="text-2xl font-semibold tracking-tight">Admin Registration</h1>
+            <p className="text-sm text-muted-foreground">
+              Create an admin or delivery partner account
+            </p>
           </div>
+
+          {/* Form Card */}
+          <Card className="border-border/50">
+            <CardContent className="pt-6">
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">First name</Label>
+                      <Input
+                        id="firstName"
+                        name="firstName"
+                        type="text"
+                        required
+                        placeholder="John"
+                        value={formData.firstName}
+                        onChange={(e) =>
+                          setFormData({ ...formData, firstName: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Last name</Label>
+                      <Input
+                        id="lastName"
+                        name="lastName"
+                        type="text"
+                        required
+                        placeholder="Doe"
+                        value={formData.lastName}
+                        onChange={(e) =>
+                          setFormData({ ...formData, lastName: e.target.value })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      placeholder="admin@example.com"
+                      value={formData.email}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      required
+                      placeholder="+1234567890"
+                      value={formData.phone}
+                      onChange={(e) =>
+                        setFormData({ ...formData, phone: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="role">Role</Label>
+                    <select
+                      id="role"
+                      name="role"
+                      required
+                      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                      value={formData.role}
+                      onChange={(e) =>
+                        setFormData({ ...formData, role: e.target.value })
+                      }
+                    >
+                      {ALLOWED_ROLES.map((role) => (
+                        <option key={role} value={role}>
+                          {role}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      required
+                      placeholder="Create a password"
+                      value={formData.password}
+                      onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+
+                {error && (
+                  <Alert variant="destructive">
+                    <p className="text-sm">{error}</p>
+                  </Alert>
+                )}
+
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Creating Account..." : "Create Admin Account"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* Sign in link */}
+          <p className="text-center text-sm text-muted-foreground">
+            Already have an account?{" "}
+            <Link
+              href="/admin/login"
+              className="font-medium text-foreground hover:underline"
+            >
+              Sign in
+            </Link>
+          </p>
         </div>
       </div>
     </div>

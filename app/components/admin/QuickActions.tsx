@@ -2,6 +2,8 @@
 
 import { FiMail, FiUsers, FiBarChart, FiRefreshCw } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Button } from '../ui/button';
 
 interface QuickActionsProps {
   onRefresh?: () => void;
@@ -24,44 +26,53 @@ const QuickActions = ({ onRefresh, isRefreshing }: QuickActionsProps) => {
   };
 
   return (
-    <div className="bg-white border-2 border-black p-8">
-      <h2 className="text-2xl font-bold mb-8 tracking-tight">QUICK ACTIONS</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <button
-          onClick={handleSendEmail}
-          className="flex items-center p-6 border-2 border-black hover:bg-black hover:text-white transition-colors group"
-        >
-          <FiMail className="w-6 h-6 text-black group-hover:text-white mr-4" />
-          <span className="font-bold text-sm tracking-widest">SEND EMAIL</span>
-        </button>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base font-semibold">Quick Actions</CardTitle>
+        <CardDescription className="text-sm text-muted-foreground">Access frequently used admin functions</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Button
+            onClick={handleSendEmail}
+            variant="outline"
+            className="h-auto py-4 justify-start"
+          >
+            <FiMail className="w-5 h-5 mr-3" />
+            Send Email
+          </Button>
 
-        <button
-          onClick={handleViewUsers}
-          className="flex items-center p-6 border-2 border-black hover:bg-black hover:text-white transition-colors group"
-        >
-          <FiUsers className="w-6 h-6 text-black group-hover:text-white mr-4" />
-          <span className="font-bold text-sm tracking-widest">VIEW USERS</span>
-        </button>
+          <Button
+            onClick={handleViewUsers}
+            variant="outline"
+            className="h-auto py-4 justify-start"
+          >
+            <FiUsers className="w-5 h-5 mr-3" />
+            View Users
+          </Button>
 
-        <button
-          onClick={handleViewAnalytics}
-          className="flex items-center p-6 border-2 border-black hover:bg-black hover:text-white transition-colors group"
-        >
-          <FiBarChart className="w-6 h-6 text-black group-hover:text-white mr-4" />
-          <span className="font-bold text-sm tracking-widest">VIEW ANALYTICS</span>
-        </button>
+          <Button
+            onClick={handleViewAnalytics}
+            variant="outline"
+            className="h-auto py-4 justify-start"
+          >
+            <FiBarChart className="w-5 h-5 mr-3" />
+            View Analytics
+          </Button>
 
-        <button
-          onClick={onRefresh}
-          disabled={isRefreshing}
-          className="flex items-center p-6 border-2 border-black hover:bg-black hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
-        >
-          <FiRefreshCw className={`w-6 h-6 text-black group-hover:text-white mr-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          <span className="font-bold text-sm tracking-widest">REFRESH DATA</span>
-        </button>
-      </div>
-    </div>
+          <Button
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            variant="outline"
+            className="h-auto py-4 justify-start"
+          >
+            <FiRefreshCw className={`w-5 h-5 mr-3 ${isRefreshing ? 'animate-spin' : ''}`} />
+            Refresh Data
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
-export default QuickActions; 
+export default QuickActions;

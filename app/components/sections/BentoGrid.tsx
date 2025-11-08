@@ -3,71 +3,57 @@ import Link from "next/link";
 
 export default function BentoGrid() {
   return (
-    <section className="container mx-auto py-8 sm:py-12 lg:py-16">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 lg:gap-4">
-        <div className="relative aspect-square md:aspect-[3/4]">
+    <section className="py-16 container mx-auto px-4 max-w-6xl">
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Link href="/products" className="md:col-span-2 md:row-span-2 group relative overflow-hidden rounded-lg aspect-square md:aspect-auto">
           <Image
-            src="/images/home-2.png"
-            alt="Collection highlight"
-            width={1000}
-            height={1500}
-            className="object-cover w-full h-full"
-            priority
+            src="/images/coming-soon.jpg"
+            alt="Featured Collection"
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          <div className="absolute inset-0 flex items-end">
-            <div className="w-full p-4 sm:p-6 lg:p-8 bg-gradient-to-t from-black/80 via-black/60 to-transparent h-[15%] sm:h-[12%]">
-              <div className="text-white">
-                <h3 className="text-xl sm:text-2xl font-medium">Summer Essentials</h3>
-                <Link
-                  href="/products"
-                  className="underline mt-1 sm:mt-2 inline-block text-sm sm:text-base hover:text-gray-200 transition-colors"
-                >
-                  Shop Now
-                </Link>
-              </div>
+          <div className="absolute inset-0" />
+          <div className="absolute inset-0 flex items-end p-6">
+            <div className="text-white">
+              <h3 className="text-2xl font-bold mb-2">New Arrivals</h3>
+              <p className="text-sm opacity-90">Explore our latest collection</p>
             </div>
           </div>
-        </div>
-        <div className="grid grid-rows-2 gap-2 sm:gap-3 lg:gap-4">
-          {[
-            {
-              title: "New Arrivals",
-              image:
-                "/images/home.png",
-              link: "/products",
-            },
-            {
-              title: "Bestsellers",
-              image:
-                "/images/home-1.png",
-              link: "/products",
-            },
-          ].map((item, index) => (
-            <div key={index} className="relative aspect-[4/3] sm:aspect-[3/2]">
-              <Image
-                src={item.image}
-                alt={item.title}
-                width={800}
-                height={600}
-                className="object-cover w-full h-full"
-              />
-              <div className="absolute inset-0 flex items-end">
-                <div className="w-full p-4 sm:p-6 bg-gradient-to-t from-black/80 via-black/60 to-transparent h-[20%]">
-                  <div className="text-white">
-                    <h3 className="text-lg sm:text-xl font-medium">{item.title}</h3>
-                    <Link
-                      href={item.link}
-                      className="underline mt-1 sm:mt-2 inline-block text-sm sm:text-base hover:text-gray-200 transition-colors"
-                    >
-                      Shop Now
-                    </Link>
-                  </div>
-                </div>
-              </div>
+        </Link>
+
+        {/* Small cards */}
+        <Link href="/products" className="group relative overflow-hidden rounded-lg aspect-square">
+          <Image
+            src="/images/coming-soon.jpg"
+            alt="Collection 1"
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+          <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
+          <div className="absolute inset-0 flex items-end p-4">
+            <div className="text-white">
+              <h3 className="text-lg font-bold">Essentials</h3>
             </div>
-          ))}
-        </div>
+          </div>
+        </Link>
+
+        <Link href="/products" className="group relative overflow-hidden rounded-lg aspect-square">
+          <Image
+            src="/images/coming-soon.jpg"
+            alt="Collection 2"
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+          <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
+          <div className="absolute inset-0 flex items-end p-4">
+            <div className="text-white">
+              <h3 className="text-lg font-bold">Premium</h3>
+            </div>
+          </div>
+        </Link>
       </div>
     </section>
   );
 }
+

@@ -33,6 +33,20 @@ export const fetchCart = createAsyncThunk(
             const response = await cartService.getCart();
             return response; // ICartResponse
         } catch (error: unknown) {
+            // Don't treat 401/403 as errors - just return empty cart
+            if (error instanceof AxiosError && (error.response?.status === 401 || error.response?.status === 403)) {
+                return {
+                    success: true,
+                    message: 'Please log in to view your cart',
+                    data: {
+                        items: [],
+                        totalItems: 0,
+                        subtotal: 0,
+                        shipping: 0,
+                        total: 0
+                    }
+                };
+            }
             const errorMessage = error instanceof AxiosError ? getErrorMessage(error) : 'Failed to fetch cart';
             return rejectWithValue(errorMessage);
         }
@@ -158,9 +172,12 @@ const cartSlice = createSlice({
         builder
             .addCase(fetchCart.pending, handlePending)
             .addCase(fetchCart.fulfilled, (state, action) => {
+                // Validate payload structure before using
                 const payload = action.payload as ICartResponse;
-                const items = payload.data?.items || [];
-                applyCartTotals(state, items, payload.data?.shipping);
+                if (payload && typeof payload === 'object' && payload.data) {
+                    const items = Array.isArray(payload.data.items) ? payload.data.items : [];
+                    applyCartTotals(state, items, payload.data.shipping);
+                }
                 state.loading = false;
             })
             .addCase(fetchCart.rejected, handleRejected);
@@ -173,8 +190,10 @@ const cartSlice = createSlice({
             })
             .addCase(addToCart.fulfilled, (state, action) => {
                 const payload = action.payload as ICartResponse;
-                const items = payload.data?.items || [];
-                applyCartTotals(state, items, payload.data?.shipping);
+                if (payload && typeof payload === 'object' && payload.data) {
+                    const items = Array.isArray(payload.data.items) ? payload.data.items : [];
+                    applyCartTotals(state, items, payload.data.shipping);
+                }
                 state.loading = false;
             })
             .addCase(addToCart.rejected, handleRejected);
@@ -187,8 +206,10 @@ const cartSlice = createSlice({
             })
             .addCase(updateCartItem.fulfilled, (state, action) => {
                 const payload = action.payload as ICartResponse;
-                const items = payload.data?.items || [];
-                applyCartTotals(state, items, payload.data?.shipping);
+                if (payload && typeof payload === 'object' && payload.data) {
+                    const items = Array.isArray(payload.data.items) ? payload.data.items : [];
+                    applyCartTotals(state, items, payload.data.shipping);
+                }
                 state.loading = false;
             })
             .addCase(updateCartItem.rejected, handleRejected);
@@ -197,8 +218,10 @@ const cartSlice = createSlice({
             .addCase(removeFromCart.pending, handlePending)
             .addCase(removeFromCart.fulfilled, (state, action) => {
                 const payload = action.payload as ICartResponse;
-                const items = payload.data?.items || [];
-                applyCartTotals(state, items, payload.data?.shipping);
+                if (payload && typeof payload === 'object' && payload.data) {
+                    const items = Array.isArray(payload.data.items) ? payload.data.items : [];
+                    applyCartTotals(state, items, payload.data.shipping);
+                }
                 state.loading = false;
             })
             .addCase(removeFromCart.rejected, handleRejected);
@@ -208,8 +231,10 @@ const cartSlice = createSlice({
             .addCase(clearCart.pending, handlePending)
             .addCase(clearCart.fulfilled, (state, action) => {
                 const payload = action.payload as ICartResponse;
-                const items = payload.data?.items || [];
-                applyCartTotals(state, items, payload.data?.shipping);
+                if (payload && typeof payload === 'object' && payload.data) {
+                    const items = Array.isArray(payload.data.items) ? payload.data.items : [];
+                    applyCartTotals(state, items, payload.data.shipping);
+                }
                 state.loading = false;
             })
             .addCase(clearCart.rejected, handleRejected);

@@ -1,10 +1,13 @@
 "use client";
 
+import { memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { CiHeart } from "react-icons/ci";
-import { FaHeart } from "react-icons/fa";
-import { FaStar } from "react-icons/fa";
+import { FiHeart, FiStar } from "react-icons/fi";
+import { toast } from "react-hot-toast";
+
+import { cn } from "@/app/lib/utils";
+import { formatCurrency, calculateDiscountPercentage } from "@/app/lib/formatters";
 import {
   useWishlist,
   useCreateWishlistItems,
@@ -12,7 +15,10 @@ import {
 } from "@/app/hooks/useWishlist";
 import { useReviews } from "@/app/hooks/useReviews";
 import { useSingleProductStock } from "@/app/hooks/useCartValidation";
-import { toast } from "react-hot-toast";
+import { Badge } from "./badge";
+import { Button } from "./button";
+import { Card, CardContent } from "./card";
+import { Skeleton } from "./skeleton";
 
 interface ProductCardProps {
   id: string;
@@ -23,10 +29,9 @@ interface ProductCardProps {
   category?: { name: string };
 }
 
-const PLACEHOLDER_IMAGE =
-  "/images/coming-soon.jpg";
+const PLACEHOLDER_IMAGE = "/images/coming-soon.jpg";
 
-export default function ProductCard({
+function ProductCardComponent({
   id,
   name,
   price,
@@ -35,76 +40,75 @@ export default function ProductCard({
   category,
 }: ProductCardProps) {
   const { data: wishlistResponse } = useWishlist();
-  const createWishlistMutation = useCreateWishlistItems();
-  const deleteWishlistMutation = useDeleteWishlistItems();
+  const createWishlist = useCreateWishlistItems();
+  const deleteWishlist = useDeleteWishlistItems();
   const { data: reviewsData } = useReviews(id);
-  const { data: stockInfo, isLoading: stockLoading } =
-    useSingleProductStock(id);
+  const { data: stockInfo, isLoading: stockLoading } = useSingleProductStock(id);
 
-  const wishlistItems = wishlistResponse?.data || [];
+  const wishlistItems = wishlistResponse?.data ?? [];
   const isInWishlist = wishlistItems.some((item) => item.product.id === id);
 
-  let displayImage = PLACEHOLDER_IMAGE;
-  if (Array.isArray(images) && images.length > 0) {
-    const primary = images.find((img) => img.isPrimary) || images[0];
-    displayImage = primary.url || PLACEHOLDER_IMAGE;
-  }
-
-  const toggleWishlist = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    try {
-      if (isInWishlist) {
-        await deleteWishlistMutation.mutateAsync(id);
-        toast.success("Removed from wishlist");
-      } else {
-        await createWishlistMutation.mutateAsync(id);
-        toast.success("Added to wishlist");
-      }
-    } catch {
-      toast.error("Failed to update wishlist");
+  const displayImage = (() => {
+    if (Array.isArray(images) && images.length > 0) {
+      const primary = images.find((img) => img.isPrimary) ?? images[0];
+      return primary?.url || PLACEHOLDER_IMAGE;
     }
-  };
+    return PLACEHOLDER_IMAGE;
+  })();
 
   const avgRating = reviewsData?.meta?.stats?.averageRating ?? 0;
   const reviewCount = reviewsData?.meta?.total ?? 0;
+  const discountPercent = discountedPrice && discountedPrice < price 
+    ? calculateDiscountPercentage(price, discountedPrice) 
+    : 0;
 
-  const renderStars = (rating: number, size: "sm" | "md" | "lg" = "md") => {
-    const sizeClasses = {
-      sm: "w-3 h-3",
-      md: "w-4 h-4",
-      lg: "w-5 h-5",
-    };
-    return [...Array(5)].map((_, i) => (
-      <FaStar
-        key={i}
-        className={`${sizeClasses[size]} ${
-          i < Math.round(rating) ? "text-yellow-400" : "text-gray-200"
-        }`}
-      />
-    ));
+  const handleWishlistToggle = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    try {
+      if (isInWishlist) {
+        await deleteWishlist.mutateAsync(id);
+        toast.success("Removed from wishlist");
+      } else {
+        await createWishlist.mutateAsync(id);
+        toast.success("Added to wishlist");
+      }
+    } catch {
+      toast.error("Unable to update wishlist right now");
+    }
   };
 
-  const getStockDisplay = () => {
-    if (stockLoading) return null;
+  const stockStatus = () => {
+    if (stockLoading) {
+      return <Skeleton className="h-5 w-24" />;
+    }
+    
     if (!stockInfo) return null;
 
     const { stockQuantity, lowStockThreshold } = stockInfo;
 
     if (stockQuantity === 0) {
       return (
-        <span className="text-xs text-red-500 font-medium">Out of Stock</span>
+        <Badge variant="destructive" className="text-xs font-medium">
+          Out of Stock
+        </Badge>
       );
-    } else if (stockQuantity <= lowStockThreshold) {
+    }
+
+    if (stockQuantity <= lowStockThreshold) {
       return (
-        <span className="text-xs text-orange-500 font-medium">
-          Only {stockQuantity} left!
-        </span>
+        <Badge className="text-xs font-medium bg-orange-500 hover:bg-orange-600">
+          Only {stockQuantity} Left
+        </Badge>
       );
-    } else if (stockQuantity <= 10) {
+    }
+
+    if (stockQuantity <= 10) {
       return (
-        <span className="text-xs text-yellow-600 font-medium">Low stock</span>
+        <Badge variant="secondary" className="text-xs font-medium bg-yellow-50 text-yellow-700 border-yellow-200">
+          Low Stock
+        </Badge>
       );
     }
 
@@ -112,81 +116,114 @@ export default function ProductCard({
   };
 
   return (
-    <Link
-      href={`/products/${id}`}
-      className="group relative block bg-white border border-gray-200 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50"
-    >
-      <div className="aspect-square w-full overflow-hidden">
-        <Image
-          src={displayImage}
-          alt={name}
-          width={500}
-          height={500}
-          className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
-        />
-        <button
-          onClick={toggleWishlist}
-          className="absolute top-4 right-4 p-2 bg-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-100 border border-gray-200"
-          disabled={
-            createWishlistMutation.isPending || deleteWishlistMutation.isPending
-          }
-        >
-          {isInWishlist ? (
-            <FaHeart className="w-5 h-5 text-red-500" />
-          ) : (
-            <CiHeart className="w-5 h-5" />
+    <Link href={`/products/${id}`} className="group block h-full">
+      <Card className="flex h-full flex-col overflow-hidden rounded-2xl border border-border/40 bg-card transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 pb-10 pt-0">
+        <div className="relative aspect-square overflow-hidden">
+          <Image
+            src={displayImage}
+            alt={name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(min-width: 768px) 320px, 100vw"
+          />
+
+          {/* Discount Badge */}
+          {discountPercent > 0 && (
+            <Badge className="absolute top-2 left-2 bg-destructive text-destructive-foreground shadow-md text-xs px-2 py-0.5">
+              -{discountPercent}%
+            </Badge>
           )}
-        </button>
-      </div>
-      <div className="p-4 flex flex-col gap-2">
-        <div>
-          {category?.name && (
-            <div className="text-xs text-gray-400 mb-1 uppercase tracking-wide font-medium">
-              {category.name}
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={handleWishlistToggle}
+            disabled={createWishlist.isPending || deleteWishlist.isPending}
+            className={cn(
+              "absolute top-2 right-2 h-7 w-7 rounded-full border backdrop-blur-sm transition-all duration-200",
+              isInWishlist 
+                ? "border-primary/50 bg-primary/90 text-primary-foreground hover:bg-primary hover:scale-110" 
+                : "border-border/50 bg-background/70 text-muted-foreground hover:bg-background/90 hover:text-foreground hover:scale-110"
+            )}
+          >
+            <FiHeart
+              className="h-3 w-3 transition-transform"
+              style={isInWishlist ? { fill: "currentColor" } : undefined}
+            />
+          </Button>
+
+          {/* Stock Status Overlay */}
+          {stockInfo?.stockQuantity === 0 && (
+            <div className="absolute inset-0 bg-background/80 backdrop-blur-[2px] flex items-center justify-center">
+              <Badge variant="destructive" className="text-xs font-semibold px-3">
+                Out of Stock
+              </Badge>
             </div>
           )}
-          <div className="flex flex-row justify-between items-start mb-2">
-            <h3 className="text-lg font-medium leading-tight group-hover:text-gray-700 transition-colors">
+        </div>
+
+        <CardContent className="flex flex-1 flex-col px-3.5 space-y-2">
+          {/* Category Badge */}
+          {category?.name && (
+            <Badge variant="secondary" className="w-fit text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 bg-secondary/80">
+              {category.name}
+            </Badge>
+          )}
+
+          {/* Product Name and Price Row */}
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="text-[15px] font-semibold leading-tight text-foreground line-clamp-2 group-hover:text-primary transition-colors flex-1">
               {name}
             </h3>
-            <div className="flex flex-col items-end">
+            <div className="flex flex-col items-end shrink-0">
               {discountedPrice && discountedPrice < price ? (
                 <>
-                  <span className="text-gray-900 font-semibold">
-                    ₹{discountedPrice.toLocaleString()}
-                  </span>
-                  <span className="text-gray-400 line-through text-sm">
-                    ₹{price.toLocaleString()}
-                  </span>
+                  <p className="text-lg font-bold text-foreground leading-tight whitespace-nowrap">
+                    {formatCurrency(discountedPrice)}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground line-through leading-tight whitespace-nowrap">
+                    {formatCurrency(price)}
+                  </p>
                 </>
               ) : (
-                <span className="text-gray-900 font-semibold">
-                  ₹{price.toLocaleString()}
-                </span>
+                <p className="text-lg font-bold text-foreground whitespace-nowrap">
+                  {formatCurrency(price)}
+                </p>
               )}
             </div>
           </div>
-          {/* Rating row like product detail page */}
-          {avgRating > 0 && (
-            <div className="flex items-center gap-2 mb-1">
-              <div className="flex items-center">
-                {renderStars(avgRating, "lg")}
-              </div>
-              <span className="text-lg font-bold text-gray-900">
-                {avgRating.toFixed(1)}
-              </span>
-              <span className="text-sm text-gray-500">out of 5</span>
-              <span className="text-sm text-gray-600">
-                {reviewCount} {reviewCount === 1 ? "review" : "reviews"}
-              </span>
-            </div>
-          )}
 
-          <div className="mt-1">
-            {getStockDisplay()}
+          {/* Rating and Stock in same row */}
+          <div className="flex items-center justify-between gap-1.5">
+            {avgRating > 0 && (
+              <div className="flex items-center gap-1">
+                <FiStar className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                <span className="text-sm font-semibold text-foreground">
+                  {avgRating.toFixed(1)}
+                </span>
+                <span className="text-[11px] text-muted-foreground">
+                  ({reviewCount})
+                </span>
+              </div>
+            )}
+            {stockStatus()}
           </div>
-        </div>
-      </div>
+
+          {/* Save Badge */}
+          {discountedPrice && discountedPrice < price && (
+            <Badge variant="secondary" className="text-[10px] font-semibold bg-green-50 text-green-700 border-green-200 px-1.5 py-0.5 w-fit">
+              Save ₹{(price - discountedPrice).toLocaleString()}
+            </Badge>
+          )}
+        </CardContent>
+      </Card>
     </Link>
   );
 }
+
+
+const ProductCard = memo(ProductCardComponent);
+ProductCard.displayName = 'ProductCard';
+
+export default ProductCard;

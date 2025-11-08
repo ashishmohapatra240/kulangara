@@ -1,3 +1,4 @@
+import { memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ICartItem } from "@/app/types/cart.type";
@@ -8,7 +9,7 @@ interface CartCardProps {
   removeFromCart: (id: string) => void;
 }
 
-export default function CartCard({
+function CartCardComponent({
   item,
   updateQuantity,
   removeFromCart,
@@ -118,3 +119,9 @@ export default function CartCard({
     </div>
   );
 }
+
+// Memoize to prevent unnecessary re-renders when cart updates other items
+const CartCard = memo(CartCardComponent);
+CartCard.displayName = 'CartCard';
+
+export default CartCard;

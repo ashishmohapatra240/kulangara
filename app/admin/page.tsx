@@ -11,6 +11,9 @@ import QuickActions from "@/app/components/admin/QuickActions";
 import ActivityFeed from "@/app/components/admin/ActivityFeed";
 import SystemHealth from "@/app/components/admin/SystemHealth";
 import { FiClock } from "react-icons/fi";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
+import { Button } from "@/app/components/ui/button";
+import { Alert, AlertDescription } from "@/app/components/ui/alert";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN", "DELIVERY_PARTNER"];
 
@@ -43,71 +46,72 @@ export default function AdminPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white">
-        <h1 className="text-3xl font-bold tracking-tight">LOADING...</h1>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <p className="text-base font-medium text-muted-foreground">Loading...</p>
       </div>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-        <h1 className="text-4xl font-bold mb-8 tracking-tight">ADMIN PANEL</h1>
-        <p className="mb-8 text-gray-600 font-medium tracking-wide text-center max-w-md">
-          YOU MUST BE AN ADMIN, SUPERADMIN, OR DELIVERY PARTNER TO ACCESS THIS
-          PAGE.
-        </p>
-        <Link
-          href="/admin/login"
-          className="px-8 py-4 bg-black text-white border-2 border-black font-bold tracking-widest hover:bg-white hover:text-black transition-colors"
-        >
-          ADMIN LOGIN
-        </Link>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+        <div className="max-w-md w-full px-6">
+          <Card>
+            <div className="p-8 text-center space-y-6">
+              <h1 className="text-2xl font-bold">Admin Panel</h1>
+              <p className="text-sm text-muted-foreground">
+                You must be an admin, superadmin, or delivery partner to access this page.
+              </p>
+              <Link href="/admin/login">
+                <Button className="w-full" size="lg">
+                  Admin Login
+                </Button>
+              </Link>
+            </div>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-white">
-        <div className="flex justify-between items-center pt-30 mb-12 pb-6 border-b-2 border-black">
-          <h1 className="text-4xl font-bold tracking-tight">DASHBOARD</h1>
-          <div className="flex items-center space-x-3 text-sm text-gray-600">
-            <FiClock className="w-5 h-5" />
-            <span className="font-medium tracking-wide">
-              LAST UPDATED: {lastUpdated?.toLocaleTimeString?.() ?? "—"}
+      <div className="min-h-screen bg-background px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 pt-4 sm:pt-6">
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <FiClock className="w-4 h-4" />
+            <span className="truncate">
+              Last updated: {lastUpdated?.toLocaleTimeString?.() ?? "—"}
             </span>
           </div>
         </div>
 
         {hasError && (
-          <div className="mb-8 p-6 border-2 border-black bg-white">
-            <p className="text-black font-bold tracking-wide">
-              ERROR LOADING DASHBOARD DATA. PLEASE TRY REFRESHING.
-            </p>
-          </div>
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>
+              Error loading dashboard data. Please try refreshing.
+            </AlertDescription>
+          </Alert>
         )}
 
-        <div className="space-y-12">
-          <section className="border-2 border-black bg-white">
-            <div className="p-8">
-              <p className="text-xl font-bold text-black mb-6 tracking-wide">
-                WELCOME BACK,{" "}
-                {user ? `${user.firstName.toUpperCase()} (${user.role})` : ""}!
-              </p>
-              <p className="text-gray-600 font-medium tracking-wide leading-relaxed">
+        <div className="space-y-6 sm:space-y-8 pb-8">
+          <Card>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-base font-semibold">
+                Welcome back, {user ? `${user.firstName} (${user.role})` : ""}!
+              </CardTitle>
+              <CardDescription className="text-sm text-muted-foreground">
                 Use the navigation menu to manage orders, users, view analytics,
                 and send emails.
-              </p>
-            </div>
-          </section>
+              </CardDescription>
+            </CardHeader>
+          </Card>
 
           <section>
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold tracking-tight border-b-2 border-black pb-4">
-                KEY METRICS
-              </h2>
-            </div>
+            <h2 className="text-lg font-semibold mb-4">
+              Key Metrics
+            </h2>
             <MetricsCards
               stats={dashboardStats}
               orderAnalytics={orderAnalytics}
@@ -116,7 +120,7 @@ export default function AdminPage() {
             />
           </section>
 
-          <section className="grid grid-cols-1 xl:grid-cols-2 gap-12">
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <QuickActions
               onRefresh={refreshAll}
               isRefreshing={dashboardLoading}

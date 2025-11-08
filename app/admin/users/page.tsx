@@ -8,6 +8,12 @@ import { IUser, IUserFilters } from "@/app/types/admin.type";
 import { FiSearch, FiUserCheck, FiUserX } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { useAdminUsers, useUpdateUserRole, useUpdateUserStatus } from "@/app/hooks/useAdminUserManagement";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table";
+import { Badge } from "@/app/components/ui/badge";
+import { Input } from "@/app/components/ui/input";
+import { Label } from "@/app/components/ui/label";
+import { Button } from "@/app/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN"];
 
@@ -124,8 +130,8 @@ export default function UsersPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white">
-        <h1 className="text-3xl font-bold tracking-tight">LOADING...</h1>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <p className="text-base font-medium text-muted-foreground">Loading...</p>
       </div>
     );
   }
@@ -136,18 +142,20 @@ export default function UsersPage() {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-white">
-        <div className="flex justify-between items-center pt-30 mb-12 pb-6 border-b-2 border-black">
-          <h1 className="text-4xl font-bold tracking-tight">USER MANAGEMENT</h1>
+      <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center pt-4 sm:pt-6 mb-6 pb-4 border-b">
+          <h1 className="text-2xl font-bold">User Management</h1>
         </div>
 
         {usersError && (
-          <div className="mb-8 p-6 border-2 border-black bg-white">
-            <p className="text-black font-bold tracking-wide">ERROR LOADING USERS. PLEASE TRY REFRESHING.</p>
-          </div>
+          <Card className="border-destructive mb-6">
+            <CardContent className="p-4 sm:p-6">
+              <p className="text-destructive font-semibold text-sm">Error loading users. Please try refreshing.</p>
+            </CardContent>
+          </Card>
         )}
 
-        <div className="space-y-12">
+        <div className="space-y-6 sm:space-y-8 pb-8">
           {/* Filters */}
           <div className="bg-white border-2 border-black p-8">
             <h2 className="text-2xl font-bold mb-8 tracking-tight">FILTERS</h2>

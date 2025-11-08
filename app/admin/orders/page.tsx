@@ -13,6 +13,12 @@ import { useRouter } from "next/navigation";
 import AdminLayout from "@/app/components/layout/AdminLayout";
 import { useAdminUsers } from "@/app/hooks/useAdminUserManagement";
 import { FiSearch } from "react-icons/fi";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table";
+import { Badge } from "@/app/components/ui/badge";
+import { Input } from "@/app/components/ui/input";
+import { Label } from "@/app/components/ui/label";
+import { Button } from "@/app/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN", "DELIVERY_PARTNER"];
 const ORDER_STATUSES = [
@@ -106,6 +112,29 @@ export default function AdminOrdersPage() {
     setFilters((prev) => ({ ...prev, page }));
   };
 
+  const getOrderStatusBadge = (status: string) => {
+    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+      DELIVERED: "default",
+      SHIPPED: "secondary",
+      PROCESSING: "secondary",
+      CONFIRMED: "outline",
+      CANCELLED: "destructive",
+      PENDING: "outline",
+    };
+    return variants[status] || "outline";
+  };
+
+  const getPaymentStatusBadge = (status: string) => {
+    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+      PAID: "default",
+      FAILED: "destructive",
+      REFUNDED: "secondary",
+      PARTIAL_REFUND: "secondary",
+      PENDING: "outline",
+    };
+    return variants[status] || "outline";
+  };
+
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated) {
@@ -125,53 +154,55 @@ export default function AdminOrdersPage() {
     !ALLOWED_ROLES.includes(user.role)
   ) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white">
-        <h1 className="text-3xl font-bold tracking-tight">LOADING...</h1>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <p className="text-base font-medium text-muted-foreground">Loading...</p>
       </div>
     );
   }
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-white">
-        <div className="flex justify-between items-center pt-30 mb-12 pb-6 border-b-2 border-gray-400">
-          <h1 className="text-4xl font-bold tracking-tight">
-            ORDERS MANAGEMENT
+      <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center pt-4 sm:pt-6 mb-6 pb-4 border-b">
+          <h1 className="text-2xl font-bold">
+            Orders Management
           </h1>
         </div>
 
-        <div className="space-y-12">
+        <div className="space-y-6 sm:space-y-8 pb-8">
           {/* Filters */}
-          <div className="bg-white border-2 border-gray-400 p-8">
-            <h2 className="text-2xl font-bold mb-8 tracking-tight">FILTERS</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-              <div>
-                <label className="block text-sm font-bold text-black mb-3 tracking-widest">
-                  SEARCH
-                </label>
-                <div className="relative">
-                  <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
-                  <input
-                    type="text"
-                    value={filters.search}
-                    onChange={(e) =>
-                      handleFilterChange("search", e.target.value)
-                    }
-                    placeholder="SEARCH BY ORDER NUMBER OR USER"
-                    className="w-full pl-12 pr-4 py-3 border-2 border-black focus:outline-none font-medium placeholder:text-gray-500"
-                  />
+          <Card>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-base font-semibold">Filters</CardTitle>
+              <CardDescription className="text-sm text-muted-foreground">Filter orders by status, payment, or search</CardDescription>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="search">Search</Label>
+                  <div className="relative">
+                    <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <Input
+                      id="search"
+                      type="text"
+                      value={filters.search}
+                      onChange={(e) =>
+                        handleFilterChange("search", e.target.value)
+                      }
+                      placeholder="Search by order number or user"
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-bold text-gray-400 mb-3 tracking-widest">
-                  STATUS
-                </label>
-                <select
-                  value={filters.status}
-                  onChange={(e) => handleFilterChange("status", e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-400 focus:outline-none font-medium"
-                >
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <select
+                    id="status"
+                    value={filters.status}
+                    onChange={(e) => handleFilterChange("status", e.target.value)}
+                    className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  >
                   <option value="">All Statuses</option>
                   {ORDER_STATUSES.map((status) => (
                     <option key={status} value={status}>
@@ -181,17 +212,16 @@ export default function AdminOrdersPage() {
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-bold text-gray-400 mb-3 tracking-widest">
-                  PAYMENT STATUS
-                </label>
-                <select
-                  value={filters.paymentStatus}
-                  onChange={(e) =>
-                    handleFilterChange("paymentStatus", e.target.value)
-                  }
-                    className="w-full px-4 py-3 border-2 border-gray-400 focus:outline-none font-medium"
-                >
+                <div className="space-y-2">
+                  <Label htmlFor="paymentStatus">Payment Status</Label>
+                  <select
+                    id="paymentStatus"
+                    value={filters.paymentStatus}
+                    onChange={(e) =>
+                      handleFilterChange("paymentStatus", e.target.value)
+                    }
+                    className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  >
                   <option value="">All Payment Statuses</option>
                   {PAYMENT_STATUSES.map((status) => (
                     <option key={status} value={status}>
@@ -201,139 +231,109 @@ export default function AdminOrdersPage() {
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-bold text-black mb-3 tracking-widest">
-                  PAYMENT METHOD
-                </label>
-                <select
-                  value={filters.paymentMethod}
-                  onChange={(e) =>
-                    handleFilterChange("paymentMethod", e.target.value)
-                  }
-                  className="w-full px-4 py-3 border-2 border-gray-400 focus:outline-none font-medium"
-                >
-                  <option value="">All Payment Methods</option>
-                  {PAYMENT_METHODS.map((method) => (
-                    <option key={method} value={method}>
-                      {method}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="paymentMethod">Payment Method</Label>
+                  <select
+                    id="paymentMethod"
+                    value={filters.paymentMethod}
+                    onChange={(e) =>
+                      handleFilterChange("paymentMethod", e.target.value)
+                    }
+                    className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  >
+                    <option value="">All Payment Methods</option>
+                    {PAYMENT_METHODS.map((method) => (
+                      <option key={method} value={method}>
+                        {method}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <div>
-                <label className="block text-sm font-bold text-black mb-3 tracking-widest">
-                  LIMIT
-                </label>
-                <select
-                  value={filters.limit}
-                  onChange={(e) =>
-                    handleFilterChange("limit", parseInt(e.target.value))
-                  }
-                  className="w-full px-4 py-3 border-2 border-black focus:outline-none font-medium"
-                >
-                  <option value={10}>10 per page</option>
-                  <option value={25}>25 per page</option>
-                  <option value={50}>50 per page</option>
-                </select>
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="limit">Limit</Label>
+                  <select
+                    id="limit"
+                    value={filters.limit}
+                    onChange={(e) =>
+                      handleFilterChange("limit", parseInt(e.target.value))
+                    }
+                    className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  >
+                    <option value={10}>10 per page</option>
+                    <option value={25}>25 per page</option>
+                    <option value={50}>50 per page</option>
+                  </select>
+                </div>
 
-              <div className="flex items-end">
-                <button
-                  onClick={() =>
-                    setFilters({
-                      page: 1,
-                      limit: 10,
-                      status: "",
-                      paymentStatus: "",
-                      paymentMethod: "",
-                      search: "",
-                    })
-                  }
-                  className="w-full px-4 py-3 bg-black text-white border-2 border-black font-bold tracking-widest hover:bg-white hover:text-black transition-colors"
-                >
-                  CLEAR FILTERS
-                </button>
+                <div className="flex items-end">
+                  <Button
+                    variant="outline"
+                    onClick={() =>
+                      setFilters({
+                        page: 1,
+                        limit: 10,
+                        status: "",
+                        paymentStatus: "",
+                        paymentMethod: "",
+                        search: "",
+                      })
+                    }
+                    className="w-full"
+                  >
+                    Clear Filters
+                  </Button>
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="border-2 border-black">
-            <div className="p-8 border-b-2 border-black bg-white">
-              <h2 className="text-2xl font-bold text-black tracking-tight">
-                ALL ORDERS
-              </h2>
+          <Card>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-base font-semibold">All Orders</CardTitle>
               {ordersData && meta && (
-                <p className="text-sm font-medium text-black mt-2 tracking-wide">
-                  SHOWING {(meta.page - 1) * meta.limit + 1} TO{" "}
-                  {Math.min(meta.page * meta.limit, meta.total)} OF {meta.total}{" "}
-                  ORDERS
-                </p>
+                <CardDescription className="text-sm text-muted-foreground">
+                  Showing {(meta.page - 1) * meta.limit + 1} to{" "}
+                  {Math.min(meta.page * meta.limit, meta.total)} of {meta.total}{" "}
+                  orders
+                </CardDescription>
               )}
-            </div>
-            <div className="p-8">
+            </CardHeader>
+            <CardContent className="p-0 sm:p-6">
               {isOrdersLoading ? (
-                <div className="text-center text-black font-bold tracking-wide py-12">
-                  LOADING ORDERS...
+                <div className="text-center py-12 px-4">
+                  <p className="text-muted-foreground font-medium text-sm">Loading orders...</p>
                 </div>
               ) : !orders || orders.length === 0 ? (
-                <div className="text-center text-gray-600 font-medium tracking-wide py-12">
-                  NO ORDERS FOUND.
+                <div className="text-center py-12 px-4">
+                  <p className="text-muted-foreground text-sm">No orders found.</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full border-collapse">
-                    <thead>
-                      <tr className="bg-black text-white">
-                        <th className="text-left px-6 py-4 font-semibold border-r border-gray-700 last:border-r-0">
-                          Order #
-                        </th>
-                        <th className="text-left px-6 py-4 font-semibold border-r border-gray-700 last:border-r-0">
-                          User
-                        </th>
-                        <th className="text-left px-6 py-4 font-semibold border-r border-gray-700 last:border-r-0">
-                          Product(s)
-                        </th>
-                        <th className="text-left px-6 py-4 font-semibold border-r border-gray-700 last:border-r-0">
-                          Qty
-                        </th>
-                        <th className="text-left px-6 py-4 font-semibold border-r border-gray-700 last:border-r-0">
-                          Status
-                        </th>
-                        <th className="text-left px-6 py-4 font-semibold border-r border-gray-700 last:border-r-0">
-                          Payment
-                        </th>
-                        <th className="text-left px-6 py-4 font-semibold border-r border-gray-700 last:border-r-0">
-                          Total (₹)
-                        </th>
-                        <th className="text-left px-6 py-4 font-semibold border-r border-gray-700 last:border-r-0">
-                          Method
-                        </th>
-                        <th className="text-left px-6 py-4 font-semibold border-r border-gray-700 last:border-r-0">
-                          ETA
-                        </th>
-                        <th className="text-left px-6 py-4 font-semibold border-r border-gray-700 last:border-r-0">
-                          Created
-                        </th>
-                        <th className="text-left px-6 py-4 font-semibold">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {orders.map((order: IOrder, index: number) => (
-                        <tr
-                          key={order.id}
-                          className={`border-b border-black ${
-                            index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                          } hover:bg-gray-100`}
-                        >
-                          <td className="px-6 py-4 border-r border-gray-200 last:border-r-0">
-                            <span className="font-mono text-sm font-medium">
+                <>
+                  <div className="rounded-md border overflow-x-auto">
+                    <Table className="min-w-[800px]">
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Order #</TableHead>
+                          <TableHead>User</TableHead>
+                          <TableHead>Product(s)</TableHead>
+                          <TableHead>Qty</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Payment</TableHead>
+                          <TableHead>Total (₹)</TableHead>
+                          <TableHead>Method</TableHead>
+                          <TableHead>ETA</TableHead>
+                          <TableHead>Created</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {orders.map((order: IOrder) => (
+                          <TableRow key={order.id}>
+                            <TableCell className="font-mono font-medium">
                               {order.orderNumber}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 border-r border-gray-200 last:border-r-0">
+                            </TableCell>
+                            <TableCell>
                             {(() => {
                               const info = getUserInfo(order.userId);
                               return (
@@ -349,18 +349,14 @@ export default function AdminOrdersPage() {
                                 </div>
                               );
                             })()}
-                          </td>
-                          <td className="px-6 py-4 border-r border-gray-200 last:border-r-0">
-                            <span className="text-sm">
+                          </TableCell>
+                            <TableCell className="text-sm">
                               {getProductNames(order.items)}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 border-r border-gray-200 last:border-r-0 text-center">
-                            <span className="font-medium">
+                            </TableCell>
+                            <TableCell className="text-center font-medium">
                               {getTotalQuantity(order.items)}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 border-r border-gray-200 last:border-r-0">
+                            </TableCell>
+                            <TableCell>
                             {editing[order.id] ? (
                               <select
                                 className="w-full px-3 py-2 border border-black bg-white text-black font-medium focus:outline-none"
@@ -378,27 +374,13 @@ export default function AdminOrdersPage() {
                                   </option>
                                 ))}
                               </select>
-                            ) : (
-                              <span
-                                className={`px-3 py-1 text-xs font-semibold uppercase tracking-wide ${
-                                  order.status === "DELIVERED"
-                                    ? "bg-black text-white"
-                                    : order.status === "SHIPPED"
-                                    ? "bg-gray-800 text-white"
-                                    : order.status === "PROCESSING"
-                                    ? "bg-gray-600 text-white"
-                                    : order.status === "CONFIRMED"
-                                    ? "bg-gray-400 text-white"
-                                    : order.status === "CANCELLED"
-                                    ? "bg-white text-black border border-black"
-                                    : "bg-gray-200 text-black"
-                                }`}
-                              >
-                                {order.status}
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-6 py-4 border-r border-gray-200 last:border-r-0">
+                              ) : (
+                                <Badge variant={getOrderStatusBadge(order.status)}>
+                                  {order.status}
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>
                             {editingPayment[order.id] ? (
                               <select
                                 className="w-full px-3 py-2 border border-black bg-white text-black font-medium focus:outline-none"
@@ -419,194 +401,173 @@ export default function AdminOrdersPage() {
                                   </option>
                                 ))}
                               </select>
-                            ) : (
-                              <span
-                                className={`px-3 py-1 text-xs font-semibold uppercase tracking-wide ${
-                                  order.paymentStatus === "PAID"
-                                    ? "bg-black text-white"
-                                    : order.paymentStatus === "FAILED"
-                                    ? "bg-white text-black border border-black"
-                                    : order.paymentStatus === "REFUNDED"
-                                    ? "bg-gray-600 text-white"
-                                    : order.paymentStatus === "PARTIAL_REFUND"
-                                    ? "bg-gray-400 text-white"
-                                    : "bg-gray-200 text-black"
-                                }`}
-                              >
-                                {order.paymentStatus}
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-6 py-4 border-r border-gray-200 last:border-r-0">
-                            <span className="font-semibold text-black">
+                              ) : (
+                                <Badge variant={getPaymentStatusBadge(order.paymentStatus)}>
+                                  {order.paymentStatus}
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell className="font-semibold">
                               ₹{order.totalAmount}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 border-r border-gray-200 last:border-r-0">
-                            <span className="text-sm font-medium uppercase">
+                            </TableCell>
+                            <TableCell className="text-sm font-medium uppercase">
                               {order.paymentMethod}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 border-r border-gray-200 last:border-r-0">
-                            <span className="text-sm">
+                            </TableCell>
+                            <TableCell className="text-sm">
                               {order.estimatedDelivery
                                 ? new Date(
                                     order.estimatedDelivery
                                   ).toLocaleDateString()
                                 : "-"}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 border-r border-gray-200 last:border-r-0">
-                            <span className="text-sm">
+                            </TableCell>
+                            <TableCell className="text-sm">
                               {new Date(order.createdAt).toLocaleDateString()}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
+                            </TableCell>
+                            <TableCell>
                             <div className="flex flex-col gap-2">
-                              {editing[order.id] ? (
-                                <div className="flex gap-2">
-                                  <button
-                                    className="px-4 py-2 bg-black text-white border border-black font-medium text-xs hover:bg-gray-800 transition-colors"
-                                    onClick={() => {
-                                      updateStatusMutation.mutate({
-                                        orderId: order.id,
-                                        status:
-                                          statusDraft[order.id] ?? order.status,
-                                      });
-                                      setEditing((e) => ({
-                                        ...e,
-                                        [order.id]: false,
-                                      }));
-                                    }}
-                                    disabled={updateStatusMutation.isPending}
-                                  >
-                                    {updateStatusMutation.isPending
-                                      ? "Saving..."
-                                      : "Save"}
-                                  </button>
-                                  <button
-                                    className="px-4 py-2 bg-white text-black border border-black font-medium text-xs hover:bg-gray-100 transition-colors"
+                                {editing[order.id] ? (
+                                  <div className="flex gap-2">
+                                    <Button
+                                      size="sm"
+                                      onClick={() => {
+                                        updateStatusMutation.mutate({
+                                          orderId: order.id,
+                                          status:
+                                            statusDraft[order.id] ?? order.status,
+                                        });
+                                        setEditing((e) => ({
+                                          ...e,
+                                          [order.id]: false,
+                                        }));
+                                      }}
+                                      disabled={updateStatusMutation.isPending}
+                                    >
+                                      {updateStatusMutation.isPending
+                                        ? "Saving..."
+                                        : "Save"}
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() =>
+                                        setEditing((e) => ({
+                                          ...e,
+                                          [order.id]: false,
+                                        }))
+                                      }
+                                    >
+                                      Cancel
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
                                     onClick={() =>
                                       setEditing((e) => ({
                                         ...e,
-                                        [order.id]: false,
+                                        [order.id]: true,
                                       }))
                                     }
                                   >
-                                    Cancel
-                                  </button>
-                                </div>
-                              ) : (
-                                <button
-                                  className="px-4 py-2 bg-white text-black border border-black font-medium text-xs hover:bg-gray-100 transition-colors"
-                                  onClick={() =>
-                                    setEditing((e) => ({
-                                      ...e,
-                                      [order.id]: true,
-                                    }))
-                                  }
-                                >
-                                  Edit Status
-                                </button>
-                              )}
+                                    Edit Status
+                                  </Button>
+                                )}
 
-                              {editingPayment[order.id] ? (
-                                <div className="flex gap-2">
-                                  <button
-                                    className="px-4 py-2 bg-black text-white border border-black font-medium text-xs hover:bg-gray-800 transition-colors"
-                                    onClick={() => {
-                                      updatePaymentStatusMutation.mutate({
-                                        orderId: order.id,
-                                        paymentStatus:
-                                          paymentStatusDraft[order.id] ??
-                                          order.paymentStatus,
-                                      });
-                                      setEditingPayment((e) => ({
-                                        ...e,
-                                        [order.id]: false,
-                                      }));
-                                    }}
-                                    disabled={
-                                      updatePaymentStatusMutation.isPending
-                                    }
-                                  >
-                                    {updatePaymentStatusMutation.isPending
-                                      ? "Saving..."
-                                      : "Save"}
-                                  </button>
-                                  <button
-                                    className="px-4 py-2 bg-white text-black border border-black font-medium text-xs hover:bg-gray-100 transition-colors"
+                                {editingPayment[order.id] ? (
+                                  <div className="flex gap-2">
+                                    <Button
+                                      size="sm"
+                                      onClick={() => {
+                                        updatePaymentStatusMutation.mutate({
+                                          orderId: order.id,
+                                          paymentStatus:
+                                            paymentStatusDraft[order.id] ??
+                                            order.paymentStatus,
+                                        });
+                                        setEditingPayment((e) => ({
+                                          ...e,
+                                          [order.id]: false,
+                                        }));
+                                      }}
+                                      disabled={
+                                        updatePaymentStatusMutation.isPending
+                                      }
+                                    >
+                                      {updatePaymentStatusMutation.isPending
+                                        ? "Saving..."
+                                        : "Save"}
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() =>
+                                        setEditingPayment((e) => ({
+                                          ...e,
+                                          [order.id]: false,
+                                        }))
+                                      }
+                                    >
+                                      Cancel
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
                                     onClick={() =>
                                       setEditingPayment((e) => ({
                                         ...e,
-                                        [order.id]: false,
+                                        [order.id]: true,
                                       }))
                                     }
                                   >
-                                    Cancel
-                                  </button>
-                                </div>
-                              ) : (
-                                <button
-                                  className="px-4 py-2 bg-white text-black border border-black font-medium text-xs hover:bg-gray-100 transition-colors"
-                                  onClick={() =>
-                                    setEditingPayment((e) => ({
-                                      ...e,
-                                      [order.id]: true,
-                                    }))
-                                  }
-                                >
-                                  Edit Payment
-                                </button>
-                              )}
+                                    Edit Payment
+                                  </Button>
+                                )}
                             </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-
-              {/* Pagination */}
-              {orders.length > 0 && (
-                <div className="mt-8 flex items-center justify-between border-t-2 border-black pt-6">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm font-bold text-black tracking-widest">
-                      SHOW
-                    </span>
-                    <select
-                      value={filters.limit}
-                      onChange={(e) =>
-                        handleFilterChange("limit", Number(e.target.value))
-                      }
-                      className="border-2 border-black px-3 py-2 text-sm font-medium"
-                    >
-                      <option value={10}>10</option>
-                      <option value={25}>25</option>
-                      <option value={50}>50</option>
-                    </select>
-                    <span className="text-sm font-bold text-black tracking-widest">
-                      ENTRIES
-                    </span>
+                          </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
 
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium text-black tracking-wide">
-                      SHOWING {(meta.page - 1) * meta.limit + 1} TO{" "}
-                      {Math.min(meta.page * meta.limit, meta.total)} OF{" "}
-                      {meta.total} RESULTS
-                    </span>
-                  </div>
+                  {/* Pagination */}
+                  {orders.length > 0 && (
+                    <div className="mt-6 px-4 sm:px-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Label htmlFor="limitSelector" className="text-xs sm:text-sm">Show</Label>
+                        <select
+                          id="limitSelector"
+                          value={filters.limit}
+                          onChange={(e) =>
+                            handleFilterChange("limit", Number(e.target.value))
+                          }
+                          className="flex h-9 items-center rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                        >
+                          <option value={10}>10</option>
+                          <option value={25}>25</option>
+                          <option value={50}>50</option>
+                        </select>
+                        <span className="text-xs sm:text-sm text-muted-foreground">entries</span>
+                      </div>
 
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => handlePageChange(meta.page - 1)}
-                      disabled={meta.page <= 1}
-                      className="px-4 py-2 text-sm border-2 border-black font-bold tracking-widest disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black hover:text-white transition-colors"
-                    >
-                      PREVIOUS
-                    </button>
+                      <div className="text-xs sm:text-sm text-muted-foreground hidden md:block">
+                        Showing {(meta.page - 1) * meta.limit + 1} to{" "}
+                        {Math.min(meta.page * meta.limit, meta.total)} of{" "}
+                        {meta.total} results
+                      </div>
+
+                      <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handlePageChange(meta.page - 1)}
+                          disabled={meta.page <= 1}
+                        >
+                          Previous
+                        </Button>
 
                     {Array.from(
                       { length: Math.min(5, meta.totalPages) },
@@ -622,34 +583,34 @@ export default function AdminOrdersPage() {
                           pageNum = meta.page - 2 + i;
                         }
 
-                        return (
-                          <button
-                            key={pageNum}
-                            onClick={() => handlePageChange(pageNum)}
-                            className={`px-4 py-2 text-sm border-2 border-black font-bold ${
-                              meta.page === pageNum
-                                ? "bg-black text-white"
-                                : "bg-white text-black hover:bg-black hover:text-white transition-colors"
-                            }`}
-                          >
-                            {pageNum}
-                          </button>
-                        );
+                          return (
+                            <Button
+                              key={pageNum}
+                              variant={meta.page === pageNum ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => handlePageChange(pageNum)}
+                            >
+                              {pageNum}
+                            </Button>
+                          );
                       }
                     )}
 
-                    <button
-                      onClick={() => handlePageChange(meta.page + 1)}
-                      disabled={meta.page >= meta.totalPages}
-                      className="px-4 py-2 text-sm border-2 border-black font-bold tracking-widest disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black hover:text-white transition-colors"
-                    >
-                      NEXT
-                    </button>
-                  </div>
-                </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handlePageChange(meta.page + 1)}
+                          disabled={meta.page >= meta.totalPages}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </AdminLayout>

@@ -8,12 +8,16 @@ import { useAuth } from "@/app/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import AdminLayout from "@/app/components/layout/AdminLayout";
-import Button from "@/app/components/ui/Button";
+import { Button } from "@/app/components/ui/button";
 import ProductManagement from "@/app/components/admin/ProductManagement";
 import { IProduct } from "@/app/types/product.type";
 import Modal from "@/app/components/ui/Modal";
 import ProductVariantsManagement from "@/app/components/admin/ProductVariantsManagement";
 import ProductImagesManagement from "@/app/components/admin/ProductImagesManagement";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
+import { Badge } from "@/app/components/ui/badge";
+import { Label } from "@/app/components/ui/label";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN"];
 
@@ -51,8 +55,8 @@ export default function AdminProductsPage() {
     !ALLOWED_ROLES.includes(user.role)
   ) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white">
-        <h1 className="text-3xl font-bold tracking-tight">LOADING...</h1>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <p className="text-base font-medium text-muted-foreground">Loading...</p>
       </div>
     );
   }
@@ -60,16 +64,18 @@ export default function AdminProductsPage() {
   if (showCreate) {
     return (
       <AdminLayout>
-        <div className="min-h-screen bg-white">
-          <div className="flex justify-between items-center mb-12 pb-6 border-b-2 border-black">
-            <h1 className="text-4xl font-bold tracking-tight">CREATE NEW PRODUCT</h1>
-            <Button variant="outline" onClick={() => setShowCreate(false)}>
-              BACK TO PRODUCTS
+        <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-4 sm:pt-6 mb-6 pb-4 border-b">
+            <h1 className="text-2xl font-bold">Create New Product</h1>
+            <Button variant="outline" onClick={() => setShowCreate(false)} className="w-full sm:w-auto">
+              Back to Products
             </Button>
           </div>
-          <div className="border-2 border-black p-8">
-            <ProductManagement />
-          </div>
+          <Card>
+            <CardContent className="p-4 sm:p-6">
+              <ProductManagement />
+            </CardContent>
+          </Card>
         </div>
       </AdminLayout>
     );
@@ -94,14 +100,14 @@ export default function AdminProductsPage() {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-white">
-        <div className="flex justify-between items-center pt-30 mb-12 pb-6 border-b-2 border-black">
-          <h1 className="text-4xl font-bold tracking-tight">PRODUCTS MANAGEMENT</h1>
-          <Button onClick={() => setShowCreate(true)}>ADD PRODUCT</Button>
+      <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-4 sm:pt-6 mb-6 pb-4 border-b">
+          <h1 className="text-2xl font-bold">Products Management</h1>
+          <Button onClick={() => setShowCreate(true)} className="w-full sm:w-auto">Add Product</Button>
         </div>
-        <div className="border-2 border-black">
-          <div className="p-8 border-b-2 border-black bg-white flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-black tracking-tight">ALL PRODUCTS</h2>
+        <Card>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-base font-semibold">All Products</CardTitle>
             {!isProductsLoading && products.length > 0 && (
               <span className="text-sm font-medium text-black tracking-wide">
                 TOTAL: {meta.total} PRODUCTS

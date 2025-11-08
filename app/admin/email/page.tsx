@@ -6,6 +6,11 @@ import { useRouter } from "next/navigation";
 import AdminLayout from "@/app/components/layout/AdminLayout";
 import { FiSend, FiEye, FiEyeOff, FiUsers } from "react-icons/fi";
 import useEmailComposer, { EMAIL_TEMPLATES } from "@/app/hooks/useEmailComposer";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
+import { Input } from "@/app/components/ui/input";
+import { Label } from "@/app/components/ui/label";
+import { Button } from "@/app/components/ui/button";
+import { Textarea } from "@/app/components/ui/textarea";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN"];
 
@@ -39,8 +44,8 @@ export default function EmailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white">
-        <h1 className="text-3xl font-bold tracking-tight">LOADING...</h1>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <p className="text-base font-medium text-muted-foreground">Loading...</p>
       </div>
     );
   }

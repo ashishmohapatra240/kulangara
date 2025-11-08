@@ -1,13 +1,18 @@
 "use client";
 
 import AdminLayout from "@/app/components/layout/AdminLayout";
-import Button from "@/app/components/ui/Button";
+import { Button } from "@/app/components/ui/button";
 import Modal from "@/app/components/ui/Modal";
 import { useAuth } from "@/app/hooks/useAuth";
 import { useCreateCoupon, useAdminCoupons, useDeleteCoupon, useUpdateCoupon } from "@/app/hooks/useAdminCoupons";
 import { ICreateCouponData, ICoupon } from "@/app/types/coupon.type";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table";
+import { Badge } from "@/app/components/ui/badge";
+import { Input } from "@/app/components/ui/input";
+import { Label } from "@/app/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN"];
 
@@ -43,8 +48,8 @@ export default function AdminCouponsPage() {
 
     if (isLoading || !isAuthenticated || !user || !ALLOWED_ROLES.includes(user.role)) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-white">
-                <h1 className="text-3xl font-bold tracking-tight">LOADING...</h1>
+            <div className="flex items-center justify-center min-h-screen bg-background">
+                <p className="text-base font-medium text-muted-foreground">Loading...</p>
             </div>
         );
     }

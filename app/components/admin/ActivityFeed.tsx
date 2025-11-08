@@ -2,6 +2,8 @@
 
 import { IActivityLog } from '@/app/types/admin.type';
 import { FiClock, FiUser, FiShoppingCart, FiPackage, FiSettings } from 'react-icons/fi';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Skeleton } from '../ui/skeleton';
 
 interface ActivityFeedProps {
   activities: IActivityLog[];
@@ -12,15 +14,15 @@ const ActivityFeed = ({ activities, isLoading }: ActivityFeedProps) => {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'user':
-        return <FiUser className="w-5 h-5 text-black" />;
+        return <FiUser className="w-4 h-4" />;
       case 'order':
-        return <FiShoppingCart className="w-5 h-5 text-black" />;
+        return <FiShoppingCart className="w-4 h-4" />;
       case 'product':
-        return <FiPackage className="w-5 h-5 text-black" />;
+        return <FiPackage className="w-4 h-4" />;
       case 'system':
-        return <FiSettings className="w-5 h-5 text-black" />;
+        return <FiSettings className="w-4 h-4" />;
       default:
-        return <FiClock className="w-5 h-5 text-black" />;
+        return <FiClock className="w-4 h-4" />;
     }
   };
 
@@ -45,70 +47,85 @@ const ActivityFeed = ({ activities, isLoading }: ActivityFeedProps) => {
 
   if (isLoading) {
     return (
-      <div className="bg-white border-2 border-black p-8">
-        <h2 className="text-2xl font-bold mb-8 tracking-tight">RECENT ACTIVITY</h2>
-        <div className="space-y-6">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-start space-x-4 py-4 border-b border-gray-200 animate-pulse">
-              <div className="w-6 h-6 bg-gray-300"></div>
-              <div className="flex-1">
-                <div className="w-32 h-4 bg-gray-300 mb-2"></div>
-                <div className="w-48 h-3 bg-gray-300"></div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base font-semibold">Recent Activity</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="flex items-start gap-4 py-3 border-b last:border-b-0">
+                <Skeleton className="h-6 w-6 rounded" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-48" />
+                </div>
+                <Skeleton className="h-3 w-16" />
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   if (!activities || activities.length === 0) {
     return (
-      <div className="bg-white border-2 border-black p-8">
-        <h2 className="text-2xl font-bold mb-8 tracking-tight">RECENT ACTIVITY</h2>
-        <div className="text-center py-12">
-          <FiClock className="w-16 h-16 text-black mx-auto mb-6" />
-          <p className="text-gray-600 font-medium tracking-wide">NO RECENT ACTIVITY</p>
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base font-semibold">Recent Activity</CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">Monitor recent actions and changes</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-12">
+            <FiClock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">No recent activity</p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="bg-white border-2 border-black p-8">
-      <h2 className="text-2xl font-bold mb-8 tracking-tight">RECENT ACTIVITY</h2>
-      <div className="space-y-0">
-        {activities.slice(0, 10).map((activity) => (
-          <div
-            key={activity.id}
-            className="flex items-start space-x-4 py-4 border-b border-gray-200 last:border-b-0"
-          >
-            <div className="flex-shrink-0 mt-1 p-2 border border-black">
-              {getActivityIcon(activity.type)}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-black mb-1 tracking-wide">
-                {activity.action.toUpperCase()}
-              </p>
-              <p className="text-sm text-gray-600 mb-2">
-                {activity.description}
-              </p>
-              {activity.userName && (
-                <p className="text-xs text-gray-500 font-medium tracking-widest">
-                  BY {activity.userName.toUpperCase()}
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base font-semibold">Recent Activity</CardTitle>
+        <CardDescription className="text-sm text-muted-foreground">Monitor recent actions and changes</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-0">
+          {activities.slice(0, 10).map((activity) => (
+            <div
+              key={activity.id}
+              className="flex items-start gap-4 py-4 border-b last:border-b-0"
+            >
+              <div className="flex-shrink-0 mt-1 p-2 border rounded">
+                {getActivityIcon(activity.type)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold mb-1">
+                  {activity.action}
                 </p>
-              )}
+                <p className="text-sm text-muted-foreground mb-2">
+                  {activity.description}
+                </p>
+                {activity.userName && (
+                  <p className="text-xs text-muted-foreground">
+                    by {activity.userName}
+                  </p>
+                )}
+              </div>
+              <div className="flex-shrink-0">
+                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                  {formatTimestamp(activity.timestamp)}
+                </span>
+              </div>
             </div>
-            <div className="flex-shrink-0">
-              <span className="text-xs text-gray-500 font-bold tracking-widest">
-                {formatTimestamp(activity.timestamp).toUpperCase()}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
-export default ActivityFeed; 
+export default ActivityFeed;

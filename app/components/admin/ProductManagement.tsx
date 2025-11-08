@@ -7,7 +7,7 @@ import {
   IUpdateProductData,
 } from "@/app/types/product.type";
 import { IProduct } from "@/app/types/product.type";
-import Button from "../ui/Button";
+import { Button } from "../ui/button";
 
 interface ProductManagementProps {
   product?: IProduct | null;

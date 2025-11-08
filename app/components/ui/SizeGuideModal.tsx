@@ -60,8 +60,8 @@ export default function SizeGuideModal({
       <div className="p-6">
         {/* Header */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-black mb-2">Size Guide</h2>
-          <p className="text-gray-600">
+          <h2 className="text-2xl font-bold text-foreground mb-2">Size Guide</h2>
+          <p className="text-muted-foreground">
             Find your perfect fit with our clothing size chart
           </p>
         </div>
@@ -69,21 +69,21 @@ export default function SizeGuideModal({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Size Chart Table */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-black">
+            <h3 className="text-lg font-semibold text-foreground">
               Clothing Size Chart
             </h3>
 
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-black">
-                <thead className="bg-black text-white">
+              <table className="w-full border-collapse border border-border">
+                <thead className="bg-primary text-primary-foreground">
                   <tr>
-                    <th className="border border-black px-4 py-3 text-left font-semibold">
+                    <th className="border border-border px-4 py-3 text-left font-semibold">
                       Measurement
                     </th>
                     {sizes.map((size) => (
                       <th
                         key={size}
-                        className="border border-black px-3 py-3 text-center font-semibold min-w-[60px]"
+                        className="border border-border px-3 py-3 text-center font-semibold min-w-[60px]"
                       >
                         {size}
                       </th>
@@ -93,14 +93,14 @@ export default function SizeGuideModal({
                 <tbody>
                   {Object.entries(clothingMeasurements).map(
                     ([measurement, sizeData]) => (
-                      <tr key={measurement} className="hover:bg-gray-50">
-                        <td className="border border-black px-4 py-3 font-medium text-black">
+                      <tr key={measurement} className="hover:bg-muted/50">
+                        <td className="border border-border px-4 py-3 font-medium text-foreground">
                           {measurement}
                         </td>
                         {sizes.map((size) => (
                           <td
                             key={size}
-                            className="border border-black px-3 py-3 text-center text-black"
+                            className="border border-border px-3 py-3 text-center text-foreground"
                           >
                             {sizeData[size] || "-"}
                           </td>
@@ -117,16 +117,16 @@ export default function SizeGuideModal({
           <div className="space-y-6">
             {/* How to Measure */}
             <div>
-              <h3 className="text-lg font-semibold text-black mb-4">
+              <h3 className="text-lg font-semibold text-foreground mb-4">
                 How to Measure
               </h3>
               <div className="space-y-3">
                 {instructions.map((instruction, index) => (
                   <div key={index} className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 mt-0.5">
+                    <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 mt-0.5">
                       {index + 1}
                     </div>
-                    <p className="text-gray-700 text-sm leading-relaxed">
+                    <p className="text-muted-foreground text-sm leading-relaxed">
                       {instruction}
                     </p>
                   </div>
@@ -136,14 +136,14 @@ export default function SizeGuideModal({
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-black flex justify-between items-center">
-          <p className="text-sm text-gray-600">
+        <div className="mt-8 pt-6 border-t border-border flex justify-between items-center">
+          <p className="text-sm text-muted-foreground">
             Need help? Contact our customer service team for personalized sizing
             assistance.
           </p>
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-black text-white hover:bg-gray-800 transition-colors"
+            className="px-6 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             Close
           </button>
