@@ -4,7 +4,13 @@ import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
-import Button from "@/app/components/ui/Button";
+import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/components/ui/input";
+import { Label } from "@/app/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
+import { Alert, AlertDescription } from "@/app/components/ui/alert";
+import { Separator } from "@/app/components/ui/separator";
+import { Badge } from "@/app/components/ui/badge";
 import { PaymentMethod } from "@/app/types/checkout.type";
 import { useCheckout } from "@/app/hooks/useCheckout";
 import { useProfile } from "@/app/hooks/useProfile";
@@ -279,263 +285,119 @@ export default function CheckoutPage() {
       />
       <div className="container mx-auto px-4 py-8 max-w-6xl mt-30">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div>
-            <div className="mb-8">
-              <h2 className="text-2xl font-medium mb-4">Delivery</h2>
-              {/* Show only default/selected address */}
-              {typedAddresses.length === 0 ? (
-                <div className="mb-4 text-gray-500">No addresses saved yet.</div>
-              ) : selectedAddress ? (
-                <div className="mb-4 border border-gray-300 p-4 rounded flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">
-                      {selectedAddress.firstName} {selectedAddress.lastName}
-                    </p>
-                    <p className="text-sm text-gray-600">{selectedAddress.address}</p>
-                    {selectedAddress.apartment && (
-                      <p className="text-sm text-gray-600">{selectedAddress.apartment}</p>
-                    )}
-                    <p className="text-sm text-gray-600">
-                      {selectedAddress.city}, {selectedAddress.state} {selectedAddress.pincode}
-                    </p>
-                    <p className="text-sm text-gray-600">{selectedAddress.phone}</p>
-                    {selectedAddress.isDefault && (
-                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Default</span>
-                    )}
+          <div className="space-y-6">
+            {/* Delivery Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Delivery Address</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {typedAddresses.length === 0 ? (
+                  <div className="text-muted-foreground">No addresses saved yet.</div>
+                ) : selectedAddress ? (
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="space-y-1">
+                      <p className="font-medium">
+                        {selectedAddress.firstName} {selectedAddress.lastName}
+                      </p>
+                      <p className="text-sm text-muted-foreground">{selectedAddress.address}</p>
+                      {selectedAddress.apartment && (
+                        <p className="text-sm text-muted-foreground">{selectedAddress.apartment}</p>
+                      )}
+                      <p className="text-sm text-muted-foreground">
+                        {selectedAddress.city}, {selectedAddress.state} {selectedAddress.pincode}
+                      </p>
+                      <p className="text-sm text-muted-foreground">{selectedAddress.phone}</p>
+                      {selectedAddress.isDefault && (
+                        <Badge variant="secondary" className="mt-2">Default</Badge>
+                      )}
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => setShowAddressModal(true)}>
+                      Change
+                    </Button>
                   </div>
-                  <Button variant="outline" onClick={() => setShowAddressModal(true)}>
-                    Change Address
-                  </Button>
+                ) : (
+                  <div className="text-muted-foreground">No address selected.</div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Payment Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Payment Method</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  All transactions are secure and encrypted.
+                </p>
+
+                <div className="space-y-3">
+                  <label className="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
+                    <input
+                      type="radio"
+                      name="payment"
+                      checked={paymentMethod === "razorpay"}
+                      onChange={() => setPaymentMethod("razorpay")}
+                      className="mr-3"
+                    />
+                    <span className="text-sm font-medium">Razorpay Secure (UPI, Cards, Wallets, NetBanking)</span>
+                  </label>
+
+                  <label className="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
+                    <input
+                      type="radio"
+                      name="payment"
+                      checked={paymentMethod === "cod"}
+                      onChange={() => setPaymentMethod("cod")}
+                      className="mr-3"
+                    />
+                    <span className="text-sm font-medium">Cash on Delivery</span>
+                  </label>
                 </div>
-              ) : (
-                <div className="mb-4 text-gray-500">No address selected.</div>
-              )}
+              </CardContent>
+            </Card>
 
-              {/* Address Modal */}
-              <Modal isOpen={showAddressModal} onClose={() => setShowAddressModal(false)} maxWidth="max-w-xl">
-                <div className="p-4">
-                  <h3 className="text-lg font-medium mb-4">Select Address</h3>
-                  {typedAddresses.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500 mb-4">No addresses saved yet</p>
-                      <Button onClick={() => setShowAddForm(true)}>Add New Address</Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-4 mb-4">
-                      {typedAddresses.map((address) => (
-                        <div key={address.id} className="border border-gray-200 p-4 rounded flex justify-between items-center">
-                          <div>
-                            <p className="font-medium">{address.firstName} {address.lastName}</p>
-                            <p className="text-sm text-gray-600">{address.address}</p>
-                            {address.apartment && <p className="text-sm text-gray-600">{address.apartment}</p>}
-                            <p className="text-sm text-gray-600">{address.city}, {address.state} {address.pincode}</p>
-                            <p className="text-sm text-gray-600">{address.phone}</p>
-                            {address.isDefault && <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Default</span>}
-                          </div>
-                          <div className="flex flex-col gap-2 items-end">
-                            <Button size="sm" onClick={() => handleSelectAddress(address)}>
-                              Select
-                            </Button>
-                            <Button size="sm" variant="outline" onClick={() => handleEditAddress(address)}>
-                              Edit
-                            </Button>
-                            {!address.isDefault && (
-                              <Button size="sm" variant="outline" onClick={() => handleSetDefaultAddress(address.id)} disabled={isSettingDefault}>
-                                Set Default
-                              </Button>
-                            )}
-                            <Button size="sm" variant="outline" onClick={() => handleDeleteAddress(address.id)} disabled={isDeletingAddress}>
-                              Remove
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                      <Button className="w-full mt-4" onClick={() => setShowAddForm(true)}>
-                        Add New Address
-                      </Button>
-                    </div>
-                  )}
-                  {/* Add/Edit Address Form */}
-                  {showAddForm && (
-                    <div className="bg-gray-50 p-4 rounded mt-4">
-                      <h4 className="text-md font-medium mb-2">{editingAddress ? "Edit Address" : "Add New Address"}</h4>
-                      <form onSubmit={handleAddressSubmit} className="space-y-3">
-                        <div className="grid grid-cols-2 gap-4">
-                          <input
-                            name="firstName"
-                            type="text"
-                            placeholder="First name"
-                            value={addressFormData.firstName}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 focus:outline-none"
-                            required
-                          />
-                          <input
-                            name="lastName"
-                            type="text"
-                            placeholder="Last name"
-                            value={addressFormData.lastName}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 focus:outline-none"
-                            required
-                          />
-                        </div>
-                        <input
-                          name="address"
-                          type="text"
-                          placeholder="Address"
-                          value={addressFormData.address}
-                          onChange={handleInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 focus:outline-none"
-                          required
-                        />
-                        <input
-                          name="apartment"
-                          type="text"
-                          placeholder="Apartment, suite, etc. (optional)"
-                          value={addressFormData.apartment}
-                          onChange={handleInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 focus:outline-none"
-                        />
-                        <div className="grid grid-cols-3 gap-4">
-                          <input
-                            name="city"
-                            type="text"
-                            placeholder="City"
-                            value={addressFormData.city}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 focus:outline-none"
-                            required
-                          />
-                          <input
-                            name="state"
-                            type="text"
-                            placeholder="State"
-                            value={addressFormData.state}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 focus:outline-none"
-                            required
-                          />
-                          <input
-                            name="pincode"
-                            type="text"
-                            placeholder="PIN code"
-                            value={addressFormData.pincode}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 focus:outline-none"
-                            required
-                          />
-                        </div>
-                        <input
-                          name="phone"
-                          type="tel"
-                          placeholder="Phone number for order updates"
-                          value={addressFormData.phone}
-                          onChange={handleInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 focus:outline-none"
-                          required
-                        />
-                        <div className="flex items-center pt-2">
-                          <input
-                            id="isDefault"
-                            name="isDefault"
-                            type="checkbox"
-                            checked={addressFormData.isDefault}
-                            onChange={(e) => setAddressFormData({ ...addressFormData, isDefault: e.target.checked })}
-                            className="mr-2 h-4 w-4 border-gray-300 text-black focus:ring-black"
-                          />
-                          <label htmlFor="isDefault" className="text-sm">
-                            Set as default address
-                          </label>
-                        </div>
-                        <div className="flex justify-end gap-4 mt-5">
-                          <Button type="button" variant="outline" onClick={() => { setShowAddForm(false); setEditingAddress(null); }}>
-                            Cancel
-                          </Button>
-                          <Button type="submit" disabled={isCreatingAddress || isUpdatingAddress}>
-                            {isCreatingAddress || isUpdatingAddress ? "Saving..." : editingAddress ? "Update Address" : "Add Address"}
-                          </Button>
-                        </div>
-                      </form>
-                    </div>
-                  )}
-                </div>
-              </Modal>
-            </div>
-
-            <div className="mb-8">
-              <h2 className="text-2xl font-medium mb-4">Payment</h2>
-              <p className="text-sm text-gray-600 mb-4">
-                All transactions are secure and encrypted.
-              </p>
-
-              <div className="space-y-4">
-                <label className="flex items-center p-4 border border-gray-300 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="payment"
-                    checked={paymentMethod === "razorpay"}
-                    onChange={() => setPaymentMethod("razorpay")}
-                    className="mr-2"
-                  />
-                  <span>Razorpay Secure (UPI, Cards, Wallets, NetBanking)</span>
-                </label>
-
-                <label className="flex items-center p-4 border border-gray-300 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="payment"
-                    checked={paymentMethod === "cod"}
-                    onChange={() => setPaymentMethod("cod")}
-                    className="mr-2"
-                  />
-                  <span>Cash on Delivery</span>
-                </label>
-              </div>
-            </div>
-
+            {/* Error Messages */}
             {(error || formError) && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                {error || formError}
-              </div>
+              <Alert variant="destructive">
+                <AlertDescription>
+                  {error || formError}
+                </AlertDescription>
+              </Alert>
             )}
 
             {validationResult?.available === false && (
-              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
-                <div className="flex">
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">
-                      Stock Issue Detected
-                    </h3>
-                    <p className="text-sm text-red-700 mt-1">
-                      {validationResult.message}
-                    </p>
-                    {validationResult.data?.invalidItems && validationResult.data.invalidItems.length > 0 && (
-                      <div className="mt-2">
-                        <p className="text-sm font-medium text-red-800 mb-1">Items with issues:</p>
-                        <ul className="text-sm text-red-700 list-disc list-inside">
-                          {validationResult.data.invalidItems.map((item, index) => (
-                            <li key={index}>
-                              Product issue: {item.message}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    <button
-                      onClick={() => router.push('/cart')}
-                      className="mt-3 text-sm text-red-800 hover:text-red-900 underline"
-                    >
-                      Review Cart
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <Alert variant="destructive">
+                <AlertDescription>
+                  <h3 className="font-medium mb-1">Stock Issue Detected</h3>
+                  <p className="mb-2">{validationResult.message}</p>
+                  {validationResult.data?.invalidItems && validationResult.data.invalidItems.length > 0 && (
+                    <div className="mt-2">
+                      <p className="font-medium mb-1">Items with issues:</p>
+                      <ul className="list-disc list-inside space-y-1">
+                        {validationResult.data.invalidItems.map((item, index) => (
+                          <li key={index} className="text-sm">
+                            Product issue: {item.message}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => router.push('/cart')}
+                    className="mt-3 text-sm underline hover:no-underline"
+                  >
+                    Review Cart
+                  </button>
+                </AlertDescription>
+              </Alert>
             )}
 
             <Button
               onClick={handleSubmit}
               className="w-full"
+              size="lg"
               disabled={loading || isValidating || !cartItems || cartItems.length === 0 || (validationResult?.available === false)}
             >
               {isValidating ? "Validating cart..." :
@@ -547,138 +409,338 @@ export default function CheckoutPage() {
                   validationResult?.available === false ? "Resolve Stock Issues" :
                     "Pay now"}
             </Button>
-          </div>
 
-          <div className="bg-gray-50 p-6">
-            <div className="space-y-4">
-              {cartItems && cartItems.length > 0 ? (
-                cartItems.map((item, index) => {
-                  try {
-                    if (!item || !item.product) return null;
-
-                    return (
-                      <div key={item.id || `item-${index}`} className="flex gap-4">
-                        <div className="relative w-16 h-16">
-                          <Image
-                            src={
-                              item.product?.images?.[0]?.url ||
-                              "/images/coming-soon.jpg"
-                            }
-                            alt={item.product?.name || "Product"}
-                            fill
-                            className="object-cover"
-                          />
-                          <span className="absolute -top-2 -right-2 bg-black text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">
-                            {item.quantity || 0}
-                          </span>
-                        </div>
-                        <div className="flex-grow">
-                          <p className="font-medium">{item.product?.name || "Product"}</p>
-                          <p className="text-sm text-gray-500">
-                            {(() => {
-                              try {
-                                if (item.variant && typeof item.variant === 'object' && item.variant !== null) {
-                                  const size = item.variant?.size || "N/A";
-                                  const color = item.variant?.color || "Standard";
-                                  return `${size} / ${color}`;
-                                }
-                                return "Standard";
-                              } catch (variantError) {
-                                console.error('Variant error:', variantError, 'Item:', item);
-                                return "Standard";
-                              }
-                            })()}
-                          </p>
-                        </div>
-                        <p className="font-medium">
-                          {item.product?.discountedPrice && item.product.discountedPrice < item.price ? (
-                            <>
-                              ₹{(item.product.discountedPrice * item.quantity).toLocaleString()}.00{' '}
-                              <span className="text-gray-500 line-through text-sm">₹{(item.price * item.quantity).toLocaleString()}.00</span>
-                            </>
-                          ) : (
-                            <>₹{(item.price * item.quantity).toLocaleString()}.00</>
-                          )}
-                        </p>
-                      </div>
-                    );
-                  } catch (error) {
-                    console.error('Error rendering cart item:', error, 'Item:', item);
-                    return (
-                      <div key={`error-${index}`} className="text-red-500 text-sm p-2">
-                        Error loading cart item
-                      </div>
-                    );
-                  }
-                })
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  Your cart is empty
-                </div>
-              )}
-            </div>
-
-            <div className="mt-6 space-y-2">
-              <div className="flex items-center">
-                <input
-                  type="text"
-                  placeholder="Discount code"
-                  value={couponCode}
-                  onChange={(e) => setCouponCode(e.target.value)}
-                  className="flex-grow px-3 py-2 border border-gray-300 focus:outline-none"
-                />
-                <Button
-                  variant="outline"
-                  className="ml-2"
-                  onClick={handleApplyCoupon}
-                  disabled={loading || !couponCode.trim()}
-                >
-                  Apply
-                </Button>
-              </div>
-
-              {appliedCoupon && (
-                <div className="p-3 bg-green-100 border border-green-400 text-green-700 rounded">
-                  <div className="flex justify-between items-center">
-                    <span>Coupon applied: {appliedCoupon.code}</span>
-                    <button
-                      onClick={handleRemoveCoupon}
-                      className="text-green-600 hover:text-green-800"
-                    >
-                      Remove
-                    </button>
+            {/* Address Modal */}
+            <Modal isOpen={showAddressModal} onClose={() => setShowAddressModal(false)} maxWidth="max-w-xl">
+              <div className="p-4">
+                <h3 className="text-lg font-medium mb-4">Select Address</h3>
+                {typedAddresses.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground mb-4">No addresses saved yet</p>
+                    <Button onClick={() => setShowAddForm(true)}>Add New Address</Button>
                   </div>
-                  <p className="text-sm mt-1">{appliedCoupon.description}</p>
-                </div>
-              )}
-
-              <div className="border-t border-gray-200 mt-4 pt-4 space-y-2">
-                <div className="flex justify-between">
-                  <span>Subtotal · {cartItems?.length || 0} items</span>
-                  <span>₹{subtotal.toLocaleString()}.00</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span>FREE</span>
-                </div>
-                {discount > 0 && (
-                  <div className="flex justify-between text-green-600">
-                    <span>Discount</span>
-                    <span>-₹{discount.toLocaleString()}.00</span>
+                ) : (
+                  <div className="space-y-4 mb-4">
+                    {typedAddresses.map((address) => (
+                      <Card key={address.id}>
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start gap-4">
+                            <div className="space-y-1">
+                              <p className="font-medium">{address.firstName} {address.lastName}</p>
+                              <p className="text-sm text-muted-foreground">{address.address}</p>
+                              {address.apartment && <p className="text-sm text-muted-foreground">{address.apartment}</p>}
+                              <p className="text-sm text-muted-foreground">{address.city}, {address.state} {address.pincode}</p>
+                              <p className="text-sm text-muted-foreground">{address.phone}</p>
+                              {address.isDefault && <Badge variant="secondary" className="mt-2">Default</Badge>}
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <Button size="sm" onClick={() => handleSelectAddress(address)}>
+                                Select
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => handleEditAddress(address)}>
+                                Edit
+                              </Button>
+                              {!address.isDefault && (
+                                <Button size="sm" variant="outline" onClick={() => handleSetDefaultAddress(address.id)} disabled={isSettingDefault}>
+                                  Set Default
+                                </Button>
+                              )}
+                              <Button size="sm" variant="outline" onClick={() => handleDeleteAddress(address.id)} disabled={isDeletingAddress}>
+                                Remove
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    <Button className="w-full mt-4" onClick={() => setShowAddForm(true)}>
+                      Add New Address
+                    </Button>
                   </div>
                 )}
-                <div className="flex justify-between text-sm text-gray-500">
-                  <span>Including all taxes</span>
-                </div>
-                <div className="border-t border-gray-200 pt-2 mt-2">
-                  <div className="flex justify-between font-medium">
-                    <span>Total</span>
-                    <span>₹{total.toLocaleString()}.00</span>
-                  </div>
-                </div>
+                {/* Add/Edit Address Form */}
+                {showAddForm && (
+                  <Card className="mt-4">
+                    <CardHeader>
+                      <CardTitle className="text-base">{editingAddress ? "Edit Address" : "Add New Address"}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <form onSubmit={handleAddressSubmit} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="firstName">First Name</Label>
+                            <Input
+                              id="firstName"
+                              name="firstName"
+                              type="text"
+                              placeholder="First name"
+                              value={addressFormData.firstName}
+                              onChange={handleInputChange}
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="lastName">Last Name</Label>
+                            <Input
+                              id="lastName"
+                              name="lastName"
+                              type="text"
+                              placeholder="Last name"
+                              value={addressFormData.lastName}
+                              onChange={handleInputChange}
+                              required
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="address">Address</Label>
+                          <Input
+                            id="address"
+                            name="address"
+                            type="text"
+                            placeholder="Address"
+                            value={addressFormData.address}
+                            onChange={handleInputChange}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="apartment">Apartment (Optional)</Label>
+                          <Input
+                            id="apartment"
+                            name="apartment"
+                            type="text"
+                            placeholder="Apartment, suite, etc."
+                            value={addressFormData.apartment}
+                            onChange={handleInputChange}
+                          />
+                        </div>
+                        <div className="grid grid-cols-3 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="city">City</Label>
+                            <Input
+                              id="city"
+                              name="city"
+                              type="text"
+                              placeholder="City"
+                              value={addressFormData.city}
+                              onChange={handleInputChange}
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="state">State</Label>
+                            <Input
+                              id="state"
+                              name="state"
+                              type="text"
+                              placeholder="State"
+                              value={addressFormData.state}
+                              onChange={handleInputChange}
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="pincode">PIN Code</Label>
+                            <Input
+                              id="pincode"
+                              name="pincode"
+                              type="text"
+                              placeholder="PIN code"
+                              value={addressFormData.pincode}
+                              onChange={handleInputChange}
+                              required
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">Phone</Label>
+                          <Input
+                            id="phone"
+                            name="phone"
+                            type="tel"
+                            placeholder="Phone number for order updates"
+                            value={addressFormData.phone}
+                            onChange={handleInputChange}
+                            required
+                          />
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            id="isDefault"
+                            name="isDefault"
+                            type="checkbox"
+                            checked={addressFormData.isDefault}
+                            onChange={(e) => setAddressFormData({ ...addressFormData, isDefault: e.target.checked })}
+                            className="h-4 w-4"
+                          />
+                          <Label htmlFor="isDefault" className="text-sm font-normal">
+                            Set as default address
+                          </Label>
+                        </div>
+                        <div className="flex justify-end gap-4 mt-6">
+                          <Button type="button" variant="outline" onClick={() => { setShowAddForm(false); setEditingAddress(null); }}>
+                            Cancel
+                          </Button>
+                          <Button type="submit" disabled={isCreatingAddress || isUpdatingAddress}>
+                            {isCreatingAddress || isUpdatingAddress ? "Saving..." : editingAddress ? "Update Address" : "Add Address"}
+                          </Button>
+                        </div>
+                      </form>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
-            </div>
+            </Modal>
           </div>
+
+          {/* Order Summary Section */}
+          <Card className="h-fit">
+            <CardHeader>
+              <CardTitle>Order Summary</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Cart Items */}
+              <div className="space-y-4">
+                {cartItems && cartItems.length > 0 ? (
+                  cartItems.map((item, index) => {
+                    try {
+                      if (!item || !item.product) return null;
+
+                      return (
+                        <div key={item.id || `item-${index}`} className="flex gap-4">
+                          <div className="relative w-16 h-16 rounded-md overflow-hidden border">
+                            <Image
+                              src={
+                                item.product?.images?.[0]?.url ||
+                                "/images/coming-soon.jpg"
+                              }
+                              alt={item.product?.name || "Product"}
+                              fill
+                              className="object-cover"
+                            />
+                            <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                              {item.quantity || 0}
+                            </Badge>
+                          </div>
+                          <div className="flex-grow">
+                            <p className="font-medium text-sm">{item.product?.name || "Product"}</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {(() => {
+                                try {
+                                  if (item.variant && typeof item.variant === 'object' && item.variant !== null) {
+                                    const size = item.variant?.size || "N/A";
+                                    const color = item.variant?.color || "Standard";
+                                    return `${size} / ${color}`;
+                                  }
+                                  return "Standard";
+                                } catch (variantError) {
+                                  console.error('Variant error:', variantError, 'Item:', item);
+                                  return "Standard";
+                                }
+                              })()}
+                            </p>
+                            <p className="font-medium text-sm mt-1">
+                              {item.product?.discountedPrice && item.product.discountedPrice < item.price ? (
+                                <>
+                                  ₹{(item.product.discountedPrice * item.quantity).toLocaleString()}.00{' '}
+                                  <span className="text-muted-foreground line-through text-xs">₹{(item.price * item.quantity).toLocaleString()}.00</span>
+                                </>
+                              ) : (
+                                <>₹{(item.price * item.quantity).toLocaleString()}.00</>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    } catch (error) {
+                      console.error('Error rendering cart item:', error, 'Item:', item);
+                      return (
+                        <Alert key={`error-${index}`} variant="destructive">
+                          <AlertDescription className="text-xs">
+                            Error loading cart item
+                          </AlertDescription>
+                        </Alert>
+                      );
+                    }
+                  })
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground text-sm">
+                    Your cart is empty
+                  </div>
+                )}
+              </div>
+
+              <Separator />
+
+              {/* Coupon Section */}
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Discount code"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    className="flex-grow"
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={handleApplyCoupon}
+                    disabled={loading || !couponCode.trim()}
+                  >
+                    Apply
+                  </Button>
+                </div>
+
+                {appliedCoupon && (
+                  <Alert className="bg-green-50 border-green-200">
+                    <AlertDescription>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium text-green-800">
+                          Coupon applied: {appliedCoupon.code}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleRemoveCoupon}
+                          className="text-green-600 hover:text-green-800 h-auto p-0"
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                      <p className="text-xs text-green-700 mt-1">{appliedCoupon.description}</p>
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+
+              <Separator />
+
+              {/* Price Summary */}
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Subtotal ({cartItems?.length || 0} items)</span>
+                  <span className="font-medium">₹{subtotal.toLocaleString()}.00</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Shipping</span>
+                  <span className="font-medium text-green-600">FREE</span>
+                </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Discount</span>
+                    <span className="font-medium">-₹{discount.toLocaleString()}.00</span>
+                  </div>
+                )}
+                <Separator />
+                <div className="flex justify-between">
+                  <span className="font-semibold">Total</span>
+                  <span className="font-bold text-lg">₹{total.toLocaleString()}.00</span>
+                </div>
+                <p className="text-xs text-muted-foreground">Including all taxes</p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </>

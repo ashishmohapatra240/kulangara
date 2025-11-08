@@ -16,14 +16,16 @@ export const useRazorpayPayment = () => {
                 const response = await paymentService.createRazorpayOrder(data);
                 return response;
             } catch (error) {
-                console.error('💳 Error in createOrderMutation:', error);
-                console.error('💳 Error message:', (error as Error).message);
-                console.error('💳 Error stack:', (error as Error).stack);
+                if (process.env.NODE_ENV === 'development') {
+                    console.error('Error in createOrderMutation:', error);
+                }
                 throw error;
             }
         },
         onError: (error: Error | AxiosError) => {
-            console.error('💳 createOrderMutation onError:', error);
+            if (process.env.NODE_ENV === 'development') {
+                console.error('createOrderMutation error:', error);
+            }
             setPaymentStatus('failed');
             toast.error(getErrorMessage(error as AxiosError));
         }
@@ -33,34 +35,19 @@ export const useRazorpayPayment = () => {
     const createCartOrderMutation = useMutation({
         mutationFn: async (data: IRazorpayCartOrderRequest) => {
             try {
-                console.log('Sending cart order request:', JSON.stringify(data, null, 2));
                 const response = await paymentService.createRazorpayOrderFromCart(data);
                 return response;
             } catch (error) {
-                console.error('Error in createCartOrderMutation:', error);
-                
-                // Log detailed error information
-                if (error instanceof Error && 'response' in error) {
-                    const axiosError = error as AxiosError;
-                    console.error('Response status:', axiosError.response?.status);
-                    console.error('Response headers:', axiosError.response?.headers);
-                    console.error('Response data:', axiosError.response?.data);
-                    console.error('Request config:', axiosError.config);
+                if (process.env.NODE_ENV === 'development') {
+                    console.error('Error in createCartOrderMutation:', error);
                 }
-                
-                console.error('Error message:', (error as Error).message);
-                console.error('Error stack:', (error as Error).stack);
                 throw error;
             }
         },
         onError: (error: Error | AxiosError) => {
-            console.error('createCartOrderMutation onError:', error);
-            
-            // Log backend error details
-            if ('response' in error && error.response) {
-                console.error('Backend error response:', error.response.data);
+            if (process.env.NODE_ENV === 'development') {
+                console.error('createCartOrderMutation error:', error);
             }
-            
             setPaymentStatus('failed');
             toast.error(getErrorMessage(error as AxiosError));
         }
@@ -112,7 +99,6 @@ export const useRazorpayPayment = () => {
         try {
             // Check if Razorpay is loaded
             if (!window.Razorpay) {
-                console.error('Razorpay SDK not loaded');
                 toast.error('Razorpay SDK not loaded. Please refresh the page.');
                 return { success: false };
             }
@@ -134,7 +120,6 @@ export const useRazorpayPayment = () => {
             const orderResponse = await createCartOrderMutation.mutateAsync(requestData);
 
             if (orderResponse.status !== 'success') {
-                console.error('Order response status not success:', orderResponse.status);
                 toast.error('Failed to create payment order');
                 setPaymentStatus('failed');
                 return { success: false };
@@ -204,16 +189,16 @@ export const useRazorpayPayment = () => {
                     const razorpay = new window.Razorpay(options);
                     razorpay.open();
                 } catch (razorpayError) {
-                    console.error('Error creating/opening Razorpay:', razorpayError);
-                    console.error('Razorpay error message:', (razorpayError as Error).message);
-                    console.error('Razorpay error stack:', (razorpayError as Error).stack);
+                    if (process.env.NODE_ENV === 'development') {
+                        console.error('Error creating/opening Razorpay:', razorpayError);
+                    }
                     resolve({ success: false });
                 }
             });
         } catch (error) {
-            console.error('processRazorpayPaymentFromCart catch block error:', error);
-            console.error('Error message:', (error as Error).message);
-            console.error('Error stack:', (error as Error).stack);
+            if (process.env.NODE_ENV === 'development') {
+                console.error('processRazorpayPaymentFromCart error:', error);
+            }
             setPaymentStatus('failed');
             toast.error(getErrorMessage(error as AxiosError));
             return { success: false };
@@ -230,7 +215,6 @@ export const useRazorpayPayment = () => {
 
             // Check if Razorpay is loaded
             if (!window.Razorpay) {
-                console.error('Razorpay SDK not loaded');
                 toast.error('Razorpay SDK not loaded. Please refresh the page.');
                 return false;
             }
@@ -240,9 +224,7 @@ export const useRazorpayPayment = () => {
             // Create Razorpay order
             const orderResponse = await createOrderMutation.mutateAsync({ orderId });
 
-
             if (orderResponse.status !== 'success') {
-                console.error('Order response status not success:', orderResponse.status);
                 toast.error('Failed to create payment order');
                 setPaymentStatus('failed');
                 return false;
@@ -300,21 +282,20 @@ export const useRazorpayPayment = () => {
                 // Open Razorpay checkout
                 try {
                     const razorpay = new window.Razorpay(options);
-
                     razorpay.open();
                 } catch (razorpayError) {
-                    console.error('Error creating/opening Razorpay:', razorpayError);
-                    console.error('Razorpay error message:', (razorpayError as Error).message);
-                    console.error('Razorpay error stack:', (razorpayError as Error).stack);
+                    if (process.env.NODE_ENV === 'development') {
+                        console.error('Error creating/opening Razorpay:', razorpayError);
+                    }
                     resolve(false);
                 }
             });
 
             return result;
         } catch (error) {
-            console.error('processRazorpayPayment catch block error:', error);
-            console.error('Error message:', (error as Error).message);
-            console.error('Error stack:', (error as Error).stack);
+            if (process.env.NODE_ENV === 'development') {
+                console.error('processRazorpayPayment error:', error);
+            }
             setPaymentStatus('failed');
             toast.error(getErrorMessage(error as AxiosError));
             return false;
