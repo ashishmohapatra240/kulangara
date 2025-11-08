@@ -94,8 +94,8 @@ export default function Sidebar() {
           className={`flex items-center justify-center p-2 border cursor-pointer
           ${
             selectedSizes.includes(size)
-              ? "border-black bg-black text-white"
-              : "border-gray-300"
+              ? "border-primary bg-primary text-primary-foreground"
+              : "border-border"
           }`}
         >
           <input

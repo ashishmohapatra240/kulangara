@@ -5,6 +5,14 @@ import { IoSearch } from "react-icons/io5";
 import { useSearchProducts } from "@/app/hooks/useProducts";
 import Link from "next/link";
 import Image from "next/image";
+import { Input } from "./input";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "./command";
 
 export default function Search() {
   const [query, setQuery] = useState("");
@@ -54,68 +62,78 @@ export default function Search() {
   return (
     <div className="relative" ref={searchRef}>
       <form onSubmit={handleSearch} className="relative">
-        <input
+        <Input
           type="text"
           placeholder="Search products..."
           value={query}
           onChange={handleInputChange}
-          className="w-full px-4 py-2 pl-10 border border-gray-300 focus:outline-none focus:border-black"
+          className="pl-10"
           aria-label="Search products"
         />
-        <IoSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        <IoSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
       </form>
 
       {/* Search Results Dropdown */}
       {isOpen && debouncedQuery.trim() && (
-        <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 shadow-lg z-50 max-h-96 overflow-y-auto">
-          {isLoading ? (
-            <div className="p-4 text-center text-gray-500">Searching...</div>
-          ) : searchResults && searchResults.length > 0 ? (
-            <div>
-              {searchResults.map((product) => (
-                <Link
-                  key={product.id}
-                  href={`/products/${product.id}`}
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center p-4 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                >
-                  <div className="w-12 h-12 relative mr-4">
-                    <Image
-                      src={product.images?.[0]?.url || "/images/coming-soon.jpg"}
-                      alt={product.name}
-                      fill
-                      className="object-cover"
-                    />
+        <div className="absolute top-full left-0 right-0 mt-1 bg-popover border border-border rounded-md shadow-md z-50 max-h-96 overflow-hidden">
+          <Command className="rounded-md border-0">
+            <CommandList>
+              {isLoading ? (
+                <div className="p-4 text-center text-muted-foreground">Searching...</div>
+              ) : searchResults && searchResults.length > 0 ? (
+                <>
+                  <CommandGroup>
+                    {searchResults.map((product) => (
+                      <CommandItem key={product.id} value={product.id} asChild>
+                        <Link
+                          href={`/products/${product.id}`}
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center p-3 cursor-pointer"
+                        >
+                          <div className="w-12 h-12 relative mr-4 flex-shrink-0">
+                            <Image
+                              src={product.images?.[0]?.url || "/images/coming-soon.jpg"}
+                              alt={product.name}
+                              fill
+                              className="object-cover rounded"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-sm truncate">{product.name}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {product.discountedPrice && product.discountedPrice < product.price ? (
+                                <>
+                                  ₹{product.discountedPrice.toLocaleString()}{" "}
+                                  <span className="line-through text-xs">
+                                    ₹{product.price.toLocaleString()}
+                                  </span>
+                                </>
+                              ) : (
+                                <>₹{product.price.toLocaleString()}</>
+                              )}
+                            </p>
+                          </div>
+                        </Link>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                  <div className="p-3 text-center border-t border-border">
+                    <Link
+                      href={`/products?search=${encodeURIComponent(query)}`}
+                      onClick={() => setIsOpen(false)}
+                      className="text-sm text-primary hover:underline"
+                    >
+                      View all results
+                    </Link>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-sm">{product.name}</h3>
-                    <p className="text-sm text-gray-600">
-                      {product.discountedPrice && product.discountedPrice < product.price ? (
-                        <>
-                          ₹{product.discountedPrice.toLocaleString()} <span className="line-through text-xs text-gray-400">₹{product.price.toLocaleString()}</span>
-                        </>
-                      ) : (
-                        <>₹{product.price.toLocaleString()}</>
-                      )}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-              <div className="p-4 text-center border-t border-gray-100">
-                <Link
-                  href={`/products?search=${encodeURIComponent(query)}`}
-                  onClick={() => setIsOpen(false)}
-                  className="text-sm text-blue-600 hover:underline"
-                >
-                  View all results
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <div className="p-4 text-center text-gray-500">
-              No products found for &ldquo;{query}&rdquo;
-            </div>
-          )}
+                </>
+              ) : (
+                <CommandEmpty>
+                  No products found for &ldquo;{query}&rdquo;
+                </CommandEmpty>
+              )}
+            </CommandList>
+          </Command>
         </div>
       )}
     </div>

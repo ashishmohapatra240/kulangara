@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import { FaStar } from "react-icons/fa";
-import Button from "./Button";
+import { Button } from "./button";
+import { Input } from "./input";
+import { Label } from "./label";
+import { Textarea } from "./textarea";
 import {
   ICreateReviewData,
   IUpdateReviewData,
@@ -77,8 +80,8 @@ export default function ReviewForm({
         <FaStar
           key={i}
           className={`w-8 h-8 cursor-pointer transition-all duration-200 ${
-            isFilled ? "text-yellow-400" : "text-gray-300"
-          } hover:scale-110 hover:text-yellow-300`}
+            isFilled ? "text-yellow-500" : "text-muted"
+          } hover:scale-110 hover:text-yellow-400`}
           onClick={() => setRating(starValue)}
           onMouseEnter={() => setHoverRating(starValue)}
           onMouseLeave={() => setHoverRating(0)}
@@ -101,106 +104,71 @@ export default function ReviewForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Rating Section */}
-      <div>
-        <label className="block text-sm font-semibold text-gray-900 mb-3">
-          Rating *
-        </label>
-        <div className="text-center">
-          <div className="flex items-center justify-center gap-1 mb-3">
-            {renderStars()}
-          </div>
-          {rating > 0 && (
-            <p className="text-lg font-semibold text-gray-900">
-              {rating} out of 5 - {getRatingText()}
-            </p>
-          )}
-          {errors.rating && (
-            <p className="text-red-500 text-sm mt-2">{errors.rating}</p>
+      {/* Rating Selection */}
+      <div className="space-y-3">
+        <Label className="text-base font-semibold">Your Rating</Label>
+        <div className="flex items-center gap-4">
+          <div className="flex gap-1">{renderStars()}</div>
+          {(hoverRating || rating) > 0 && (
+            <span className="text-sm font-medium text-muted-foreground">
+              {getRatingText()}
+            </span>
           )}
         </div>
+        {errors.rating && (
+          <p className="text-sm text-destructive">{errors.rating}</p>
+        )}
       </div>
 
-      {/* Title Section */}
-      <div>
-        <label
-          htmlFor="title"
-          className="block text-sm font-semibold text-gray-900 mb-2"
-        >
-          Title (optional)
-        </label>
-        <input
-          type="text"
+      {/* Title */}
+      <div className="space-y-2">
+        <Label htmlFor="title">Review Title (Optional)</Label>
+        <Input
           id="title"
+          type="text"
+          placeholder="Sum up your experience"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-            errors.title ? "border-red-300" : "border-gray-300"
-          }`}
-          placeholder="Brief summary of your experience"
-          maxLength={100}
+          disabled={isLoading}
         />
-        <div className="flex justify-between items-center mt-1">
-          {errors.title && (
-            <p className="text-red-500 text-sm">{errors.title}</p>
-          )}
-          <span className="text-sm text-gray-500 ml-auto">
-            {title.length}/100
-          </span>
-        </div>
+        {errors.title && (
+          <p className="text-sm text-destructive">{errors.title}</p>
+        )}
       </div>
 
-      {/* Comment Section */}
-      <div>
-        <label
-          htmlFor="comment"
-          className="block text-sm font-semibold text-gray-900 mb-2"
-        >
-          Review *
-        </label>
-        <textarea
+      {/* Comment */}
+      <div className="space-y-2">
+        <Label htmlFor="comment">Your Review</Label>
+        <Textarea
           id="comment"
+          placeholder="Share your thoughts about this product..."
           value={comment}
           onChange={(e) => setComment(e.target.value)}
+          disabled={isLoading}
           rows={5}
-          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-colors ${
-            errors.comment ? "border-red-300" : "border-gray-300"
-          }`}
-          placeholder="Share your detailed experience with this product..."
-          maxLength={1000}
+          className="resize-none"
         />
-        <div className="flex justify-between items-center mt-1">
-          {errors.comment && (
-            <p className="text-red-500 text-sm">{errors.comment}</p>
-          )}
-          <span className="text-sm text-gray-500 ml-auto">
-            {comment.length}/1000
-          </span>
-        </div>
+        {errors.comment && (
+          <p className="text-sm text-destructive">{errors.comment}</p>
+        )}
       </div>
 
-
       {/* Action Buttons */}
-      <div className="flex gap-3">
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className="flex-1 py-3 text-base font-semibold"
-        >
-          {isLoading
-            ? "Saving..."
-            : isEditing
-            ? "Update Review"
-            : "Submit Review"}
-        </Button>
+      <div className="flex justify-end gap-3">
         <Button
           type="button"
           variant="outline"
           onClick={onCancel}
           disabled={isLoading}
-          className="flex-1 py-3 text-base font-semibold"
         >
           Cancel
+        </Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading
+            ? "Submitting..."
+            : isEditing
+            ? "Update Review"
+            : "Submit Review"}
         </Button>
       </div>
     </form>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { IProduct } from "@/app/types/product.type";
-import Button from "./Button";
+import { Button } from "./button";
 import productsService from "@/app/services/products.service";
 
 const PLACEHOLDER_IMAGE =
@@ -94,8 +94,8 @@ export default function WishlistCard({
                     type="button"
                     onClick={() => setSelectedSize(size)}
                     className={`px-3 py-1 border text-sm ${isSelected
-                        ? "border-black bg-black text-white"
-                        : "border-gray-300 bg-white text-gray-900 hover:border-gray-400"
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-background text-foreground hover:border-primary/50"
                       }`}
                   >
                     {size}
