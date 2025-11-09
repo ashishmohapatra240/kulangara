@@ -11,7 +11,7 @@ import QuickActions from "@/app/components/admin/QuickActions";
 import ActivityFeed from "@/app/components/admin/ActivityFeed";
 import SystemHealth from "@/app/components/admin/SystemHealth";
 import { FiClock } from "react-icons/fi";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
 import { Alert, AlertDescription } from "@/app/components/ui/alert";
 

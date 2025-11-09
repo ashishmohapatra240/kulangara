@@ -17,7 +17,7 @@ export function GoogleSignInButton({ mode = "login" }: GoogleSignInButtonProps) 
     onSuccess: async (response) => {
       try {
         // Get user info from Google
-        const userInfo = await axios.get(
+        await axios.get(
           "https://www.googleapis.com/oauth2/v3/userinfo",
           {
             headers: {

@@ -8,11 +8,6 @@ import { useCreateCoupon, useAdminCoupons, useDeleteCoupon, useUpdateCoupon } fr
 import { ICreateCouponData, ICoupon } from "@/app/types/coupon.type";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table";
-import { Badge } from "@/app/components/ui/badge";
-import { Input } from "@/app/components/ui/input";
-import { Label } from "@/app/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN"];
 

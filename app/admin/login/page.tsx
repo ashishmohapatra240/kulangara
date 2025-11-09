@@ -3,7 +3,6 @@
 import { Suspense, useState } from "react";
 import { Button } from "@/app/components/ui/button";
 import Image from "next/image";
-import Link from "next/link";
 import { useAuth } from "@/app/hooks/useAuth";
 import { Toaster } from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -29,7 +28,7 @@ function AdminLoginContent() {
     setError("");
     const result = await loginAsync(formData);
     const loggedInUser = (result as { user?: { role?: string } } | undefined)?.user;
-    const next = params.get('next') ?? undefined;
+    const next = params["get"]('next') ?? undefined;
     if (loggedInUser && loggedInUser.role && ALLOWED_ROLES.includes(loggedInUser.role)) {
       if (loggedInUser.role === 'DELIVERY_PARTNER') {
         router.replace('/admin/orders');
