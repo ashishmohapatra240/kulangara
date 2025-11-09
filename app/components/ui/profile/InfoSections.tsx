@@ -1,4 +1,4 @@
-import { Card, CardContent } from "./card";
+import { Card, CardContent } from "@/app/components/ui/card";
 
 export const ContactSection = () => (
   <div className="w-full mt-30">
