@@ -239,7 +239,7 @@ export const useCheckout = () => {
           if (response.data && response.data.items) {
             currentCartItems = response.data.items;
           }
-        } catch (refreshError) {
+        } catch {
           // Silently fall back to current cart data
           currentCartItems = cartItems;
         }
@@ -279,7 +279,7 @@ export const useCheckout = () => {
             } catch (priceError) {
               // Silently fall back to cart price
               // In development, log the error for debugging
-              if (process.env.NODE_ENV === 'development') {
+              if (process.env["NODE_ENV"] === 'development') {
                 console.error(`Failed to fetch price for item ${index}:`, priceError);
               }
             }

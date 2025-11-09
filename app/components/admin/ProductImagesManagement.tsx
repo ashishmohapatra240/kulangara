@@ -52,6 +52,9 @@ export default function ProductImagesManagement({
       }
 
       const uploadUrlData = response.uploadUrls[0];
+      if (!uploadUrlData) {
+        throw new Error("Invalid upload URL data");
+      }
       const uploadURL = uploadUrlData.uploadURL;
       const imageKey = uploadUrlData.key;
 

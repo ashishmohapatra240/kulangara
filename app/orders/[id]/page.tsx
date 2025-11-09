@@ -26,7 +26,7 @@ interface ActualOrderApiResponse {
 export default function OrderConfirmationPage() {
   const params = useParams();
   const router = useRouter();
-  const orderId = params.id as string;
+  const orderId = params["id"] as string;
   const [order, setOrder] = useState<IOrder | null>(null);
   const [tracking, setTracking] = useState<ITrackingHistoryItem[]>([]);
 

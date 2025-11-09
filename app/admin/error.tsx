@@ -15,7 +15,7 @@ export default function AdminError({
   const router = useRouter();
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env["NODE_ENV"] === 'development') {
       console.error('Admin error:', error);
     }
   }, [error]);

@@ -13,7 +13,7 @@ export default function Error({
 }) {
   useEffect(() => {
     // Log the error to an error reporting service
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env["NODE_ENV"] === 'development') {
       console.error('Root error:', error);
     }
   }, [error]);
@@ -42,7 +42,7 @@ export default function Error({
             </div>
           </AlertDescription>
         </Alert>
-        {process.env.NODE_ENV === 'development' && error.digest && (
+        {process.env["NODE_ENV"] === 'development' && error.digest && (
           <p className="text-xs text-muted-foreground">Error ID: {error.digest}</p>
         )}
       </div>

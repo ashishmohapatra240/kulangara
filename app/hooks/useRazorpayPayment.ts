@@ -16,14 +16,14 @@ export const useRazorpayPayment = () => {
                 const response = await paymentService.createRazorpayOrder(data);
                 return response;
             } catch (error) {
-                if (process.env.NODE_ENV === 'development') {
+                if (process.env["NODE_ENV"] === 'development') {
                     console.error('Error in createOrderMutation:', error);
                 }
                 throw error;
             }
         },
         onError: (error: Error | AxiosError) => {
-            if (process.env.NODE_ENV === 'development') {
+            if (process.env["NODE_ENV"] === 'development') {
                 console.error('createOrderMutation error:', error);
             }
             setPaymentStatus('failed');
@@ -38,14 +38,14 @@ export const useRazorpayPayment = () => {
                 const response = await paymentService.createRazorpayOrderFromCart(data);
                 return response;
             } catch (error) {
-                if (process.env.NODE_ENV === 'development') {
+                if (process.env["NODE_ENV"] === 'development') {
                     console.error('Error in createCartOrderMutation:', error);
                 }
                 throw error;
             }
         },
         onError: (error: Error | AxiosError) => {
-            if (process.env.NODE_ENV === 'development') {
+            if (process.env["NODE_ENV"] === 'development') {
                 console.error('createCartOrderMutation error:', error);
             }
             setPaymentStatus('failed');
@@ -189,14 +189,14 @@ export const useRazorpayPayment = () => {
                     const razorpay = new window.Razorpay(options);
                     razorpay.open();
                 } catch (razorpayError) {
-                    if (process.env.NODE_ENV === 'development') {
+                    if (process.env["NODE_ENV"] === 'development') {
                         console.error('Error creating/opening Razorpay:', razorpayError);
                     }
                     resolve({ success: false });
                 }
             });
         } catch (error) {
-            if (process.env.NODE_ENV === 'development') {
+            if (process.env["NODE_ENV"] === 'development') {
                 console.error('processRazorpayPaymentFromCart error:', error);
             }
             setPaymentStatus('failed');
@@ -284,7 +284,7 @@ export const useRazorpayPayment = () => {
                     const razorpay = new window.Razorpay(options);
                     razorpay.open();
                 } catch (razorpayError) {
-                    if (process.env.NODE_ENV === 'development') {
+                    if (process.env["NODE_ENV"] === 'development') {
                         console.error('Error creating/opening Razorpay:', razorpayError);
                     }
                     resolve(false);
@@ -293,7 +293,7 @@ export const useRazorpayPayment = () => {
 
             return result;
         } catch (error) {
-            if (process.env.NODE_ENV === 'development') {
+            if (process.env["NODE_ENV"] === 'development') {
                 console.error('processRazorpayPayment error:', error);
             }
             setPaymentStatus('failed');

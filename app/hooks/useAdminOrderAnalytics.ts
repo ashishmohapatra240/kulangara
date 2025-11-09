@@ -65,7 +65,7 @@ function adaptOrderAnalytics(apiData: IOrderAnalyticsApiResponse): IOrderAnalyti
         if (statusKeys.includes(key)) {
             (statusObj as Record<string, number>)[key] = s.count || 0;
         }
-        else if (key && s.count > 0 && process.env.NODE_ENV === 'development') {
+        else if (key && s.count > 0 && process.env["NODE_ENV"] === 'development') {
             console.warn(`Unmapped order status: ${key} with count: ${s.count}`);
         }
     });
@@ -84,7 +84,7 @@ function adaptOrderAnalytics(apiData: IOrderAnalyticsApiResponse): IOrderAnalyti
             paymentObj.cod += m.count || 0;
         }
         // Log unmapped payment methods for debugging
-        else if (key && m.count > 0 && process.env.NODE_ENV === 'development') {
+        else if (key && m.count > 0 && process.env["NODE_ENV"] === 'development') {
             console.warn(`Unmapped payment method: ${key} with count: ${m.count}`);
         }
     });

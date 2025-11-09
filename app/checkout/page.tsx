@@ -166,7 +166,7 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (typedAddresses.length > 0) {
       const defaultAddr = typedAddresses.find(a => a.isDefault) || typedAddresses[0];
-      setSelectedAddress(defaultAddr);
+      setSelectedAddress(defaultAddr || null);
       if (defaultAddr?.id) {
         setSelectedAddressId(defaultAddr.id);
       }
