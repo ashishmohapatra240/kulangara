@@ -15,7 +15,7 @@ export default function CheckoutError({
   const router = useRouter();
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env["NODE_ENV"] === 'development') {
       console.error('Checkout error:', error);
     }
   }, [error]);

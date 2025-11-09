@@ -16,9 +16,8 @@ import {
   IUpdateReviewData,
   IReview,
 } from "@/app/types/review.type";
-import { Card, CardContent, CardHeader, CardTitle } from "./card";
+import { Card, CardContent, CardHeader } from "./card";
 import { Badge } from "./badge";
-import { Separator } from "./separator";
 import { Skeleton } from "./skeleton";
 import { Avatar, AvatarFallback } from "./avatar";
 import {

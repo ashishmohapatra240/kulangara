@@ -51,8 +51,9 @@ export default function SizeGuideModal({
   isOpen,
   onClose,
 }: SizeGuideModalProps) {
+  const firstCategory = Object.keys(clothingMeasurements)[0] || "Men";
   const sizes = Object.keys(
-    clothingMeasurements[Object.keys(clothingMeasurements)[0]]
+    clothingMeasurements[firstCategory as keyof typeof clothingMeasurements] || {}
   );
 
   return (

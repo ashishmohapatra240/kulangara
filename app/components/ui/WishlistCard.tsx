@@ -41,7 +41,7 @@ export default function WishlistCard({
   let displayImage = PLACEHOLDER_IMAGE;
   if (Array.isArray(item.images) && item.images.length > 0) {
     const primary = item.images.find((img) => img.isPrimary) || item.images[0];
-    displayImage = primary.url || PLACEHOLDER_IMAGE;
+    displayImage = primary?.url || PLACEHOLDER_IMAGE;
   } else if (item.image) {
     displayImage = item.image;
   }
@@ -52,7 +52,7 @@ export default function WishlistCard({
       new Set((productData.variants || []).map((v) => v.size).filter(Boolean))
     );
   const [selectedSize, setSelectedSize] = useState<string | null>(
-    sizeOptions.length === 1 ? sizeOptions[0] : null
+    sizeOptions.length === 1 ? sizeOptions[0] || null : null
   );
   const selectedVariantId = selectedSize
     ? productData.variants?.find((v) => v.size === selectedSize)?.id

@@ -15,7 +15,7 @@ export default function CartError({
   const router = useRouter();
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env["NODE_ENV"] === 'development') {
       console.error('Cart error:', error);
     }
   }, [error]);

@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
     // Feature-flag the middleware to avoid accidental lockouts in dev or
     // when API is on a different origin. Enable by setting
     // NEXT_PUBLIC_ENABLE_ADMIN_MIDDLEWARE=true
-    if (process.env.NEXT_PUBLIC_ENABLE_ADMIN_MIDDLEWARE !== 'true') {
+    if (process.env["NEXT_PUBLIC_ENABLE_ADMIN_MIDDLEWARE"] !== 'true') {
         return NextResponse.next();
     }
     const { pathname } = request.nextUrl;
@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || '';
+    const apiBase = process.env["NEXT_PUBLIC_API_URL"] || '';
     // If API base is not configured or is a different origin than the current site,
     // we cannot reliably forward auth cookies from the browser to the API in middleware.
     // In that case, skip server-side auth and let client-side guards handle it.

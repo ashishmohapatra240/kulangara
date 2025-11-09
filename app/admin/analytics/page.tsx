@@ -13,7 +13,6 @@ import {
   FiDollarSign,
 } from "react-icons/fi";
 import AdminLayout from "@/app/components/layout/AdminLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN"];
 

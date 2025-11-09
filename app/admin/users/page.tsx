@@ -8,12 +8,7 @@ import { IUser, IUserFilters } from "@/app/types/admin.type";
 import { FiSearch, FiUserCheck, FiUserX } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { useAdminUsers, useUpdateUserRole, useUpdateUserStatus } from "@/app/hooks/useAdminUserManagement";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table";
-import { Badge } from "@/app/components/ui/badge";
-import { Input } from "@/app/components/ui/input";
-import { Label } from "@/app/components/ui/label";
-import { Button } from "@/app/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
+import { Card, CardContent } from "@/app/components/ui/card";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN"];
 

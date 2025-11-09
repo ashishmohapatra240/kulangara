@@ -10,9 +10,7 @@ import { Button } from "@/app/components/ui/button";
 import CategoryManagement from "@/app/components/admin/CategoryManagement";
 import Modal from "@/app/components/ui/Modal";
 import { ICategory } from "@/app/types/category.type";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table";
-import { Badge } from "@/app/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
+import { Card, CardContent } from "@/app/components/ui/card";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN"];
 
@@ -63,8 +61,9 @@ export default function AdminCategoriesPage() {
                     </div>
                     <Card>
                         <CardContent className="p-4 sm:p-6">
-                        <CategoryManagement onClose={() => setShowCreate(false)} />
-                    </div>
+                            <CategoryManagement onClose={() => setShowCreate(false)} />
+                        </CardContent>
+                    </Card>
                 </div>
             </AdminLayout>
         );

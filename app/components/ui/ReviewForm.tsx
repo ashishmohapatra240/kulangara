@@ -38,17 +38,17 @@ export default function ReviewForm({
     const newErrors: { [key: string]: string } = {};
 
     if (rating === 0) {
-      newErrors.rating = "Please select a rating";
+      newErrors["rating"] = "Please select a rating";
     }
 
     if (!comment.trim()) {
-      newErrors.comment = "Please write a review comment";
+      newErrors["comment"] = "Please write a review comment";
     } else if (comment.trim().length < 10) {
-      newErrors.comment = "Review must be at least 10 characters long";
+      newErrors["comment"] = "Review must be at least 10 characters long";
     }
 
     if (title.trim() && title.trim().length < 3) {
-      newErrors.title = "Title must be at least 3 characters long";
+      newErrors["title"] = "Title must be at least 3 characters long";
     }
 
     setErrors(newErrors);
@@ -115,8 +115,8 @@ export default function ReviewForm({
             </span>
           )}
         </div>
-        {errors.rating && (
-          <p className="text-sm text-destructive">{errors.rating}</p>
+        {errors["rating"] && (
+          <p className="text-sm text-destructive">{errors["rating"]}</p>
         )}
       </div>
 
@@ -131,8 +131,8 @@ export default function ReviewForm({
           onChange={(e) => setTitle(e.target.value)}
           disabled={isLoading}
         />
-        {errors.title && (
-          <p className="text-sm text-destructive">{errors.title}</p>
+        {errors["title"] && (
+          <p className="text-sm text-destructive">{errors["title"]}</p>
         )}
       </div>
 
@@ -148,8 +148,8 @@ export default function ReviewForm({
           rows={5}
           className="resize-none"
         />
-        {errors.comment && (
-          <p className="text-sm text-destructive">{errors.comment}</p>
+        {errors["comment"] && (
+          <p className="text-sm text-destructive">{errors["comment"]}</p>
         )}
       </div>
 

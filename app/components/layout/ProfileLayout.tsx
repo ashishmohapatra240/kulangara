@@ -6,7 +6,6 @@ import { useAuth } from "@/app/hooks/useAuth";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
-import { Badge } from "../ui/badge";
 import { Sheet, SheetContent } from "../ui/sheet";
 import { useState } from "react";
 import { 

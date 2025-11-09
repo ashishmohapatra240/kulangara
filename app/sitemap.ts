@@ -45,7 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // TODO: Fetch dynamic product pages from your API
   // Example:
-  // const products = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/products`);
+  // const products = await fetch(`${process.env["NEXT_PUBLIC_API_URL"]}/api/v1/products`);
   // const productPages = products.map(product => ({
   //   url: `${baseUrl}/products/${product.id}`,
   //   lastModified: new Date(product.updatedAt),

@@ -8,7 +8,7 @@ import {
     useGenerateSlug 
 } from "@/app/hooks/useCategories";
 import { ICategory, ICategoryCreate, ICategoryUpdate } from "@/app/types/category.type";
-import Button from "../ui/Button";
+import { Button } from "../ui/button";
 
 interface CategoryManagementProps {
     category?: ICategory;

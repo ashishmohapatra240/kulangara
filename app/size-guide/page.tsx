@@ -192,8 +192,9 @@ const instructions = [
 ];
 
 export default function SizeGuidePage() {
+  const firstCategory = Object.keys(clothingMeasurements)[0] || "Men";
   const sizes = Object.keys(
-    clothingMeasurements[Object.keys(clothingMeasurements)[0]]
+    clothingMeasurements[firstCategory as keyof typeof clothingMeasurements] || {}
   );
 
   return (

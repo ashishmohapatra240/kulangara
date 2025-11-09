@@ -16,7 +16,7 @@ export function Providers({ children }: { children: ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <GoogleOAuthProvider clientId={googleClientId}>
         {children}
-        {process.env.NODE_ENV === "development" && (
+        {process.env["NODE_ENV"] === "development" && (
           <ReactQueryDevtools initialIsOpen={false} />
         )}
         </GoogleOAuthProvider>

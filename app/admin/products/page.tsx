@@ -14,10 +14,7 @@ import { IProduct } from "@/app/types/product.type";
 import Modal from "@/app/components/ui/Modal";
 import ProductVariantsManagement from "@/app/components/admin/ProductVariantsManagement";
 import ProductImagesManagement from "@/app/components/admin/ProductImagesManagement";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
-import { Badge } from "@/app/components/ui/badge";
-import { Label } from "@/app/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN"];
 
@@ -113,7 +110,8 @@ export default function AdminProductsPage() {
                 TOTAL: {meta.total} PRODUCTS
               </span>
             )}
-          </div>
+          </CardHeader>
+          <CardContent>
           <div className="p-8">
             {isProductsLoading ? (
               <div className="text-center text-black font-bold tracking-wide py-12">
@@ -274,46 +272,47 @@ export default function AdminProductsPage() {
               </div>
             )}
           </div>
-        </div>
-
-        {editProduct && (
-          <Modal isOpen={!!editProduct} onClose={() => setEditProduct(null)}>
-            <div className="p-6 max-w-lg w-full">
-              <h2 className="text-xl font-bold mb-4">Edit Product</h2>
-              <ProductManagement
-                product={editProduct}
-                onClose={() => setEditProduct(null)}
-              />
-            </div>
-          </Modal>
-        )}
-
-        {variantProduct && (
-          <Modal
-            isOpen={!!variantProduct}
-            onClose={() => setVariantProduct(null)}
-            maxWidth="max-w-2xl"
-          >
-            <ProductVariantsManagement
-              product={variantProduct}
-              onClose={() => setVariantProduct(null)}
-            />
-          </Modal>
-        )}
-
-        {imageProduct && (
-          <Modal
-            isOpen={!!imageProduct}
-            onClose={() => setImageProduct(null)}
-            maxWidth="max-w-2xl"
-          >
-            <ProductImagesManagement
-              product={imageProduct}
-              onClose={() => setImageProduct(null)}
-            />
-          </Modal>
-        )}
+          </CardContent>
+        </Card>
       </div>
+
+      {editProduct && (
+        <Modal isOpen={!!editProduct} onClose={() => setEditProduct(null)}>
+          <div className="p-6 max-w-lg w-full">
+            <h2 className="text-xl font-bold mb-4">Edit Product</h2>
+            <ProductManagement
+              product={editProduct}
+              onClose={() => setEditProduct(null)}
+            />
+          </div>
+        </Modal>
+      )}
+
+      {variantProduct && (
+        <Modal
+          isOpen={!!variantProduct}
+          onClose={() => setVariantProduct(null)}
+          maxWidth="max-w-2xl"
+        >
+          <ProductVariantsManagement
+            product={variantProduct}
+            onClose={() => setVariantProduct(null)}
+          />
+        </Modal>
+      )}
+
+      {imageProduct && (
+        <Modal
+          isOpen={!!imageProduct}
+          onClose={() => setImageProduct(null)}
+          maxWidth="max-w-2xl"
+        >
+          <ProductImagesManagement
+            product={imageProduct}
+            onClose={() => setImageProduct(null)}
+          />
+        </Modal>
+      )}
     </AdminLayout>
   );
 }

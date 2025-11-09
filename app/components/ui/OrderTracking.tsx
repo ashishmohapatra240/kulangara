@@ -51,7 +51,7 @@ export const OrderTrackingComponent = ({ tracking, currentStatus }: OrderTrackin
             <div className="flex items-center w-full">
               {/* Left connector */}
               {idx > 0 && (
-                <div className={`h-1 flex-1 ${timeline[idx - 1].reached ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                <div className={`h-1 flex-1 ${timeline[idx - 1]?.reached ? 'bg-green-500' : 'bg-gray-300'}`}></div>
               )}
               {/* Dot */}
               <div className={`w-4 h-4 rounded-full border-2 ${step.reached ? 'bg-green-500 border-green-600' : 'bg-white border-gray-300'}`}></div>

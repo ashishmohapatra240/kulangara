@@ -8,7 +8,7 @@ import {
   IUpdateVariantData,
 } from "@/app/types/product.type";
 import { useAddProductVariant, useDeleteProductVariant, useUpdateProductVariant } from "@/app/hooks/useProducts";
-import Button from "../ui/Button";
+import { Button } from "../ui/button";
 
 interface ProductVariantsManagementProps {
   product: IProduct;
