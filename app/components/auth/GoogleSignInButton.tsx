@@ -16,8 +16,8 @@ export function GoogleSignInButton({ mode = "login" }: GoogleSignInButtonProps) 
   const login = useGoogleLogin({
     onSuccess: async (response) => {
       try {
-        // Get user info from Google
-        await axios.get(
+        // Get user info from Google (optional - just to verify token works)
+        const userInfo = await axios.get(
           "https://www.googleapis.com/oauth2/v3/userinfo",
           {
             headers: {
@@ -25,11 +25,19 @@ export function GoogleSignInButton({ mode = "login" }: GoogleSignInButtonProps) 
             },
           }
         );
+        
+        console.log("Google user info:", userInfo.data);
 
-        // Send the token to our backend
+        // Send the access token to our backend
+        // The backend will verify this token with Google and create/authenticate the user
         googleLogin(response.access_token);
       } catch (error) {
         console.error("Error during Google sign in:", error);
+        if (axios.isAxiosError(error)) {
+          console.error("Response data:", error.response?.data);
+          console.error("Response status:", error.response?.status);
+          console.error("Response headers:", error.response?.headers);
+        }
       }
     },
     onError: (error) => {
