@@ -41,7 +41,13 @@ export const useAuth = () => {
             toast.success('Login successful!');
             // Avoid overriding admin-specific redirects; only push if not on admin login pages
             if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin')) {
-                router.push('/');
+                const redirectPath = window.sessionStorage.getItem('postLoginRedirect');
+                if (redirectPath) {
+                    window.sessionStorage.removeItem('postLoginRedirect');
+                    router.push(redirectPath);
+                } else {
+                    router.push('/');
+                }
             }
         },
         onError: (error: AxiosError) => {

@@ -39,7 +39,7 @@ function ProductCardComponent({
   images,
   category,
 }: ProductCardProps) {
-  const { data: wishlistResponse } = useWishlist();
+  const { data: wishlistResponse, refetch: refetchWishlist } = useWishlist();
   const createWishlist = useCreateWishlistItems();
   const deleteWishlist = useDeleteWishlistItems();
   const { data: reviewsData } = useReviews(id);
@@ -69,9 +69,11 @@ function ProductCardComponent({
     try {
       if (isInWishlist) {
         await deleteWishlist.mutateAsync(id);
+        await refetchWishlist();
         toast.success("Removed from wishlist");
       } else {
         await createWishlist.mutateAsync(id);
+        await refetchWishlist();
         toast.success("Added to wishlist");
       }
     } catch {

@@ -93,16 +93,9 @@ export default function ProfileLayout({
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Desktop Header (fixed) */}
-      <div className="hidden lg:block fixed top-0 left-0 right-0 z-40 bg-background border-b border-border h-16">
-        <div className="flex items-center h-full px-8">
-          <h1 className="text-lg font-semibold">Profile</h1>
-        </div>
-      </div>
-
       {/* Mobile Header with Menu Button */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
-        <div className="flex items-center justify-between p-4">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background border-b border-border h-16">
+        <div className="flex items-center justify-between h-full px-4">
           <h1 className="text-base font-semibold">My Profile</h1>
           <Button
             variant="ghost"
