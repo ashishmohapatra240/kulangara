@@ -23,14 +23,21 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
   const pathname = usePathname();
+  const isProfileRoute = pathname?.startsWith("/profile");
+  const isAdminRoute = pathname?.startsWith("/admin");
 
-  // Hide header on admin routes
-  if (pathname?.startsWith("/admin")) {
+  // Hide header completely on admin routes
+  if (isAdminRoute) {
     return null;
   }
 
+  // On profile routes, show header only on large screens
+  const headerClasses = isProfileRoute 
+    ? "border-b border-border fixed top-0 left-0 right-0 z-40 bg-white shadow-sm hidden lg:block"
+    : "border-b border-border fixed top-10 left-0 right-0 z-40 bg-white shadow-sm";
+
   return (
-    <header className="border-b border-border fixed top-10 left-0 right-0 z-40 bg-white shadow-sm">
+    <header className={headerClasses}>
       <div className="container mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
         <Link href="/" className="text-xl font-bold tracking-tight hover:text-black">
           KULANGARA
@@ -40,7 +47,7 @@ export default function Header() {
           <Search />
           <Button variant="ghost" size="icon" asChild>
             <Link href="/wishlist">
-              <CiHeart className="w-5 h-5" />
+              <CiHeart className="w-6 h-6" />
             </Link>
           </Button>
           <CartBadge />
@@ -99,10 +106,10 @@ export default function Header() {
               <div className="flex items-center gap-4">
                 <Button variant="outline" size="icon" asChild>
                   <Link href="/wishlist">
-                    <CiHeart className="w-5 h-5" />
+                    <CiHeart className="w-6 h-6" />
                   </Link>
                 </Button>
-                <CartBadge />
+                <CartBadge variant="outline" />
               </div>
               <Separator />
               <div className="flex flex-col gap-3">
