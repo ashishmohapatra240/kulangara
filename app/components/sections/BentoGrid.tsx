@@ -8,7 +8,7 @@ export default function BentoGrid() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Link href="/products" className="md:col-span-2 md:row-span-2 group relative overflow-hidden rounded-lg aspect-square md:aspect-auto">
           <Image
-            src="/images/coming-soon.jpg"
+            src="/images/maarana.png"
             alt="Featured Collection"
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -25,15 +25,15 @@ export default function BentoGrid() {
         {/* Small cards */}
         <Link href="/products" className="group relative overflow-hidden rounded-lg aspect-square">
           <Image
-            src="/images/coming-soon.jpg"
+            src="/images/maahi.jpg"
             alt="Collection 1"
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
-          <div className="absolute inset-0 flex items-end p-4">
+          {/* <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" /> */}
+          <div className="absolute top-1 left-0.5 flex items-end p-4">
             <div className="text-white">
-              <h3 className="text-lg font-bold">Essentials</h3>
+              <h3 className="text-xl font-bold">Essentials</h3>
             </div>
           </div>
         </Link>
