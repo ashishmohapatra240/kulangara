@@ -2,9 +2,12 @@
 
 import { notFound } from "next/navigation";
 import { use, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useProduct } from "@/app/hooks/useProducts";
 import { useReviews } from "@/app/hooks/useReviews";
 import { useAddToCart } from "@/app/hooks/useCart";
+import { useAppDispatch } from "@/app/store/hooks";
+import { fetchCart } from "@/app/store/slices/cartSlice";
 import { Button } from "@/app/components/ui/button";
 import ProductReviews from "@/app/components/ui/ProductReviews";
 import {
@@ -47,6 +50,8 @@ type Params = { id: string };
 
 export default function ProductPage({ params }: { params: Promise<Params> }) {
   const { id } = use(params);
+  const router = useRouter();
+  const dispatch = useAppDispatch();
   const { data: product, isLoading, error } = useProduct(id);
   const { data: reviewsData } = useReviews(id);
   const { data: wishlistResponse } = useWishlist();
@@ -228,14 +233,18 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
         (v) => v.size === selectedSize
       );
 
+      // Add item to cart and wait for it to complete
       await addItemToCart({
         productId: product.id,
         quantity: quantity,
         variantId: selectedVariant?.id,
       });
 
-      // Redirect to checkout
-      window.location.href = "/checkout";
+      // Fetch the latest cart state to ensure it's synced
+      await dispatch(fetchCart()).unwrap();
+
+      // Navigate to checkout using Next.js router
+      router.push("/checkout");
     } catch (error) {
       if (
         error instanceof Error &&
@@ -246,6 +255,7 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
         );
       } else {
         console.error("Failed to buy now:", error);
+        toast.error("Failed to proceed to checkout. Please try again.");
       }
     }
   };

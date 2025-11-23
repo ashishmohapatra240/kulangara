@@ -31,7 +31,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link 
-                  href="/profile/about" 
+                  href="/about" 
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   About Us
@@ -39,7 +39,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link 
-                  href="/profile/contact" 
+                  href="/contact" 
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Contact
@@ -133,14 +133,14 @@ export default function Footer() {
           <p className="text-sm text-muted-foreground">&copy; 2025 Kulangara. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <Link 
-              href="/profile/privacy" 
+              href="/privacy" 
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Privacy Policy
             </Link>
             <Separator orientation="vertical" className="h-4" />
             <Link 
-              href="/profile/terms" 
+              href="/terms" 
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Terms of Service
