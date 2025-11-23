@@ -33,23 +33,24 @@ const authService = {
             // The backend should return user data along with the token
             console.error('Backend returned incomplete response. Expected user data but got:', response.data);
             throw new Error('Backend response missing user data. Expected format: { data: { user: {...}, token: "..." } }');
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Google auth error:', error);
             
             // Provide more helpful error messages
-            if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+            if (error && typeof error === 'object' && 'code' in error && (error.code === 'ERR_NETWORK' || (error as { message?: string }).message === 'Network Error')) {
                 const apiUrl = process.env["NEXT_PUBLIC_API_URL"] || 'http://localhost:3000';
                 throw new Error(`Cannot connect to backend at ${apiUrl}/api/v1/auth/google. Please check if the backend server is running and accessible.`);
             }
             
-            if (error.code === 'ECONNABORTED') {
+            if (error && typeof error === 'object' && 'code' in error && error.code === 'ECONNABORTED') {
                 throw new Error('Request timed out. The backend server may be slow or unresponsive.');
             }
             
-            if (error.response) {
+            if (error && typeof error === 'object' && 'response' in error) {
                 // Backend responded with an error
-                const status = error.response.status;
-                const message = error.response.data?.message || error.message;
+                const axiosError = error as { response?: { status?: number; data?: { message?: string } } };
+                const status = axiosError.response?.status;
+                const message = axiosError.response?.data?.message || (error instanceof Error ? error.message : 'Unknown error');
                 throw new Error(`Backend error (${status}): ${message}`);
             }
             
