@@ -251,6 +251,8 @@ export default function CheckoutPage() {
       phone: "",
       isDefault: false,
     });
+    // React Query will automatically refresh addresses after successful mutation
+    // The modal will stay open to show the updated address list
   };
 
   const handleEditAddress = (address: IAddress) => {
@@ -293,7 +295,15 @@ export default function CheckoutPage() {
               </CardHeader>
               <CardContent>
                 {typedAddresses.length === 0 ? (
-                  <div className="text-muted-foreground">No addresses saved yet.</div>
+                  <div className="space-y-4">
+                    <div className="text-muted-foreground">No addresses saved yet.</div>
+                    <Button onClick={() => {
+                      setShowAddressModal(true);
+                      setShowAddForm(true);
+                    }}>
+                      Add New Address
+                    </Button>
+                  </div>
                 ) : selectedAddress ? (
                   <div className="flex justify-between items-start gap-4">
                     <div className="space-y-1">
@@ -321,7 +331,6 @@ export default function CheckoutPage() {
                 )}
               </CardContent>
             </Card>
-
             {/* Payment Section */}
             <Card>
               <CardHeader>
@@ -411,7 +420,22 @@ export default function CheckoutPage() {
             </Button>
 
             {/* Address Modal */}
-            <Modal isOpen={showAddressModal} onClose={() => setShowAddressModal(false)} maxWidth="max-w-xl">
+            <Modal isOpen={showAddressModal} onClose={() => {
+              setShowAddressModal(false);
+              setShowAddForm(false);
+              setEditingAddress(null);
+              setAddressFormData({
+                firstName: "",
+                lastName: "",
+                address: "",
+                apartment: "",
+                city: "",
+                state: "",
+                pincode: "",
+                phone: "",
+                isDefault: false,
+              });
+            }} maxWidth="max-w-xl">
               <div className="p-4">
                 <h3 className="text-lg font-medium mb-4">Select Address</h3>
                 {typedAddresses.length === 0 ? (
@@ -579,7 +603,21 @@ export default function CheckoutPage() {
                           </Label>
                         </div>
                         <div className="flex justify-end gap-4 mt-6">
-                          <Button type="button" variant="outline" onClick={() => { setShowAddForm(false); setEditingAddress(null); }}>
+                          <Button type="button" variant="outline" onClick={() => {
+                            setShowAddForm(false);
+                            setEditingAddress(null);
+                            setAddressFormData({
+                              firstName: "",
+                              lastName: "",
+                              address: "",
+                              apartment: "",
+                              city: "",
+                              state: "",
+                              pincode: "",
+                              phone: "",
+                              isDefault: false,
+                            });
+                          }}>
                             Cancel
                           </Button>
                           <Button type="submit" disabled={isCreatingAddress || isUpdatingAddress}>
