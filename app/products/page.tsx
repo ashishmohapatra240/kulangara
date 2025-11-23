@@ -87,7 +87,7 @@ export default function ProductsPage() {
                 : searchParams.sortBy
             }
             onChange={(e) => handleSortChange(e.target.value)}
-            className="appearance-none px-4 py-2 pr-8 border border-gray-300"
+            className="appearance-none px-4 py-2 pr-8 border border-gray-300 cursor-pointer"
           >
             <option value="createdAt">Newest</option>
             <option value="price-asc">Price: Low to High</option>
@@ -127,8 +127,8 @@ export default function ProductsPage() {
                 onClick={() => setSearchParams((prev: IProductSearchParams) => ({ ...prev, page }))}
                 className={`px-3 py-2 border ${
                   searchParams.page === page
-                    ? "bg-black text-white border-black"
-                    : "bg-white text-black border-gray-300 hover:bg-gray-50"
+                    ? "bg-black text-white border-black cursor-pointer"
+                    : "bg-white text-black border-gray-300 hover:bg-gray-50 cursor-pointer"
                 }`}
               >
                 {page}

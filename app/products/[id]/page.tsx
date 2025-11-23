@@ -595,7 +595,7 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
                 variant="outline"
                 size="lg"
                 onClick={handleBuyNow}
-                className="flex-1 h-14 text-base font-semibold border-2 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
+                className="flex-1 h-14 text-base font-semibold border-2 hover:bg-primary  hover:border-primary transition-all"
                 disabled={
                   !selectedSize || cartLoading || stockInfo?.stockQuantity === 0
                 }

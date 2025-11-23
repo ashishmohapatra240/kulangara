@@ -32,7 +32,7 @@ export default function Header() {
   return (
     <header className="border-b border-border fixed top-10 left-0 right-0 z-40 bg-white shadow-sm">
       <div className="container mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold tracking-tight hover:text-accent transition-colors">
+        <Link href="/" className="text-xl font-bold tracking-tight hover:text-black">
           KULANGARA
         </Link>
 
