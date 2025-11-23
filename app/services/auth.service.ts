@@ -13,8 +13,52 @@ const authService = {
     },
 
     googleAuth: async (token: string): Promise<IAuthResponse> => {
-        const response = await axiosInstance.post(`/api/v1/auth/google`, { token });
-        return response.data.data;
+        try {
+            const response = await axiosInstance.post(`/api/v1/auth/google`, { token });
+            
+            console.log('Backend response:', response.data);
+            
+            // Handle different response formats
+            // Expected: { success: true, data: { user: {...}, token: "..." } }
+            // Or: { data: { user: {...}, token: "..." } }
+            // Or: { user: {...}, token: "..." }
+            if (response.data?.data?.user) {
+                return response.data.data;
+            }
+            if (response.data?.user) {
+                return response.data;
+            }
+            
+            // If backend returns just { token }, this is an error
+            // The backend should return user data along with the token
+            console.error('Backend returned incomplete response. Expected user data but got:', response.data);
+            throw new Error('Backend response missing user data. Expected format: { data: { user: {...}, token: "..." } }');
+        } catch (error: any) {
+            console.error('Google auth error:', error);
+            
+            // Provide more helpful error messages
+            if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+                const apiUrl = process.env["NEXT_PUBLIC_API_URL"] || 'http://localhost:3000';
+                throw new Error(`Cannot connect to backend at ${apiUrl}/api/v1/auth/google. Please check if the backend server is running and accessible.`);
+            }
+            
+            if (error.code === 'ECONNABORTED') {
+                throw new Error('Request timed out. The backend server may be slow or unresponsive.');
+            }
+            
+            if (error.response) {
+                // Backend responded with an error
+                const status = error.response.status;
+                const message = error.response.data?.message || error.message;
+                throw new Error(`Backend error (${status}): ${message}`);
+            }
+            
+            if (error instanceof Error) {
+                throw error;
+            }
+            
+            throw new Error('Failed to authenticate with Google. Please try again.');
+        }
     },
 
     logout: async (): Promise<void> => {
