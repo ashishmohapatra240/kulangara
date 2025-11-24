@@ -19,6 +19,7 @@ import Modal from "@/app/components/ui/Modal";
 import { IOrder } from "@/app/types/order.type";
 import React from "react";
 import { IAddress } from "@/app/types/profile.type";
+import { isValidPincode } from "@/app/lib/validation";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -175,6 +176,12 @@ export default function CheckoutPage() {
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("razorpay");
   const [formError, setFormError] = useState("");
+  
+  // Pincode availability checker
+  const [pincode, setPincode] = useState("");
+  const [pincodeError, setPincodeError] = useState("");
+  const [isCheckingPincode, setIsCheckingPincode] = useState(false);
+  const [pincodeAvailable, setPincodeAvailable] = useState<boolean | null>(null);
 
   // Clear errors when cart becomes empty and clean up any stale data
   useEffect(() => {
@@ -187,6 +194,70 @@ export default function CheckoutPage() {
       }
     }
   }, [cartItems.length]);
+
+  // Pincode validation and availability check with debounce
+  useEffect(() => {
+    // Reset states when pincode is cleared
+    if (pincode === "") {
+      setPincodeError("");
+      setPincodeAvailable(null);
+      setIsCheckingPincode(false);
+      return;
+    }
+
+    // Validate format: must be exactly 6 digits
+    if (pincode.length < 6) {
+      setPincodeError("");
+      setPincodeAvailable(null);
+      setIsCheckingPincode(false);
+      return;
+    }
+
+    // Check if all are numbers
+    const pincodeRegex = /^[0-9]{6}$/;
+    if (!pincodeRegex.test(pincode)) {
+      setPincodeError("Pincode must be exactly 6 numbers");
+      setPincodeAvailable(null);
+      setIsCheckingPincode(false);
+      return;
+    }
+
+    // Validate using Indian pincode format (first digit should not be 0)
+    if (!isValidPincode(pincode)) {
+      setPincodeError("Invalid pincode format. First digit cannot be 0");
+      setPincodeAvailable(null);
+      setIsCheckingPincode(false);
+      return;
+    }
+
+    // Clear error if format is valid
+    setPincodeError("");
+
+    // Debounce: Wait 1 second before checking availability
+    setIsCheckingPincode(true);
+    const timer = setTimeout(async () => {
+      try {
+        // Simulate API call - In production, replace with actual API endpoint
+        // For now, we'll simulate availability check
+        // You can replace this with: await axiosInstance.get(`/api/v1/delivery/check-pincode/${pincode}`)
+        
+        // Mock availability check (replace with actual API call)
+        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+        
+        // Mock logic: Consider pincode available if it's valid format
+        // In production, this would be an actual API call
+        const isAvailable = true; // Replace with actual API response
+        setPincodeAvailable(isAvailable);
+      } catch (error) {
+        console.error('Error checking pincode availability:', error);
+        setPincodeAvailable(false);
+      } finally {
+        setIsCheckingPincode(false);
+      }
+    }, 1000); // 1 second debounce
+
+    return () => clearTimeout(timer);
+  }, [pincode]);
 
   const handleApplyCoupon = async () => {
     setFormError("");
@@ -331,6 +402,52 @@ export default function CheckoutPage() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Pincode Availability Checker */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Check Availability</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <Label htmlFor="pincode-check">Check availability</Label>
+                  <Input
+                    id="pincode-check"
+                    type="text"
+                    placeholder="Enter 6-digit pincode"
+                    value={pincode}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, ''); // Only allow numbers
+                      if (value.length <= 6) {
+                        setPincode(value);
+                      }
+                    }}
+                    maxLength={6}
+                    className={pincodeError ? "border-destructive" : ""}
+                  />
+                  {pincodeError && (
+                    <p className="text-sm text-destructive">{pincodeError}</p>
+                  )}
+                  {isCheckingPincode && pincode.length === 6 && !pincodeError && (
+                    <p className="text-sm text-muted-foreground">Checking availability...</p>
+                  )}
+                  {!isCheckingPincode && pincode.length === 6 && !pincodeError && pincodeAvailable !== null && (
+                    <div className="flex items-center gap-2">
+                      {pincodeAvailable ? (
+                        <>
+                          <span className="text-sm text-green-600 font-medium">✓ Delivery available</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-sm text-destructive font-medium">✗ Delivery not available for this pincode</span>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Payment Section */}
             <Card>
               <CardHeader>
@@ -353,7 +470,7 @@ export default function CheckoutPage() {
                     <span className="text-sm font-medium">Razorpay Secure (UPI, Cards, Wallets, NetBanking)</span>
                   </label>
 
-                  <label className="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
+                  {/* <label className="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
                     <input
                       type="radio"
                       name="payment"
@@ -362,7 +479,7 @@ export default function CheckoutPage() {
                       className="mr-3"
                     />
                     <span className="text-sm font-medium">Cash on Delivery</span>
-                  </label>
+                  </label> */}
                 </div>
               </CardContent>
             </Card>
@@ -657,7 +774,7 @@ export default function CheckoutPage() {
                               fill
                               className="object-cover"
                             />
-                            <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                            <Badge className="absolute top-1 right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
                               {item.quantity || 0}
                             </Badge>
                           </div>
