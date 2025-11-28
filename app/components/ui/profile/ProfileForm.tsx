@@ -118,7 +118,7 @@ export const ProfileForm = () => {
   }
 
   return (
-    <div className="pt-30">
+    <div className="p-4 lg:pt-1">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-normal">Profile Details</h1>
         {!isEditMode && (
