@@ -589,7 +589,7 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
               <Button
                 onClick={handleAddToCart}
                 size="lg"
-                className="flex-1 h-14 text-base font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all"
+                className="flex-1 h-14 p-2 text-base font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all"
                 disabled={
                   !selectedSize || cartLoading || stockInfo?.stockQuantity === 0
                 }
@@ -605,7 +605,7 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
                 variant="outline"
                 size="lg"
                 onClick={handleBuyNow}
-                className="flex-1 h-14 text-base font-semibold border-2 hover:bg-primary  hover:border-primary transition-all"
+                className="flex-1 h-14 p-2 text-base font-semibold border-2 hover:bg-primary  hover:border-primary transition-all"
                 disabled={
                   !selectedSize || cartLoading || stockInfo?.stockQuantity === 0
                 }

@@ -100,19 +100,36 @@ export default function Header() {
               <RiMenu3Line className="w-6 h-6" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-            <div className="flex flex-col gap-6 mt-8">
+          <SheetContent 
+            side="right" 
+            className="w-full max-w-xs sm:max-w-md p-0"
+          >
+            {/* Top-right close button with spacing and bg */}
+            <div className="flex justify-end p-4">
+              <button
+                aria-label="Close"
+                className="rounded-full bg-muted hover:bg-muted/80 text-foreground transition p-2"
+                onClick={() => setIsMenuOpen(false)}
+                type="button"
+              >
+              </button>
+            </div>
+            <div className="flex flex-col gap-6 mt-2 px-4 pb-8">
               <Search />
-              <div className="flex items-center gap-4">
-                <Button variant="outline" size="icon" asChild>
+
+              {/* Wishlist & Cart centered with proper spacing */}
+              <div className="flex justify-center items-center gap-6 mt-2 mb-2">
+                <Button variant="outline" size="icon" asChild className="rounded-full">
                   <Link href="/wishlist">
                     <CiHeart className="w-6 h-6" />
                   </Link>
                 </Button>
-                <CartBadge variant="outline" />
+                <CartBadge variant="outline" className="rounded-full" />
               </div>
+
               <Separator />
-              <div className="flex flex-col gap-3">
+
+              <div className="flex flex-col gap-3 px-2">
                 {isAuthenticated ? (
                   <>
                     <p className="text-sm font-medium text-muted-foreground text-center">
