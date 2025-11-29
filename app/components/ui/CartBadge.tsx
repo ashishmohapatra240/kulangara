@@ -9,6 +9,7 @@ import { buttonVariants } from "@/app/components/ui/button";
 
 type CartBadgeProps = {
   variant?: VariantProps<typeof buttonVariants>["variant"];
+  className?: string;
 };
 
 export default function CartBadge({ variant = "ghost" }: CartBadgeProps) {
