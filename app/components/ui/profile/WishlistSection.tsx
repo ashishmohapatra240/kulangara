@@ -96,7 +96,7 @@ export const WishlistSection = () => {
   }
 
   return (
-    <div className="pt-30">
+    <div className="p-4 lg:pt-1">
       <h1 className="text-2xl font-normal mb-8">My Wishlist</h1>
       {wishlistItems.length === 0 ? (
         <Card>

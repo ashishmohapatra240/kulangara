@@ -100,8 +100,8 @@ export const AddressSection = () => {
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-8 pt-30">
+    <div className="p-4 lg:pt-1">
+      <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-normal">Saved Addresses</h1>
         <Button onClick={() => setShowAddForm(true)}>
           Add New Address
