@@ -107,7 +107,7 @@ export const OrdersSection = () => {
   }
 
   return (
-    <div className="pt-30 space-y-4">
+    <div className="p-4 lg:pt-1">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">My Orders</h1>
@@ -124,95 +124,209 @@ export const OrdersSection = () => {
           const remainingCount = (order.items?.length || 0) - 3;
 
           return (
+            // <Card key={order.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            //   <CardContent className="p-0">
+            //     {/* Header Section */}
+            //     <div className={`${statusConfig.bg} px-6 py-4 border-b`}>
+            //       <div className="flex items-center justify-between">
+            //         <div className="flex items-center gap-4">
+            //           <div className="flex items-center gap-2">
+            //             <FiPackage className={`h-5 w-5 ${statusConfig.color}`} />
+            //             <div>
+            //               <p className="text-xs text-muted-foreground">Order</p>
+            //               <p className="font-semibold">#{order.orderNumber}</p>
+            //             </div>
+            //           </div>
+            //           <Separator orientation="vertical" className="h-10" />
+            //           <div>
+            //             <p className="text-xs text-muted-foreground">Placed on</p>
+            //             <p className="text-sm font-medium">
+            //               {new Date(order.createdAt).toLocaleDateString("en-US", {
+            //                 month: "short",
+            //                 day: "numeric",
+            //                 year: "numeric",
+            //               })}
+            //             </p>
+            //           </div>
+            //           <Separator orientation="vertical" className="h-10" />
+            //           <div>
+            //             <p className="text-xs text-muted-foreground">Total</p>
+            //             <p className="text-sm font-bold">₹{order.totalAmount.toLocaleString()}</p>
+            //           </div>
+            //         </div>
+            //         <Badge variant={statusConfig.variant} className="font-medium">
+            //           {order.status}
+            //         </Badge>
+            //       </div>
+            //     </div>
+
+            //     {/* Items Preview */}
+            //     <div className="px-6 py-4">
+            //       <div className="flex items-center gap-4 mb-4">
+            //         <div className="flex -space-x-2">
+            //           {firstThreeItems.map((item, index) => (
+            //             <div
+            //               key={index}
+            //               className="relative w-12 h-12 rounded-lg border-2 border-background overflow-hidden bg-muted"
+            //             >
+            //               <Image
+            //                 src={item.product?.images?.[0]?.url || "/images/coming-soon.jpg"}
+            //                 alt={item.product?.name || "Product"}
+            //                 fill
+            //                 className="object-cover"
+            //               />
+            //             </div>
+            //           ))}
+            //           {remainingCount > 0 && (
+            //             <div className="relative w-12 h-12 rounded-lg border-2 border-background bg-muted flex items-center justify-center">
+            //               <span className="text-xs font-semibold text-muted-foreground">
+            //                 +{remainingCount}
+            //               </span>
+            //             </div>
+            //           )}
+            //         </div>
+            //         <div className="flex-grow">
+            //           <p className="text-sm font-medium">
+            //             {order.items?.length || 0} {order.items?.length === 1 ? 'item' : 'items'}
+            //           </p>
+            //           <p className="text-xs text-muted-foreground line-clamp-1">
+            //             {firstThreeItems.map(item => item.product?.name).filter(Boolean).join(", ")}
+            //           </p>
+            //         </div>
+            //       </div>
+
+            //       {/* Actions */}
+            //       <div className="flex gap-3">
+            //         <Link href={`/orders/${order.id}`} className="flex-1">
+            //           <Button variant="default" className="w-full" size="sm">
+            //             View Order Details
+            //           </Button>
+            //         </Link>
+            //         {order.status === "DELIVERED" && (
+            //           <Link href={`/orders/${order.id}`}>
+            //             <Button variant="outline" size="sm">
+            //               Rate Products
+            //             </Button>
+            //           </Link>
+            //         )}
+            //       </div>
+            //     </div>
+            //   </CardContent>
+            // </Card>
             <Card key={order.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-              <CardContent className="p-0">
-                {/* Header Section */}
-                <div className={`${statusConfig.bg} px-6 py-4 border-b`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <FiPackage className={`h-5 w-5 ${statusConfig.color}`} />
-                        <div>
-                          <p className="text-xs text-muted-foreground">Order</p>
-                          <p className="font-semibold">#{order.orderNumber}</p>
-                        </div>
-                      </div>
-                      <Separator orientation="vertical" className="h-10" />
-                      <div>
-                        <p className="text-xs text-muted-foreground">Placed on</p>
-                        <p className="text-sm font-medium">
-                          {new Date(order.createdAt).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </p>
-                      </div>
-                      <Separator orientation="vertical" className="h-10" />
-                      <div>
-                        <p className="text-xs text-muted-foreground">Total</p>
-                        <p className="text-sm font-bold">₹{order.totalAmount.toLocaleString()}</p>
-                      </div>
-                    </div>
-                    <Badge variant={statusConfig.variant} className="font-medium">
-                      {order.status}
-                    </Badge>
-                  </div>
-                </div>
+  <CardContent className="p-0">
 
-                {/* Items Preview */}
-                <div className="px-6 py-4">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="flex -space-x-2">
-                      {firstThreeItems.map((item, index) => (
-                        <div
-                          key={index}
-                          className="relative w-12 h-12 rounded-lg border-2 border-background overflow-hidden bg-muted"
-                        >
-                          <Image
-                            src={item.product?.images?.[0]?.url || "/images/coming-soon.jpg"}
-                            alt={item.product?.name || "Product"}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      ))}
-                      {remainingCount > 0 && (
-                        <div className="relative w-12 h-12 rounded-lg border-2 border-background bg-muted flex items-center justify-center">
-                          <span className="text-xs font-semibold text-muted-foreground">
-                            +{remainingCount}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-grow">
-                      <p className="text-sm font-medium">
-                        {order.items?.length || 0} {order.items?.length === 1 ? 'item' : 'items'}
-                      </p>
-                      <p className="text-xs text-muted-foreground line-clamp-1">
-                        {firstThreeItems.map(item => item.product?.name).filter(Boolean).join(", ")}
-                      </p>
-                    </div>
-                  </div>
+    {/* Header Section */}
+    <div className={`${statusConfig.bg} px-6 py-4 border-b`}>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-                  {/* Actions */}
-                  <div className="flex gap-3">
-                    <Link href={`/orders/${order.id}`} className="flex-1">
-                      <Button variant="default" className="w-full" size="sm">
-                        View Order Details
-                      </Button>
-                    </Link>
-                    {order.status === "DELIVERED" && (
-                      <Link href={`/orders/${order.id}`}>
-                        <Button variant="outline" size="sm">
-                          Rate Products
-                        </Button>
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        {/* Left side details */}
+        <div className="flex flex-col md:flex-row md:items-center md:gap-4 gap-2">
+
+          {/* Order number */}
+          <div className="flex items-center gap-2">
+            <FiPackage className={`h-5 w-5 ${statusConfig.color}`} />
+            <div>
+              <p className="text-xs text-muted-foreground">Order</p>
+              <p className="font-semibold">#{order.orderNumber}</p>
+            </div>
+          </div>
+
+          {/* vertical separator (show only on md+) */}
+          <Separator orientation="vertical" className="h-10 hidden md:block" />
+
+          {/* Placed on */}
+          <div>
+            <p className="text-xs text-muted-foreground">Placed on</p>
+            <p className="text-sm font-medium">
+              {new Date(order.createdAt).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </p>
+          </div>
+
+          {/* vertical separator (md only) */}
+          <Separator orientation="vertical" className="h-10 hidden md:block" />
+
+          {/* Total */}
+          <div>
+            <p className="text-xs text-muted-foreground">Total</p>
+            <p className="text-sm font-bold">₹{order.totalAmount.toLocaleString()}</p>
+          </div>
+        </div>
+
+        {/* Status Badge */}
+        <Badge variant={statusConfig.variant} className="font-medium self-start md:self-center">
+          {order.status}
+        </Badge>
+
+      </div>
+    </div>
+
+    {/* Items Preview */}
+    <div className="px-6 py-4">
+      <div className="flex items-center gap-4 mb-4">
+
+        {/* Product thumbnails */}
+        <div className="flex -space-x-2">
+          {firstThreeItems.map((item, index) => (
+            <div
+              key={index}
+              className="relative w-12 h-12 rounded-lg border-2 border-background overflow-hidden bg-muted"
+            >
+              <Image
+                src={item.product?.images?.[0]?.url || "/images/coming-soon.jpg"}
+                alt={item.product?.name || "Product"}
+                fill
+                className="object-cover"
+              />
+            </div>
+          ))}
+          {remainingCount > 0 && (
+            <div className="relative w-12 h-12 rounded-lg border-2 border-background bg-muted flex items-center justify-center">
+              <span className="text-xs font-semibold text-muted-foreground">
+                +{remainingCount}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Item names */}
+        <div className="flex-grow">
+          <p className="text-sm font-medium">
+            {order.items?.length || 0} {order.items?.length === 1 ? 'item' : 'items'}
+          </p>
+          <p className="text-xs text-muted-foreground line-clamp-1">
+            {firstThreeItems.map(item => item.product?.name).filter(Boolean).join(", ")}
+          </p>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="grid grid-cols-2 gap-3">
+        <Link href={`/orders/${order.id}`}>
+          <Button variant="default" className="w-full" size="sm">
+            View Order 
+          </Button>
+        </Link>
+
+        {order.status === "DELIVERED" ? (
+          <Link href={`/orders/${order.id}`}>
+            <Button variant="outline" className="w-full" size="sm">
+              Rate Products
+            </Button>
+          </Link>
+        ) : (
+          <div></div> // keeps symmetry when button is missing
+        )}
+      </div>
+
+    </div>
+  </CardContent>
+</Card>
+
           );
         })}
       </div>

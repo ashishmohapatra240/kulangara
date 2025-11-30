@@ -96,7 +96,7 @@ export default function ProfileLayout({
       {/* Mobile Header with Menu Button */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background border-b border-border h-16">
         <div className="flex items-center justify-between h-full px-4">
-          <h1 className="text-base font-semibold">My Profile</h1>
+          <Link href="/"><h1 className="text-base font-semibold">KULANGARA</h1></Link>
           <Button
             variant="ghost"
             size="sm"

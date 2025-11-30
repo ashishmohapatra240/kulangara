@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/app/components/ui/card";
 
 export const ContactSection = () => (
-  <div className="w-full mt-30">
+  <div className="w-full p-4 lg:pt-1">
     <h1 className="text-2xl font-normal mb-8">Contact Us</h1>
     <Card>
       <CardContent className="p-6">
@@ -29,7 +29,7 @@ export const ContactSection = () => (
 );
 
 export const AboutSection = () => (
-  <div className="w-full mt-30">
+  <div className="w-full p-4 lg:pt-1">
     <h1 className="text-2xl font-normal mb-8">About Us</h1>
     <Card>
       <CardContent className="p-6">
@@ -45,7 +45,7 @@ export const AboutSection = () => (
 );
 
 export const TermsSection = () => (
-  <div className="w-full mt-30">
+  <div className="w-full p-4 lg:pt-1">
     <h1 className="text-2xl font-normal mb-8">Terms of Use</h1>
     <Card>
       <CardContent className="p-6">
@@ -61,7 +61,7 @@ export const TermsSection = () => (
 );
 
 export const PrivacySection = () => (
-  <div className="w-full mt-30">
+  <div className="w-full p-4 lg:pt-1">
     <h1 className="text-2xl font-normal mb-8">Privacy Policy</h1>
     <Card>
       <CardContent className="p-6">
