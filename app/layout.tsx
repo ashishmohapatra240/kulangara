@@ -11,7 +11,7 @@ import { Toaster } from "react-hot-toast";
 const josefin = Josefin_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Kulangara - Coming Soon",
+  title: "Kulangara",
   description: "Bhubaneswar based fashion wear store with khanti Odia touch",
 };
 
