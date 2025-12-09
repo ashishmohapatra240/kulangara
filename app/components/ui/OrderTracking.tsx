@@ -76,7 +76,7 @@ export const OrderTrackingComponent = ({ tracking, currentStatus }: OrderTrackin
       };
     });
 
-  const currentIndex = currentStatus ? STATUS_ORDER.indexOf(currentStatus) : -1;
+  // const currentIndex = currentStatus ? STATUS_ORDER.indexOf(currentStatus) : -1;
   const activeIndex = timeline.findIndex(step => step.reached && !timeline[timeline.indexOf(step) + 1]?.reached);
 
   return (
