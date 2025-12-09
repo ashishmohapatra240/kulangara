@@ -47,7 +47,7 @@ export default function ReturnsPage() {
                 Contact Page
               </a>{" "}
               or email us at{" "}
-              <span className="font-semibold">support@kulangara.com</span>.
+              <span className="font-semibold">contact.kulangara@gmail.com</span>.
             </li>
             <li>
               Provide your order number and details of the item you wish to

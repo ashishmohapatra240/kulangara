@@ -41,7 +41,13 @@ export const useAuth = () => {
             toast.success('Login successful!');
             // Avoid overriding admin-specific redirects; only push if not on admin login pages
             if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin')) {
-                const redirectPath = window.sessionStorage.getItem('postLoginRedirect');
+                // Check sessionStorage first, then URL query param
+                const sessionRedirect = window.sessionStorage.getItem('postLoginRedirect');
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlRedirect = urlParams.get('next');
+                
+                const redirectPath = sessionRedirect || urlRedirect;
+                
                 if (redirectPath) {
                     window.sessionStorage.removeItem('postLoginRedirect');
                     router.push(redirectPath);
@@ -60,7 +66,23 @@ export const useAuth = () => {
         onSuccess: (data) => {
             queryClient.setQueryData(['user'], data.user);
             toast.success('Registration successful!');
-            router.push('/');
+            // Check sessionStorage first, then URL query param for redirect
+            if (typeof window !== 'undefined') {
+                const sessionRedirect = window.sessionStorage.getItem('postLoginRedirect');
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlRedirect = urlParams.get('next');
+                
+                const redirectPath = sessionRedirect || urlRedirect;
+                
+                if (redirectPath) {
+                    window.sessionStorage.removeItem('postLoginRedirect');
+                    router.push(redirectPath);
+                } else {
+                    router.push('/');
+                }
+            } else {
+                router.push('/');
+            }
         },
         onError: (error: AxiosError) => {
             toast.error(getErrorMessage(error));
@@ -94,7 +116,23 @@ export const useAuth = () => {
         onSuccess: (data) => {
             queryClient.setQueryData(['user'], data.user);
             toast.success('Google authentication successful!');
-            router.push('/');
+            // Check sessionStorage first, then URL query param for redirect
+            if (typeof window !== 'undefined') {
+                const sessionRedirect = window.sessionStorage.getItem('postLoginRedirect');
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlRedirect = urlParams.get('next');
+                
+                const redirectPath = sessionRedirect || urlRedirect;
+                
+                if (redirectPath) {
+                    window.sessionStorage.removeItem('postLoginRedirect');
+                    router.push(redirectPath);
+                } else {
+                    router.push('/');
+                }
+            } else {
+                router.push('/');
+            }
         },
         onError: (error: AxiosError) => {
             toast.error(getErrorMessage(error));

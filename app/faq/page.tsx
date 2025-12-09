@@ -51,7 +51,7 @@ const faqs = [
   {
     question: "How can I contact Kulangara support?",
     answer:
-      "You can reach us through the Contact page, or email us at support@kulangara.com for quick assistance.",
+      "You can reach us through the Contact page, or email us at contact.kulangara@gmail.com for quick assistance.",
   },
 ];
 
