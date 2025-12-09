@@ -1,29 +1,42 @@
 "use client";
 
 import React, { useState } from "react";
+import Modal from "../components/ui/Modal";
+import { useContact } from "../hooks/useContact";
+
+const initialForm = { name: "", email: "", message: "" };
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [form, setForm] = useState(initialForm);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [submittedName, setSubmittedName] = useState("");
+  const { submitContact, isSubmitting } = useContact();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For now, just log. You can integrate with backend or email API later.
-    console.log("Form submitted:", form);
-    alert("Thank you for contacting Kulangara! We’ll get back to you soon.");
-    setForm({ name: "", email: "", message: "" });
+    try {
+      await submitContact(form);
+      setSubmittedName(form.name);
+      setIsModalOpen(true);
+      setForm(initialForm);
+    } catch {
+      // Errors are surfaced via toast in useContact
+    }
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-16 {josefin.className}">
+    <div className="max-w-3xl mx-auto px-6 py-16">
       {/* Page Title */}
       <div className="mt-20">
         <h1 className="text-3xl md:text-4xl font-bold text-center mb-6 ">
-        Contact Us
-      </h1>
+          Contact Us
+        </h1>
       </div>
 
       <p className="text-gray-600 text-center mb-12">
@@ -80,17 +93,60 @@ export default function ContactPage() {
 
         <button
           type="submit"
-          className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+          disabled={isSubmitting}
+          className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
         >
-          Send Message
+          {isSubmitting ? "Sending..." : "Send Message"}
         </button>
       </form>
 
-      {/* Contact Info */}
       <div className="mt-12 text-center text-gray-700">
-        <p>Email: <span className="font-medium">support@kulangara.com</span></p>
-        <p>Phone: <span className="font-medium">+91 98765 43210</span></p>
+        <p>
+          Email:{" "}
+          <span className="font-medium">contact.kulangara@gmail.com</span>
+        </p>
+        <p>
+          Phone: <span className="font-medium">+91 9938616555</span>
+        </p>
       </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        maxWidth="max-w-lg"
+      >
+        <div className="p-6 text-center space-y-4">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-600">
+            <svg
+              aria-hidden="true"
+              className="h-7 w-7"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-semibold text-gray-900">Thank you!</h2>
+            <p className="text-gray-600">
+              {submittedName ? `${submittedName}, ` : ""}your message has been
+              received. Our team will get back to you shortly.
+            </p>
+          </div>
+          <button
+            onClick={() => setIsModalOpen(false)}
+            className="mt-2 inline-flex items-center justify-center rounded-lg bg-black px-5 py-2 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }
