@@ -9,9 +9,9 @@ export const ContactSection = () => (
           <div>
             <h2 className="text-lg font-semibold mb-2">Customer Support</h2>
             <p className="text-muted-foreground">
-              Email: support@kulangara.com
+              Email: contact.kulangara@gmail.com
               <br />
-              Phone: 1800-123-1555
+              Phone: +91 9938616555
             </p>
           </div>
           <div>

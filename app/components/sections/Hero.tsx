@@ -16,7 +16,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative h-[60vh] overflow-hidden mt-30">
+    <section className="relative h-[60vh] overflow-hidden mt-20">
       {SLIDES.map((slide, index) => (
         <div
           key={index}

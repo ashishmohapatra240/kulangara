@@ -94,12 +94,14 @@ export default function Header() {
         </div>
 
         {/* Mobile Menu */}
-        <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-          <SheetTrigger asChild className="lg:hidden">
-            <Button variant="ghost" size="icon">
-              <RiMenu3Line className="w-6 h-6" />
-            </Button>
-          </SheetTrigger>
+        <div className="flex items-center gap-2 lg:hidden">
+          <CartBadge />
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <RiMenu3Line className="w-6 h-6" />
+              </Button>
+            </SheetTrigger>
           <SheetContent 
             side="right" 
             className="w-full max-w-xs sm:max-w-md p-0"
@@ -173,6 +175,7 @@ export default function Header() {
             </div>
           </SheetContent>
         </Sheet>
+        </div>
       </div>
     </header>
   );
