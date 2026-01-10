@@ -74,9 +74,27 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
   );
 
   // Derive sizes from variants if not available
-  const sizes = product?.sizes || [
+  const rawSizes = product?.sizes || [
     ...new Set(product?.variants?.map((v) => v.size) || []),
   ];
+
+  // Sort sizes in standard order: XS, S, M, L, XL, XXL, XXXL
+  const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+  const sizes = [...rawSizes].sort((a, b) => {
+    const aIndex = sizeOrder.findIndex(size => size.toUpperCase() === a.toUpperCase());
+    const bIndex = sizeOrder.findIndex(size => size.toUpperCase() === b.toUpperCase());
+    
+    // If both sizes are in the order, sort by their index
+    if (aIndex !== -1 && bIndex !== -1) {
+      return aIndex - bIndex;
+    }
+    // If only a is in the order, it comes first
+    if (aIndex !== -1) return -1;
+    // If only b is in the order, it comes first
+    if (bIndex !== -1) return 1;
+    // If neither is in the order, maintain original order (or sort alphabetically)
+    return a.localeCompare(b);
+  });
 
   // Fallback data for missing properties
   const companyFeatures = product?.companyFeatures || [
