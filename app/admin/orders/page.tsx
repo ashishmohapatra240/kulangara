@@ -22,7 +22,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -109,7 +108,7 @@ export default function AdminOrdersPage() {
   // Helper to get sizes (truncated)
   const getOrderSizes = (items: IOrder["items"]) => {
     if (!items || items.length === 0) return "-";
-    const sizes = items.map((item) => item.size || "N/A");
+    const sizes = items.map((item) => item.variant?.size || "N/A");
     const uniqueSizes = [...new Set(sizes)];
     if (uniqueSizes.length <= 2) return uniqueSizes.join(", ");
     return `${uniqueSizes.slice(0, 2).join(", ")} +${uniqueSizes.length - 2}`;
