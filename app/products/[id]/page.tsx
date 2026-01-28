@@ -101,7 +101,7 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
     {
       icon: "truck",
       title: "Free Shipping",
-      description: "Free shipping on orders over ₹999",
+      description: "Free shipping on all orders",
     },
     {
       icon: "credit-card",
@@ -111,16 +111,15 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
     {
       icon: "shield",
       title: "Easy Returns",
-      description: "30-day return policy",
+      description: "7-day return policy",
     },
   ];
 
   const deliveryInfo = product?.deliveryInfo || {
-    estimatedDays: "3-5",
+    estimatedDays: "8-10",
     shippingFee: 0,
-    returnPeriod: 30,
+    returnPeriod: 7,
   };
-
   const handleSizeSelect = (size: string) => {
     setSelectedSize(size);
   };

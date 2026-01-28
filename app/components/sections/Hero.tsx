@@ -35,9 +35,14 @@ export default function Hero() {
               <h1 className="text-5xl text-white font-medium">{slide.title}</h1>
               <p className="text-xl text-white">{slide.description}</p>
               <Link href="/products">
+              <div className="flex flex-row gap-4 justify-center">
               <Button variant="default" size="lg" className="mt-6 bg-white text-black">
                 Shop Now
               </Button>
+              <Button variant="default" size="lg" className="mt-6 bg-white text-black">
+                View Catalogue
+              </Button>
+              </div>
               </Link>
             </div>
           </div>
