@@ -6,7 +6,7 @@ import { FiUser, FiShoppingBag, FiLogOut, FiChevronDown } from "react-icons/fi";
 import { Button } from "@/app/components/ui/button";
 import Search from "../ui/Search";
 import CartBadge from "../ui/CartBadge";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useAuth } from "@/app/hooks/useAuth";
 import { usePathname } from "next/navigation";
 import {
@@ -25,6 +25,20 @@ export default function Header() {
   const pathname = usePathname();
   const isProfileRoute = pathname?.startsWith("/profile");
   const isAdminRoute = pathname?.startsWith("/admin");
+
+  // Memoized handlers to prevent recreation on every render
+  const handleLogout = useCallback(() => {
+    logout();
+  }, [logout]);
+
+  const handleCloseMenu = useCallback(() => {
+    setIsMenuOpen(false);
+  }, []);
+
+  const handleLogoutAndClose = useCallback(() => {
+    logout();
+    setIsMenuOpen(false);
+  }, [logout]);
 
   // Hide header completely on admin routes
   if (isAdminRoute) {
@@ -76,8 +90,8 @@ export default function Header() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    onClick={() => logout()}
+                  <DropdownMenuItem
+                    onClick={handleLogout}
                     className="cursor-pointer text-destructive focus:text-destructive"
                   >
                     <FiLogOut className="mr-2 h-4 w-4" />
@@ -111,7 +125,7 @@ export default function Header() {
               <button
                 aria-label="Close"
                 className="rounded-full bg-muted hover:bg-muted/80 text-foreground transition p-2"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={handleCloseMenu}
                 type="button"
               >
               </button>
@@ -151,10 +165,7 @@ export default function Header() {
                     </Button>
                     <Button
                       variant="outline"
-                      onClick={() => {
-                        logout();
-                        setIsMenuOpen(false);
-                      }}
+                      onClick={handleLogoutAndClose}
                       className="w-full text-destructive hover:text-destructive"
                     >
                       <FiLogOut className="mr-2 h-4 w-4" />

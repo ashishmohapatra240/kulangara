@@ -12,7 +12,6 @@ export const useAuth = () => {
     const queryClient = useQueryClient();
     const router = useRouter();
 
-    const cachedUser = queryClient.getQueryData<IUser>(['user']);
     const { data: user, isLoading: isLoadingUser } = useQuery<IUser>({
         queryKey: ['user'],
         queryFn: async (): Promise<IUser> => {
@@ -27,8 +26,6 @@ export const useAuth = () => {
                 return null;
             }
         },
-        enabled: !cachedUser,
-        initialData: cachedUser,
         retry: 1,
         staleTime: 1000 * 60 * 5, // 5 minutes
         refetchOnWindowFocus: true,

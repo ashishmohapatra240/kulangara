@@ -1,8 +1,3 @@
-/**
- * Secure logging utility that only logs in development mode
- * Prevents sensitive data from being logged in production
- */
-
 const isDevelopment = process.env["NODE_ENV"] === 'development';
 
 export const logger = {
@@ -30,7 +25,6 @@ export const logger = {
     }
   },
   
-  // For production-safe errors that should always be logged
   critical: (...args: unknown[]) => {
     console.error('[CRITICAL]', ...args);
   }

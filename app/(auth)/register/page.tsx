@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, ChangeEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/app/components/ui/button";
@@ -20,6 +20,14 @@ export default function RegisterPage() {
     phone: "",
   });
 
+  const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -38,6 +46,7 @@ export default function RegisterPage() {
           src="/images/coming-soon.jpg"
           alt="Register"
           fill
+          sizes="50vw"
           className="object-cover"
           priority
         />
@@ -69,9 +78,7 @@ export default function RegisterPage() {
                         required
                         placeholder="John"
                         value={formData.firstName}
-                        onChange={(e) =>
-                          setFormData({ ...formData, firstName: e.target.value })
-                        }
+                        onChange={handleInputChange}
                       />
                     </div>
                     <div className="space-y-2">
@@ -83,9 +90,7 @@ export default function RegisterPage() {
                         required
                         placeholder="Doe"
                         value={formData.lastName}
-                        onChange={(e) =>
-                          setFormData({ ...formData, lastName: e.target.value })
-                        }
+                        onChange={handleInputChange}
                       />
                     </div>
                   </div>
@@ -99,9 +104,7 @@ export default function RegisterPage() {
                       required
                       placeholder="name@example.com"
                       value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
+                      onChange={handleInputChange}
                     />
                   </div>
                   <div className="space-y-2">
@@ -113,9 +116,7 @@ export default function RegisterPage() {
                       required
                       placeholder="+1234567890"
                       value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
+                      onChange={handleInputChange}
                     />
                   </div>
                   <div className="space-y-2">
@@ -127,9 +128,7 @@ export default function RegisterPage() {
                       required
                       placeholder="Create a password"
                       value={formData.password}
-                      onChange={(e) =>
-                        setFormData({ ...formData, password: e.target.value })
-                      }
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>

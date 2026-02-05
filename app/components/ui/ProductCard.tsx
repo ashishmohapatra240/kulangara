@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useMemo, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FiHeart, FiStar } from "react-icons/fi";
@@ -48,21 +48,27 @@ function ProductCardComponent({
   const wishlistItems = wishlistResponse?.data ?? [];
   const isInWishlist = wishlistItems.some((item) => item.product.id === id);
 
-  const displayImage = (() => {
+  const displayImage = useMemo(() => {
     if (Array.isArray(images) && images.length > 0) {
       const primary = images.find((img) => img.isPrimary) ?? images[0];
       return primary?.url || PLACEHOLDER_IMAGE;
     }
     return PLACEHOLDER_IMAGE;
-  })();
+  }, [images]);
 
-  const avgRating = reviewsData?.meta?.stats?.averageRating ?? 0;
-  const reviewCount = reviewsData?.meta?.total ?? 0;
-  const discountPercent = discountedPrice && discountedPrice < price 
-    ? calculateDiscountPercentage(price, discountedPrice) 
-    : 0;
+  const { avgRating, reviewCount } = useMemo(() => ({
+    avgRating: reviewsData?.meta?.stats?.averageRating ?? 0,
+    reviewCount: reviewsData?.meta?.total ?? 0,
+  }), [reviewsData]);
 
-  const handleWishlistToggle = async (event: React.MouseEvent<HTMLButtonElement>) => {
+  const discountPercent = useMemo(
+    () => discountedPrice && discountedPrice < price
+      ? calculateDiscountPercentage(price, discountedPrice)
+      : 0,
+    [price, discountedPrice]
+  );
+
+  const handleWishlistToggle = useCallback(async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
 
@@ -79,13 +85,13 @@ function ProductCardComponent({
     } catch {
       toast.error("Unable to update wishlist right now");
     }
-  };
+  }, [isInWishlist, deleteWishlist, id, refetchWishlist, createWishlist]);
 
   const stockStatus = () => {
     if (stockLoading) {
       return <Skeleton className="h-5 w-24" />;
     }
-    
+
     if (!stockInfo) return null;
 
     const { stockQuantity, lowStockThreshold } = stockInfo;
@@ -144,8 +150,8 @@ function ProductCardComponent({
             disabled={createWishlist.isPending || deleteWishlist.isPending}
             className={cn(
               "absolute top-2 right-2 h-7 w-7 rounded-full border backdrop-blur-sm transition-all duration-200",
-              isInWishlist 
-                ? "border-primary/50 bg-primary/90 text-primary-foreground hover:bg-primary hover:scale-110" 
+              isInWishlist
+                ? "border-primary/50 bg-primary/90 text-primary-foreground hover:bg-primary hover:scale-110"
                 : "border-border/50 bg-background/70 text-muted-foreground hover:bg-background/90 hover:text-foreground hover:scale-110"
             )}
           >

@@ -64,7 +64,13 @@ export default function WishlistCard({
         href={`/products/${item.id}`}
         className="block w-24 h-24 relative flex-shrink-0"
       >
-        <Image src={displayImage} alt={item.name} fill className="object-cover" />
+        <Image
+          src={displayImage}
+          alt={item.name}
+          fill
+          sizes="96px"
+          className="object-cover"
+        />
       </Link>
 
       <div className="flex-grow min-w-0">

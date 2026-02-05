@@ -54,6 +54,9 @@ export default function CheckoutPage() {
 
   // Add comprehensive error handling to catch the specific color property error
   useEffect(() => {
+    // Debug mode only in development
+    if (process.env.NODE_ENV !== 'development') return;
+
     console.log('🔍 Error handler initialized on checkout page');
     const handleError = (event: ErrorEvent) => {
       if (event.error && event.error.message.includes("Cannot read properties of undefined (reading 'color')")) {
@@ -249,7 +252,9 @@ export default function CheckoutPage() {
         const isAvailable = true; // Replace with actual API response
         setPincodeAvailable(isAvailable);
       } catch (error) {
-        console.error('Error checking pincode availability:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error checking pincode availability:', error);
+        }
         setPincodeAvailable(false);
       } finally {
         setIsCheckingPincode(false);
@@ -772,6 +777,7 @@ export default function CheckoutPage() {
                               }
                               alt={item.product?.name || "Product"}
                               fill
+                              sizes="64px"
                               className="object-cover"
                             />
                             <Badge className="absolute top-1 right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
@@ -790,7 +796,9 @@ export default function CheckoutPage() {
                                   }
                                   return "Standard";
                                 } catch (variantError) {
-                                  console.error('Variant error:', variantError, 'Item:', item);
+                                  if (process.env.NODE_ENV === 'development') {
+                                    console.error('Variant error:', variantError, 'Item:', item);
+                                  }
                                   return "Standard";
                                 }
                               })()}
@@ -809,7 +817,9 @@ export default function CheckoutPage() {
                         </div>
                       );
                     } catch (error) {
-                      console.error('Error rendering cart item:', error, 'Item:', item);
+                      if (process.env.NODE_ENV === 'development') {
+                        console.error('Error rendering cart item:', error, 'Item:', item);
+                      }
                       return (
                         <Alert key={`error-${index}`} variant="destructive">
                           <AlertDescription className="text-xs">
