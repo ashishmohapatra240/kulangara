@@ -4,22 +4,23 @@ export interface IOrderItem {
     quantity: number;
     price: number;
     product?: {
-        id: string;
+        id?: string;
         name: string;
-        slug: string;
-        images: Array<{
+        slug?: string;
+        images?: Array<{
             url: string;
             alt: string;
             isPrimary: boolean;
         }>;
     };
     variant?: {
-        id: string;
+        id?: string;
         size: string;
-        color: string;
-        price: number;
-        sku: string;
-        stock: number;
+        fit?: string;
+        color?: string;
+        price?: number;
+        sku?: string;
+        stock?: number;
     };
 }
 

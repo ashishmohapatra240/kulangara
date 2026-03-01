@@ -1,3 +1,7 @@
+export type ProductFit = 'OVERSIZED' | 'NORMAL';
+export type ProductSize = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
+export const PRODUCT_SIZES: ProductSize[] = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+
 export interface IProduct {
     id: string;
     name: string;
@@ -82,7 +86,8 @@ export interface IProductImage {
 export interface IProductVariant {
     id: string;
     productId: string;
-    size: string;
+    size: ProductSize;
+    fit?: ProductFit;
     color: string;
     price: number | null;
     sku: string;
@@ -153,15 +158,17 @@ export interface IUpdateProductData {
 }
 
 export interface ICreateVariantData {
-    size: string;
-    color: string;
-    price: number;
+    size: ProductSize;
+    fit?: ProductFit;
+    color?: string;
+    price?: number;
     sku: string;
     stock: number;
 }
 
 export interface IUpdateVariantData {
-    size?: string;
+    size?: ProductSize;
+    fit?: ProductFit;
     color?: string;
     price?: number;
     sku?: string;
