@@ -62,6 +62,7 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
     useSingleProductStock(id);
 
   // State management
+  const [selectedFit, setSelectedFit] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -73,28 +74,42 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
     (item: IWishlistItem) => item.product.id === id
   );
 
-  // Derive sizes from variants if not available
-  const rawSizes = product?.sizes || [
-    ...new Set(product?.variants?.map((v) => v.size) || []),
-  ];
-
-  // Sort sizes in standard order: XS, S, M, L, XL, XXL, XXXL
   const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
-  const sizes = [...rawSizes].sort((a, b) => {
-    const aIndex = sizeOrder.findIndex(size => size.toUpperCase() === a.toUpperCase());
-    const bIndex = sizeOrder.findIndex(size => size.toUpperCase() === b.toUpperCase());
-    
-    // If both sizes are in the order, sort by their index
-    if (aIndex !== -1 && bIndex !== -1) {
-      return aIndex - bIndex;
-    }
-    // If only a is in the order, it comes first
-    if (aIndex !== -1) return -1;
-    // If only b is in the order, it comes first
-    if (bIndex !== -1) return 1;
-    // If neither is in the order, maintain original order (or sort alphabetically)
-    return a.localeCompare(b);
-  });
+
+  const sortSizes = (arr: string[]) =>
+    [...arr].sort((a, b) => {
+      const ai = sizeOrder.findIndex((s) => s.toUpperCase() === a.toUpperCase());
+      const bi = sizeOrder.findIndex((s) => s.toUpperCase() === b.toUpperCase());
+      if (ai !== -1 && bi !== -1) return ai - bi;
+      if (ai !== -1) return -1;
+      if (bi !== -1) return 1;
+      return a.localeCompare(b);
+    });
+
+  // Distinct fit values on the product's variants (NORMAL / OVERSIZED)
+  const availableFits = [
+    ...new Set(
+      (product?.variants || []).map((v) => v.fit).filter(Boolean) as string[]
+    ),
+  ];
+  const hasFits = availableFits.length > 0;
+
+  // Sizes filtered by the selected fit (or all sizes when no fits exist)
+  const sizesForFit = hasFits
+    ? sortSizes([
+        ...new Set(
+          (product?.variants || [])
+            .filter((v) => v.fit === (selectedFit || availableFits[0]))
+            .map((v) => v.size)
+        ),
+      ])
+    : sortSizes([
+        ...new Set(
+          product?.sizes || (product?.variants || []).map((v) => v.size)
+        ),
+      ]);
+
+  const sizes = sizesForFit;
 
   // Fallback data for missing properties
   const companyFeatures = product?.companyFeatures || [
@@ -120,6 +135,11 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
     shippingFee: 0,
     returnPeriod: 7,
   };
+  const handleFitSelect = (fit: string) => {
+    setSelectedFit(fit);
+    setSelectedSize(""); // reset size when fit changes
+  };
+
   const handleSizeSelect = (size: string) => {
     setSelectedSize(size);
   };
@@ -176,6 +196,10 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
   };
 
   const handleAddToCart = async () => {
+    if (hasFits && !selectedFit) {
+      toast.error("Please select a fit (Normal or Oversized)");
+      return;
+    }
     if (!selectedSize) {
       toast.error("Please select a size");
       return;
@@ -186,7 +210,6 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
       return;
     }
 
-    // Check stock availability before adding to cart
     if (stockInfo && stockInfo.stockQuantity === 0) {
       toast.error("This item is out of stock");
       return;
@@ -198,9 +221,9 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
     }
 
     try {
-      // Find the variant for the selected size
+      const activeFit = selectedFit || undefined;
       const selectedVariant = product.variants?.find(
-        (v) => v.size === selectedSize
+        (v) => v.size === selectedSize && (!activeFit || v.fit === activeFit)
       );
 
       await addItemToCart({
@@ -223,6 +246,10 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
   };
 
   const handleBuyNow = async () => {
+    if (hasFits && !selectedFit) {
+      toast.error("Please select a fit (Normal or Oversized)");
+      return;
+    }
     if (!selectedSize) {
       toast.error("Please select a size");
       return;
@@ -233,7 +260,6 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
       return;
     }
 
-    // Check stock availability before buying
     if (stockInfo && stockInfo.stockQuantity === 0) {
       toast.error("This item is out of stock");
       return;
@@ -245,9 +271,9 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
     }
 
     try {
-      // Find the variant for the selected size
+      const activeFit = selectedFit || undefined;
       const selectedVariant = product.variants?.find(
-        (v) => v.size === selectedSize
+        (v) => v.size === selectedSize && (!activeFit || v.fit === activeFit)
       );
 
       // Add item to cart and wait for it to complete
@@ -525,6 +551,38 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
 
           <Separator />
 
+          {/* Fit Selection — only shown when the product has fit variants */}
+          {hasFits && (
+            <>
+              <div className="space-y-3">
+                <label className="text-base font-semibold">Select Fit</label>
+                <div className="flex flex-wrap gap-3">
+                  {availableFits.map((fit) => (
+                    <Button
+                      key={fit}
+                      variant={selectedFit === fit ? "default" : "outline"}
+                      onClick={() => handleFitSelect(fit)}
+                      className={`h-12 px-6 font-semibold transition-all ${
+                        selectedFit === fit
+                          ? "ring-2 ring-primary/20 shadow-md"
+                          : "hover:border-primary/50"
+                      }`}
+                    >
+                      {fit === "OVERSIZED" ? "Oversized" : "Normal"}
+                    </Button>
+                  ))}
+                </div>
+                {selectedFit && (
+                  <div className="flex items-center gap-2 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                    <FaCheck className="text-green-600" />
+                    {selectedFit === "OVERSIZED" ? "Oversized" : "Normal"} fit selected
+                  </div>
+                )}
+              </div>
+              <Separator />
+            </>
+          )}
+
           {/* Size Selection */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -546,9 +604,10 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
                   key={size}
                   variant={selectedSize === size ? "default" : "outline"}
                   onClick={() => handleSizeSelect(size)}
+                  disabled={hasFits && !selectedFit}
                   className={`min-w-[3.5rem] h-12 font-semibold transition-all ${
-                    selectedSize === size 
-                      ? "ring-2 ring-primary/20 shadow-md" 
+                    selectedSize === size
+                      ? "ring-2 ring-primary/20 shadow-md"
                       : "hover:border-primary/50"
                   }`}
                 >
@@ -556,6 +615,11 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
                 </Button>
               ))}
             </div>
+            {hasFits && !selectedFit && (
+              <p className="text-sm text-muted-foreground">
+                Select a fit above to see available sizes
+              </p>
+            )}
             {selectedSize && (
               <div className="flex items-center gap-2 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
                 <FaCheck className="text-green-600" />
@@ -608,7 +672,7 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
                 size="lg"
                 className="flex-1 h-14 p-2 text-base font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all"
                 disabled={
-                  !selectedSize || cartLoading || stockInfo?.stockQuantity === 0
+                  (hasFits && !selectedFit) || !selectedSize || cartLoading || stockInfo?.stockQuantity === 0
                 }
               >
                 <FaShoppingBag className="mr-2 h-5 w-5" />
@@ -624,7 +688,7 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
                 onClick={handleBuyNow}
                 className="flex-1 h-14 p-2 text-base font-semibold border-2 hover:bg-primary  hover:border-primary transition-all"
                 disabled={
-                  !selectedSize || cartLoading || stockInfo?.stockQuantity === 0
+                  (hasFits && !selectedFit) || !selectedSize || cartLoading || stockInfo?.stockQuantity === 0
                 }
               >
                 <FaBolt className="mr-2 h-5 w-5" />
@@ -635,13 +699,15 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
                   : "Buy Now"}
               </Button>
             </div>
-            {!selectedSize && (
+            {(hasFits && !selectedFit) || !selectedSize ? (
               <div className="bg-destructive/10 border border-destructive/30 rounded-lg px-4 py-3 text-center">
                 <p className="text-sm font-medium text-destructive">
-                  Please select a size to continue
+                  {hasFits && !selectedFit
+                    ? "Please select a fit to continue"
+                    : "Please select a size to continue"}
                 </p>
               </div>
-            )}
+            ) : null}
           </div>
 
           <Separator />
