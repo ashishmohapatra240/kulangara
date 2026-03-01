@@ -9,6 +9,15 @@ import { FiSearch, FiUserCheck, FiUserX } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { useAdminUsers, useUpdateUserRole, useUpdateUserStatus } from "@/app/hooks/useAdminUserManagement";
 import { Card, CardContent } from "@/app/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/app/components/ui/table";
+import { Badge } from "@/app/components/ui/badge";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN"];
 
@@ -138,8 +147,8 @@ export default function UsersPage() {
   return (
     <AdminLayout>
       <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center pt-4 sm:pt-6 mb-6 pb-4 border-b">
-          <h1 className="text-2xl font-bold">User Management</h1>
+        <div className="flex justify-between items-center pt-30 mb-12 pb-6 border-b-2 border-black">
+          <h1 className="text-4xl font-bold tracking-tight">USER MANAGEMENT</h1>
         </div>
 
         {usersError && (
@@ -245,116 +254,125 @@ export default function UsersPage() {
             </div>
 
             {usersLoading ? (
-              <div className="p-6 text-center">
-                <p className="text-gray-500">Loading users...</p>
+              <div className="p-12 text-center">
+                <p className="text-black font-bold tracking-wide">LOADING USERS...</p>
               </div>
             ) : users.length > 0 ? (
               <>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          User
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Role
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Joined
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {users.map((userItem) => {
-                        const status = userItem.status;
-                        return (
-                          <tr key={userItem.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center">
-                                <div className="flex-shrink-0 h-10 w-10">
-                                  <div className="h-10 w-10 rounded-0 bg-gray-300 flex items-center justify-center">
-                                    <FiUserCheck className="h-6 w-6 text-gray-600" />
-                                  </div>
-                                </div>
-                                <div className="ml-4">
-                                  <div className="text-sm font-medium text-gray-900">
-                                    {userItem.firstName} {userItem.lastName}
-                                  </div>
-                                  <div className="text-sm text-gray-500">{userItem.email}</div>
-                                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-black hover:bg-black">
+                      <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">
+                        USER
+                      </TableHead>
+                      <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">
+                        ROLE
+                      </TableHead>
+                      <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">
+                        STATUS
+                      </TableHead>
+                      <TableHead className="px-8 py-4 text-white font-bold tracking-widest">
+                        JOINED
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {users.map((userItem, index) => {
+                      const status = userItem.status;
+                      return (
+                        <TableRow
+                          key={userItem.id}
+                          className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                        >
+                          <TableCell className="px-8 py-5 border-r border-gray-200">
+                            <div className="flex items-center gap-4">
+                              <div className="h-10 w-10 bg-gray-100 border border-gray-300 flex items-center justify-center shrink-0">
+                                <FiUserCheck className="h-5 w-5 text-gray-500" />
                               </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <select
-                                value={userItem.role}
-                                onChange={(e) => handleRoleUpdate(userItem.id, e.target.value)}
-                                disabled={user?.role !== "SUPER_ADMIN"}
-                                className={`text-sm px-2 py-1 rounded-0 font-medium ${getRoleColor(
-                                  userItem.role
-                                )} ${user?.role !== "SUPER_ADMIN" ? "cursor-not-allowed" : ""}`}
+                              <div>
+                                <div className="text-sm font-bold text-black">
+                                  {userItem.firstName} {userItem.lastName}
+                                </div>
+                                <div className="text-xs text-gray-500 mt-0.5">{userItem.email}</div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-8 py-5 border-r border-gray-200">
+                            <select
+                              value={userItem.role}
+                              onChange={(e) => handleRoleUpdate(userItem.id, e.target.value)}
+                              disabled={user?.role !== "SUPER_ADMIN"}
+                              className={`text-xs px-3 py-1.5 font-bold tracking-widest border-2 border-black focus:outline-none ${getRoleColor(userItem.role)} ${user?.role !== "SUPER_ADMIN" ? "cursor-not-allowed opacity-70" : ""}`}
+                            >
+                              {ROLES.map((role) => (
+                                <option key={role.value} value={role.value}>
+                                  {role.label}
+                                </option>
+                              ))}
+                            </select>
+                          </TableCell>
+                          <TableCell className="px-8 py-5 border-r border-gray-200">
+                            <div className="flex items-center gap-3">
+                              <Badge
+                                variant="outline"
+                                className={
+                                  status === "ACTIVE"
+                                    ? "bg-black text-white border-black rounded-none tracking-widest text-xs font-bold"
+                                    : status === "SUSPENDED"
+                                    ? "bg-white text-black border-black rounded-none tracking-widest text-xs font-bold"
+                                    : "bg-white text-black border-black rounded-none tracking-widest text-xs font-bold"
+                                }
                               >
-                                {ROLES.map((role) => (
-                                  <option key={role.value} value={role.value}>
-                                    {role.label}
-                                  </option>
-                                ))}
-                              </select>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                                {status}
+                              </Badge>
                               <select
                                 value={status}
                                 onChange={(e) => handleStatusUpdate(userItem.id, e.target.value)}
-                                className={`text-sm px-2 py-1 rounded-0 font-medium ${getStatusColor(status)}`}
+                                className="text-xs px-2 py-1 border-2 border-black font-bold tracking-widest focus:outline-none"
                               >
                                 <option value="ACTIVE">Active</option>
                                 <option value="INACTIVE">Inactive</option>
                                 <option value="SUSPENDED">Suspended</option>
                               </select>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {new Date(userItem.createdAt).toLocaleDateString()}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-8 py-5 text-sm text-gray-600">
+                            {new Date(userItem.createdAt).toLocaleDateString()}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
                 {/* Pagination */}
                 {usersData?.meta?.totalPages && usersData?.meta?.totalPages > 1 && (
-                  <div className="px-6 py-4 border-t border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm text-gray-700">
-                        Page {usersData?.meta?.page} of {usersData?.meta?.totalPages}
-                      </div>
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => handlePageChange((usersData?.meta?.page ?? 2) - 1)}
-                          disabled={usersData?.meta?.page === 1}
-                          className="px-3 py-1 border border-gray-300 rounded-0 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                        >
-                          Previous
-                        </button>
-                        <button
-                          onClick={() => handlePageChange((usersData?.meta?.page ?? 0) + 1)}
-                          disabled={usersData?.meta?.page === usersData?.meta?.totalPages}
-                          className="px-3 py-1 border border-gray-300 rounded-0 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                        >
-                          Next
-                        </button>
-                      </div>
+                  <div className="px-8 py-5 border-t-2 border-black flex items-center justify-between">
+                    <p className="text-sm font-medium text-black tracking-wide">
+                      PAGE {usersData?.meta?.page} OF {usersData?.meta?.totalPages}
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handlePageChange((usersData?.meta?.page ?? 2) - 1)}
+                        disabled={usersData?.meta?.page === 1}
+                        className="px-4 py-2 border-2 border-black text-xs font-bold tracking-widest hover:bg-black hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        PREVIOUS
+                      </button>
+                      <button
+                        onClick={() => handlePageChange((usersData?.meta?.page ?? 0) + 1)}
+                        disabled={usersData?.meta?.page === usersData?.meta?.totalPages}
+                        className="px-4 py-2 border-2 border-black text-xs font-bold tracking-widest hover:bg-black hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        NEXT
+                      </button>
                     </div>
                   </div>
                 )}
               </>
             ) : (
-              <div className="p-6 text-center">
+              <div className="p-12 text-center">
                 <FiUserX className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">No users found</p>
+                <p className="text-gray-500 font-medium tracking-wide">NO USERS FOUND</p>
               </div>
             )}
           </div>

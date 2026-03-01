@@ -196,8 +196,8 @@ export default function ProductManagement({ product, onClose }: ProductManagemen
             className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
           >
             <option value="UNISEX">Unisex</option>
-            <option value="MALE">Male</option>
-            <option value="FEMALE">Female</option>
+            <option value="MEN">Men</option>
+            <option value="WOMEN">Women</option>
           </select>
         </div>
 

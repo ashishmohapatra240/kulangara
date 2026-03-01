@@ -11,6 +11,15 @@ import CategoryManagement from "@/app/components/admin/CategoryManagement";
 import Modal from "@/app/components/ui/Modal";
 import { ICategory } from "@/app/types/category.type";
 import { Card, CardContent } from "@/app/components/ui/card";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/app/components/ui/table";
+import { Badge } from "@/app/components/ui/badge";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN"];
 
@@ -106,102 +115,108 @@ export default function AdminCategoriesPage() {
                             </Button>
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-black text-white">
-                                    <tr>
-                                        <th className="px-8 py-4 text-left text-sm font-bold tracking-widest border-r border-gray-700">
-                                            CATEGORY
-                                        </th>
-                                        <th className="px-8 py-4 text-left text-sm font-bold tracking-widest border-r border-gray-700">
-                                            SLUG
-                                        </th>
-                                        <th className="px-8 py-4 text-left text-sm font-bold tracking-widest border-r border-gray-700">
-                                            PARENT
-                                        </th>
-                                        <th className="px-8 py-4 text-left text-sm font-bold tracking-widest border-r border-gray-700">
-                                            PRODUCTS
-                                        </th>
-                                        <th className="px-8 py-4 text-left text-sm font-bold tracking-widest border-r border-gray-700">
-                                            STATUS
-                                        </th>
-                                        <th className="px-8 py-4 text-left text-sm font-bold tracking-widest border-r border-gray-700">
-                                            SORT
-                                        </th>
-                                        <th className="px-8 py-4 text-left text-sm font-bold tracking-widest">
-                                            ACTIONS
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white">
-                                    {categories.map((category, index) => (
-                                        <tr key={category.id} className={`border-b border-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                                            <td className="px-8 py-6 border-r border-gray-200">
-                                                <div className="flex items-center">
-                                                    {category.image && (
-                                                        <Image
-                                                            src={category.image}
-                                                            alt={category.name}
-                                                            width={48}
-                                                            height={48}
-                                                            className="object-cover mr-4 border-2 border-black"
-                                                        />
-                                                    )}
-                                                    <div>
-                                                        <div className="text-lg font-bold text-black tracking-wide">
-                                                            {category.name}
-                                                        </div>
-                                                        {category.description && (
-                                                            <div className="text-sm text-gray-600 font-medium truncate max-w-xs">
-                                                                {category.description}
-                                                            </div>
-                                                        )}
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="bg-black hover:bg-black">
+                                    <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">
+                                        CATEGORY
+                                    </TableHead>
+                                    <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">
+                                        SLUG
+                                    </TableHead>
+                                    <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">
+                                        PARENT
+                                    </TableHead>
+                                    <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">
+                                        PRODUCTS
+                                    </TableHead>
+                                    <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">
+                                        STATUS
+                                    </TableHead>
+                                    <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">
+                                        SORT
+                                    </TableHead>
+                                    <TableHead className="px-8 py-4 text-white font-bold tracking-widest">
+                                        ACTIONS
+                                    </TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {categories.map((category, index) => (
+                                    <TableRow
+                                        key={category.id}
+                                        className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                                    >
+                                        <TableCell className="px-8 py-6 border-r border-gray-200">
+                                            <div className="flex items-center gap-4">
+                                                {category.image && (
+                                                    <Image
+                                                        src={category.image}
+                                                        alt={category.name}
+                                                        width={48}
+                                                        height={48}
+                                                        className="object-cover border-2 border-black shrink-0"
+                                                    />
+                                                )}
+                                                <div>
+                                                    <div className="text-sm font-bold text-black tracking-wide">
+                                                        {category.name}
                                                     </div>
+                                                    {category.description && (
+                                                        <div className="text-xs text-gray-500 truncate max-w-xs mt-0.5">
+                                                            {category.description}
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            </td>
-                                            <td className="px-8 py-6 text-sm font-medium text-black border-r border-gray-200">
-                                                {category.slug}
-                                            </td>
-                                            <td className="px-8 py-6 text-sm font-medium text-black border-r border-gray-200">
-                                                {category.parent ? category.parent.name : 'NONE'}
-                                            </td>
-                                            <td className="px-8 py-6 text-sm font-bold text-black border-r border-gray-200">
-                                                {category._count?.products || 0}
-                                            </td>
-                                            <td className="px-8 py-6 border-r border-gray-200">
-                                                <span
-                                                    className={`px-3 py-1 text-xs font-bold tracking-widest ${
-                                                        category.isActive
-                                                            ? 'bg-black text-white'
-                                                            : 'bg-white text-black border border-black'
-                                                    }`}
-                                                >
-                                                    {category.isActive ? 'ACTIVE' : 'INACTIVE'}
-                                                </span>
-                                            </td>
-                                            <td className="px-8 py-6 text-sm font-bold text-black border-r border-gray-200">
-                                                {category.sortOrder}
-                                            </td>
-                                            <td className="px-8 py-6 text-sm font-medium space-x-3">
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="px-8 py-6 text-sm font-mono text-gray-700 border-r border-gray-200">
+                                            {category.slug}
+                                        </TableCell>
+                                        <TableCell className="px-8 py-6 text-sm font-medium text-black border-r border-gray-200">
+                                            {category.parent ? category.parent.name : (
+                                                <span className="text-gray-400">—</span>
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="px-8 py-6 text-sm font-bold text-black border-r border-gray-200">
+                                            {category._count?.products || 0}
+                                        </TableCell>
+                                        <TableCell className="px-8 py-6 border-r border-gray-200">
+                                            <Badge
+                                                className={
+                                                    category.isActive
+                                                        ? "bg-black text-white border-black rounded-none tracking-widest text-xs font-bold"
+                                                        : "bg-white text-black border-black rounded-none tracking-widest text-xs font-bold"
+                                                }
+                                                variant="outline"
+                                            >
+                                                {category.isActive ? "ACTIVE" : "INACTIVE"}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="px-8 py-6 text-sm font-bold text-black border-r border-gray-200">
+                                            {category.sortOrder}
+                                        </TableCell>
+                                        <TableCell className="px-8 py-6">
+                                            <div className="flex items-center gap-2">
                                                 <button
                                                     onClick={() => setEditCategory(category)}
-                                                    className="px-4 py-2 bg-white text-black border-2 border-black font-bold tracking-widest hover:bg-black hover:text-white transition-colors"
+                                                    className="px-4 py-2 bg-white text-black border-2 border-black text-xs font-bold tracking-widest hover:bg-black hover:text-white transition-colors"
                                                 >
                                                     EDIT
                                                 </button>
                                                 <button
                                                     onClick={() => setDeleteCategory(category)}
-                                                    className="px-4 py-2 bg-white text-black border-2 border-black font-bold tracking-widest hover:bg-black hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    className="px-4 py-2 bg-white text-black border-2 border-black text-xs font-bold tracking-widest hover:bg-black hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                                                     disabled={(category._count?.products ?? 0) > 0}
                                                 >
                                                     DELETE
                                                 </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
                     )}
                 </div>
 

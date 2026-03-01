@@ -8,6 +8,15 @@ import { useCreateCoupon, useAdminCoupons, useDeleteCoupon, useUpdateCoupon } fr
 import { ICreateCouponData, ICoupon } from "@/app/types/coupon.type";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/app/components/ui/table";
+import { Badge } from "@/app/components/ui/badge";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN"];
 
@@ -109,41 +118,97 @@ export default function AdminCouponsPage() {
                         ) : coupons.length === 0 ? (
                             <div className="text-center text-gray-600 font-medium tracking-wide py-12">NO COUPONS FOUND.</div>
                         ) : (
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full">
-                                    <thead>
-                                        <tr className="bg-black text-white">
-                                            <th className="text-left px-8 py-4 font-bold tracking-widest border-r border-gray-700">CODE</th>
-                                            <th className="text-left px-8 py-4 font-bold tracking-widest border-r border-gray-700">TYPE</th>
-                                            <th className="text-left px-8 py-4 font-bold tracking-widest border-r border-gray-700">VALUE</th>
-                                            <th className="text-left px-8 py-4 font-bold tracking-widest border-r border-gray-700">MIN ORDER</th>
-                                            <th className="text-left px-8 py-4 font-bold tracking-widest border-r border-gray-700">ACTIVE</th>
-                                            <th className="text-left px-8 py-4 font-bold tracking-widest">ACTIONS</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {coupons.map((c, index) => (
-                                            <tr key={c.id} className={`border-b border-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                                                <td className="px-8 py-6 font-bold text-black border-r border-gray-200">{c.code}</td>
-                                                <td className="px-8 py-6 font-medium text-black border-r border-gray-200">{c.type}</td>
-                                                <td className="px-8 py-6 font-bold text-black border-r border-gray-200">{c.type === 'PERCENTAGE' ? `${c.value}%` : `₹${c.value}`}</td>
-                                                <td className="px-8 py-6 font-medium text-black border-r border-gray-200">₹{c.minOrderValue}</td>
-                                                <td className="px-8 py-6 border-r border-gray-200">
-                                                    <span className={`px-3 py-1 text-xs font-bold tracking-widest ${c.isActive ? 'bg-black text-white' : 'bg-white text-black border border-black'}`}>
-                                                        {c.isActive ? 'YES' : 'NO'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-8 py-6">
-                                                    <div className="flex gap-3">
-                                                        <Button size="sm" variant="outline" onClick={() => { setEditCoupon(c); setIsOpen(true); }}>EDIT</Button>
-                                                        <Button size="sm" variant="outline" onClick={() => deleteCoupon.mutate(c.id)} disabled={deleteCoupon.isPending}>DELETE</Button>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="bg-black hover:bg-black">
+                                        <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">CODE</TableHead>
+                                        <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">NAME</TableHead>
+                                        <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">TYPE</TableHead>
+                                        <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">VALUE</TableHead>
+                                        <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">MIN ORDER</TableHead>
+                                        <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">VALIDITY</TableHead>
+                                        <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">USAGE</TableHead>
+                                        <TableHead className="px-8 py-4 text-white font-bold tracking-widest border-r border-gray-700">STATUS</TableHead>
+                                        <TableHead className="px-8 py-4 text-white font-bold tracking-widest">ACTIONS</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {coupons.map((c, index) => (
+                                        <TableRow key={c.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                                            <TableCell className="px-8 py-5 font-mono font-bold text-black border-r border-gray-200">
+                                                {c.code}
+                                            </TableCell>
+                                            <TableCell className="px-8 py-5 text-sm text-gray-700 border-r border-gray-200">
+                                                {c.name || <span className="text-gray-400">—</span>}
+                                            </TableCell>
+                                            <TableCell className="px-8 py-5 border-r border-gray-200">
+                                                <Badge variant="outline" className="rounded-none text-xs font-bold tracking-widest border-black">
+                                                    {c.type}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="px-8 py-5 font-bold text-black border-r border-gray-200">
+                                                {c.type === "PERCENTAGE" ? `${c.value}%` : `₹${c.value}`}
+                                                {c.maxDiscount ? (
+                                                    <span className="block text-xs text-gray-500 font-normal">max ₹{c.maxDiscount}</span>
+                                                ) : null}
+                                            </TableCell>
+                                            <TableCell className="px-8 py-5 text-sm text-black border-r border-gray-200">
+                                                ₹{c.minOrderValue}
+                                            </TableCell>
+                                            <TableCell className="px-8 py-5 text-xs text-gray-600 border-r border-gray-200">
+                                                {c.validFrom ? (
+                                                    <div>
+                                                        <span className="font-medium">From:</span> {new Date(c.validFrom).toLocaleDateString()}
                                                     </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                                ) : null}
+                                                {c.validUntil ? (
+                                                    <div>
+                                                        <span className="font-medium">Until:</span> {new Date(c.validUntil).toLocaleDateString()}
+                                                    </div>
+                                                ) : null}
+                                                {!c.validFrom && !c.validUntil && <span className="text-gray-400">—</span>}
+                                            </TableCell>
+                                            <TableCell className="px-8 py-5 text-xs text-gray-600 border-r border-gray-200">
+                                                {c.usageCount ?? 0}
+                                                {c.usageLimit ? ` / ${c.usageLimit}` : ""}
+                                            </TableCell>
+                                            <TableCell className="px-8 py-5 border-r border-gray-200">
+                                                <Badge
+                                                    variant="outline"
+                                                    className={
+                                                        c.isActive
+                                                            ? "bg-black text-white border-black rounded-none tracking-widest text-xs font-bold"
+                                                            : "bg-white text-black border-black rounded-none tracking-widest text-xs font-bold"
+                                                    }
+                                                >
+                                                    {c.isActive ? "ACTIVE" : "INACTIVE"}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="px-8 py-5">
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => { setEditCoupon(c); setIsOpen(true); }}
+                                                        className="text-xs font-bold tracking-widest border-2 border-black rounded-none"
+                                                    >
+                                                        EDIT
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => deleteCoupon.mutate(c.id)}
+                                                        disabled={deleteCoupon.isPending}
+                                                        className="text-xs font-bold tracking-widest border-2 border-black rounded-none"
+                                                    >
+                                                        DELETE
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
                         )}
                     </div>
                 </div>

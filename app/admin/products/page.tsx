@@ -15,6 +15,15 @@ import Modal from "@/app/components/ui/Modal";
 import ProductVariantsManagement from "@/app/components/admin/ProductVariantsManagement";
 import ProductImagesManagement from "@/app/components/admin/ProductImagesManagement";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/app/components/ui/table";
+import { Badge } from "@/app/components/ui/badge";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN"];
 
@@ -111,167 +120,170 @@ export default function AdminProductsPage() {
               </span>
             )}
           </CardHeader>
-          <CardContent>
-          <div className="p-8">
+          <CardContent className="px-0 pb-0">
             {isProductsLoading ? (
-              <div className="text-center text-black font-bold tracking-wide py-12">
-                LOADING PRODUCTS...
+              <div className="text-center text-muted-foreground py-16">
+                Loading products...
               </div>
             ) : products.length === 0 ? (
-              <div className="text-center text-gray-600 font-medium tracking-wide py-12">
-                NO PRODUCTS FOUND.
+              <div className="text-center text-muted-foreground py-16">
+                No products found.
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full">
-                  <thead>
-                    <tr className="bg-white text-black">
-                      <th className="text-left px-8 py-4 font-bold tracking-widest border-r border-gray-700">NAME</th>
-                      <th className="text-left px-8 py-4 font-bold tracking-widest border-r border-gray-700">PRICE</th>
-                      <th className="text-left px-8 py-4 font-bold tracking-widest border-r border-gray-700">STOCK</th>
-                      <th className="text-left px-8 py-4 font-bold tracking-widest border-r border-gray-700">
-                        CATEGORY
-                      </th>
-                      <th className="text-left px-8 py-4 font-bold tracking-widest">
-                        ACTIONS
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.map((product: IProduct, index) => (
-                      <tr key={product.id} className={`border-b border-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                        <td className="px-8 py-4 font-medium text-black border-r border-gray-200">{product.name}</td>
-                        <td className="px-8 py-4 font-bold text-black border-r border-gray-200">₹{product.price}</td>
-                        <td className="px-8 py-4 font-medium text-black border-r border-gray-200">{product.stockQuantity}</td>
-                        <td className="px-8 py-4 font-medium text-black border-r border-gray-200">
-                          {product.category?.name || product.categoryId}
-                        </td>
-                        <td className="px-8 py-4">
-                          <div className="flex gap-3 flex-wrap">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setEditProduct(product)}
-                            >
-                              EDIT
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setVariantProduct(product)}
-                            >
-                              VARIANTS
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setImageProduct(product)}
-                            >
-                              IMAGES
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant={
-                                product.isFeatured ? "outline" : "secondary"
-                              }
-                              onClick={() =>
-                                toggleFeatured.mutate({
-                                  id: product.id,
-                                  isFeatured: !product.isFeatured,
-                                })
-                              }
-                              disabled={toggleFeatured.isPending}
-                            >
-                              {product.isFeatured
-                                ? "UNMARK FEATURED"
-                                : "MARK FEATURED"}
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {products.length > 0 && (
-              <div className="mt-8 flex items-center justify-between border-t-2 border-black pt-6">
-                <div className="flex items-center space-x-3">
-                  <span className="text-sm font-bold text-black tracking-widest">SHOW</span>
-                  <select
-                    value={pageSize}
-                    onChange={(e) =>
-                      handlePageSizeChange(Number(e.target.value))
-                    }
-                    className="border-2 border-black px-3 py-2 text-sm font-medium"
-                  >
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                    <option value={20}>20</option>
-                    <option value={50}>50</option>
-                  </select>
-                  <span className="text-sm font-bold text-black tracking-widest">ENTRIES</span>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium text-black tracking-wide">
-                    SHOWING {(currentPage - 1) * pageSize + 1} TO{" "}
-                    {Math.min(currentPage * pageSize, meta.total)} OF{" "}
-                    {meta.total} RESULTS
-                  </span>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage <= 1}
-                    className="px-4 py-2 text-sm border-2 border-black font-bold tracking-widest disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black hover:text-white transition-colors"
-                  >
-                    PREVIOUS
-                  </button>
-
-                  {Array.from(
-                    { length: Math.min(5, meta.totalPages) },
-                    (_, i) => {
-                      let pageNum;
-                      if (meta.totalPages <= 5) {
-                        pageNum = i + 1;
-                      } else if (currentPage <= 3) {
-                        pageNum = i + 1;
-                      } else if (currentPage >= meta.totalPages - 2) {
-                        pageNum = meta.totalPages - 4 + i;
-                      } else {
-                        pageNum = currentPage - 2 + i;
-                      }
-
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="pl-6 w-[220px]">Name</TableHead>
+                      <TableHead>Price</TableHead>
+                      <TableHead>Stock</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Fit</TableHead>
+                      <TableHead className="pr-6">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {products.map((product: IProduct) => {
+                      const fits = [
+                        ...new Set(
+                          (product.variants || [])
+                            .map((v) => v.fit)
+                            .filter(Boolean)
+                        ),
+                      ];
                       return (
-                        <button
+                        <TableRow key={product.id}>
+                          <TableCell className="pl-6 font-medium">
+                            {product.name}
+                          </TableCell>
+                          <TableCell>₹{product.price}</TableCell>
+                          <TableCell>{product.stockQuantity}</TableCell>
+                          <TableCell>
+                            {product.category?.name || product.categoryId}
+                          </TableCell>
+                          <TableCell>
+                            {fits.length === 0 ? (
+                              <span className="text-muted-foreground text-xs">—</span>
+                            ) : (
+                              <div className="flex flex-wrap gap-1">
+                                {fits.map((fit) => (
+                                  <Badge
+                                    key={fit}
+                                    variant="secondary"
+                                    className={
+                                      fit === "OVERSIZED"
+                                        ? "bg-orange-100 text-orange-800 hover:bg-orange-100"
+                                        : "bg-blue-100 text-blue-800 hover:bg-blue-100"
+                                    }
+                                  >
+                                    {fit === "OVERSIZED" ? "Oversized" : "Normal"}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell className="pr-6">
+                            <div className="flex gap-2 flex-wrap">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setEditProduct(product)}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setVariantProduct(product)}
+                              >
+                                Variants
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setImageProduct(product)}
+                              >
+                                Images
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant={product.isFeatured ? "secondary" : "outline"}
+                                onClick={() =>
+                                  toggleFeatured.mutate({
+                                    id: product.id,
+                                    isFeatured: !product.isFeatured,
+                                  })
+                                }
+                                disabled={toggleFeatured.isPending}
+                              >
+                                {product.isFeatured ? "Unmark Featured" : "Mark Featured"}
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+
+                {/* Pagination */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span>Rows per page</span>
+                    <select
+                      value={pageSize}
+                      onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                      className="border rounded-md px-2 py-1 text-sm bg-background"
+                    >
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                    </select>
+                  </div>
+
+                  <span className="text-sm text-muted-foreground">
+                    {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, meta.total)} of {meta.total}
+                  </span>
+
+                  <div className="flex items-center gap-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage <= 1}
+                    >
+                      Previous
+                    </Button>
+                    {Array.from({ length: Math.min(5, meta.totalPages) }, (_, i) => {
+                      let pageNum: number;
+                      if (meta.totalPages <= 5) pageNum = i + 1;
+                      else if (currentPage <= 3) pageNum = i + 1;
+                      else if (currentPage >= meta.totalPages - 2) pageNum = meta.totalPages - 4 + i;
+                      else pageNum = currentPage - 2 + i;
+                      return (
+                        <Button
                           key={pageNum}
+                          size="sm"
+                          variant={currentPage === pageNum ? "default" : "outline"}
                           onClick={() => handlePageChange(pageNum)}
-                          className={`px-4 py-2 text-sm border-2 border-black font-bold ${
-                            currentPage === pageNum
-                              ? "bg-black text-white"
-                              : "bg-white text-black hover:bg-black hover:text-white transition-colors"
-                          }`}
                         >
                           {pageNum}
-                        </button>
+                        </Button>
                       );
-                    }
-                  )}
-
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage >= meta.totalPages}
-                    className="px-4 py-2 text-sm border-2 border-black font-bold tracking-widest disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black hover:text-white transition-colors"
-                  >
-                    NEXT
-                  </button>
+                    })}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage >= meta.totalPages}
+                    >
+                      Next
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              </>
             )}
-          </div>
           </CardContent>
         </Card>
       </div>
