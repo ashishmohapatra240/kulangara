@@ -104,18 +104,6 @@ export default function UsersPage() {
     updateStatusMutation.mutate({ userId, status });
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "ACTIVE":
-        return "bg-black text-white";
-      case "INACTIVE":
-        return "bg-white text-black border border-black";
-      case "SUSPENDED":
-        return "bg-white text-black border border-black";
-      default:
-        return "bg-gray-200 text-black";
-    }
-  };
 
   const getRoleColor = (role: string) => {
     switch (role) {

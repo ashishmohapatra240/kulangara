@@ -9,6 +9,7 @@ export interface ICoupon {
     validFrom?: string;
     validUntil?: string;
     usageLimit?: number;
+    usageCount?: number;
     userUsageLimit?: number;
     isActive?: boolean;
     description?: string;
