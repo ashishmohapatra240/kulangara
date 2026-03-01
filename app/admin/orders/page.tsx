@@ -19,6 +19,14 @@ import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import { Button } from "@/app/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/app/components/ui/dropdown-menu";
+import { MoreVertical, MapPin, Phone, User } from "lucide-react";
 
 const ALLOWED_ROLES = ["SUPER_ADMIN", "ADMIN", "DELIVERY_PARTNER"];
 const ORDER_STATUSES = [
@@ -95,6 +103,20 @@ export default function AdminOrdersPage() {
 
   const getTotalQuantity = (items: IOrder["items"]) => {
     return items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  };
+
+  // Helper to get sizes (truncated)
+  const getOrderSizes = (items: IOrder["items"]) => {
+    if (!items || items.length === 0) return "-";
+    const sizes = items.map((item) => item.variant?.size || "N/A");
+    const uniqueSizes = [...new Set(sizes)];
+    if (uniqueSizes.length <= 2) return uniqueSizes.join(", ");
+    return `${uniqueSizes.slice(0, 2).join(", ")} +${uniqueSizes.length - 2}`;
+  };
+
+  // Helper to get mobile number from shipping address
+  const getMobileNumber = (order: IOrder) => {
+    return order.shippingAddress?.phone || "-";
   };
 
   const handleFilterChange = (
@@ -311,13 +333,15 @@ export default function AdminOrdersPage() {
               ) : (
                 <>
                   <div className="rounded-md border overflow-x-auto">
-                    <Table className="min-w-[800px]">
+                    <Table className="min-w-[1000px]">
                       <TableHeader>
                         <TableRow>
                           <TableHead>Order #</TableHead>
                           <TableHead>User</TableHead>
                           <TableHead>Product(s)</TableHead>
+                          <TableHead>Size</TableHead>
                           <TableHead>Qty</TableHead>
+                          <TableHead>Mobile</TableHead>
                           <TableHead>Status</TableHead>
                           <TableHead>Payment</TableHead>
                           <TableHead>Total (₹)</TableHead>
@@ -325,6 +349,7 @@ export default function AdminOrdersPage() {
                           <TableHead>ETA</TableHead>
                           <TableHead>Created</TableHead>
                           <TableHead>Actions</TableHead>
+                          <TableHead></TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -353,8 +378,14 @@ export default function AdminOrdersPage() {
                             <TableCell className="text-sm">
                               {getProductNames(order.items)}
                             </TableCell>
+                            <TableCell className="text-sm">
+                              {getOrderSizes(order.items)}
+                            </TableCell>
                             <TableCell className="text-center font-medium">
                               {getTotalQuantity(order.items)}
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {getMobileNumber(order)}
                             </TableCell>
                             <TableCell>
                             {editing[order.id] ? (
@@ -526,6 +557,52 @@ export default function AdminOrdersPage() {
                                   </Button>
                                 )}
                             </div>
+                          </TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-80">
+                                <DropdownMenuLabel className="font-semibold">Order Details</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                
+                                <div className="px-2 py-3 space-y-3">
+                                  <div className="flex items-start gap-2">
+                                    <User className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs font-medium text-muted-foreground">Customer Name</p>
+                                      <p className="text-sm break-words">
+                                        {order.shippingAddress?.firstName} {order.shippingAddress?.lastName}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-start gap-2">
+                                    <Phone className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs font-medium text-muted-foreground">Phone Number</p>
+                                      <p className="text-sm">{order.shippingAddress?.phone || "-"}</p>
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-start gap-2">
+                                    <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs font-medium text-muted-foreground">Shipping Address</p>
+                                      <p className="text-sm break-words">
+                                        {order.shippingAddress?.address}
+                                        {order.shippingAddress?.apartment && `, ${order.shippingAddress.apartment}`}
+                                        <br />
+                                        {order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.pincode}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </TableCell>
                           </TableRow>
                         ))}
