@@ -105,13 +105,24 @@ export default function AdminOrdersPage() {
     return items.reduce((sum, item) => sum + (item.quantity || 0), 0);
   };
 
-  // Helper to get sizes (truncated)
   const getOrderSizes = (items: IOrder["items"]) => {
     if (!items || items.length === 0) return "-";
-    const sizes = items.map((item) => item.variant?.size || "N/A");
+    const sizes = items.map((item) => item.variant?.size || "—");
     const uniqueSizes = [...new Set(sizes)];
     if (uniqueSizes.length <= 2) return uniqueSizes.join(", ");
     return `${uniqueSizes.slice(0, 2).join(", ")} +${uniqueSizes.length - 2}`;
+  };
+
+  const getOrderFit = (items: IOrder["items"]) => {
+    if (!items || items.length === 0) return "—";
+    const fits = items
+      .map((item) => item.variant?.fit)
+      .filter(Boolean) as string[];
+    const uniqueFits = [...new Set(fits)];
+    if (uniqueFits.length === 0) return "—";
+    return uniqueFits
+      .map((f) => (f === "OVERSIZED" ? "Oversized" : "Normal"))
+      .join(", ");
   };
 
   // Helper to get mobile number from shipping address
@@ -339,6 +350,7 @@ export default function AdminOrdersPage() {
                           <TableHead>Order #</TableHead>
                           <TableHead>User</TableHead>
                           <TableHead>Product(s)</TableHead>
+                          <TableHead>Fit</TableHead>
                           <TableHead>Size</TableHead>
                           <TableHead>Qty</TableHead>
                           <TableHead>Mobile</TableHead>
@@ -377,6 +389,9 @@ export default function AdminOrdersPage() {
                           </TableCell>
                             <TableCell className="text-sm">
                               {getProductNames(order.items)}
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {getOrderFit(order.items)}
                             </TableCell>
                             <TableCell className="text-sm">
                               {getOrderSizes(order.items)}
