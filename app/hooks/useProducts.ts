@@ -177,6 +177,23 @@ export function useAddProductVariant() {
     });
 }
 
+export function useBulkAddProductVariants() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ productId, variants }: { productId: string; variants: ICreateVariantData[] }) =>
+            productsService.addBulkProductVariants(productId, variants),
+        onSuccess: (_, { productId }) => {
+            queryClient.invalidateQueries({ queryKey: ['product', productId] });
+            queryClient.invalidateQueries({ queryKey: ['admin-products'], exact: false });
+            toast.success('Variants saved successfully!');
+        },
+        onError: (error: AxiosError) => {
+            toast.error(getErrorMessage(error));
+        },
+    });
+}
+
 export function useUpdateProductVariant() {
     const queryClient = useQueryClient();
 
