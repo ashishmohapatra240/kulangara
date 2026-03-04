@@ -7,7 +7,7 @@ import { useProduct } from "@/app/hooks/useProducts";
 import { useReviews } from "@/app/hooks/useReviews";
 import { useAddToCart } from "@/app/hooks/useCart";
 import { useAppDispatch } from "@/app/store/hooks";
-import { fetchCart } from "@/app/store/slices/cartSlice";
+import { fetchCart, clearCart } from "@/app/store/slices/cartSlice";
 import { Button } from "@/app/components/ui/button";
 import ProductReviews from "@/app/components/ui/ProductReviews";
 import {
@@ -275,6 +275,10 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
       const selectedVariant = product.variants?.find(
         (v) => v.size === selectedSize && (!activeFit || v.fit === activeFit)
       );
+
+      // Clear cart first so buy-now checks out only this item
+      // (prevents quantity accumulation from previous failed buy-now attempts)
+      await dispatch(clearCart()).unwrap();
 
       // Add item to cart and wait for it to complete
       await addItemToCart({

@@ -280,8 +280,11 @@ export default function CheckoutPage() {
         return;
       }
 
-      const order = await createOrder(paymentMethod) as IOrder;
-      if (order && order.id) {
+      const order = await createOrder(paymentMethod) as IOrder & { pendingWebhook?: boolean };
+      if (order?.pendingWebhook) {
+        // Payment captured but client-side verify failed — webhook will create the order.
+        router.push('/profile/orders');
+      } else if (order && order.id) {
         router.push(`/orders/${order.id}`);
       }
     } catch (err: unknown) {

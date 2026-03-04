@@ -301,12 +301,18 @@ export const useCheckout = () => {
           })
         );
 
+        const freshSubtotal = cartItemsWithCurrentPrices.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+        const freshTotal = freshSubtotal + shipping + tax - discount;
+
         const cartData = {
           items: cartItemsWithCurrentPrices,
-          subtotal,
+          subtotal: freshSubtotal,
           tax,
           discount,
-          total,
+          total: freshTotal,
           couponCode: appliedCoupon?.code,
           shippingAddressId: selectedAddressId,
         };
@@ -318,6 +324,13 @@ export const useCheckout = () => {
         );
 
         if (!paymentResult.success) {
+          if (paymentResult.paymentCaptured) {
+            // Payment was taken by Razorpay but client-side order creation failed.
+            // The webhook will create the order in the background.
+            // Return a sentinel so the page can redirect to the orders list.
+            dispatch(fetchCartThunk());
+            return { id: null, pendingWebhook: true } as unknown as IOrder;
+          }
           throw new Error("Payment failed or cancelled");
         }
 

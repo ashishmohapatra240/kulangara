@@ -73,20 +73,18 @@ export const useRazorpayPayment = () => {
     });
 
     // Verify payment and create order mutation (new - cart-based)
+    // Toasts are handled in the handler's try/catch to avoid duplicates
     const verifyPaymentAndCreateOrderMutation = useMutation({
         mutationFn: paymentService.verifyRazorpayPaymentAndCreateOrder,
         onSuccess: (response) => {
             if (response.status === 'success' || response.data?.verified) {
                 setPaymentStatus('success');
-                toast.success(response?.message || 'Payment verified and order created successfully!');
             } else {
                 setPaymentStatus('failed');
-                toast.error(response?.message || 'Payment verification failed');
             }
         },
-        onError: (error: Error | AxiosError) => {
+        onError: () => {
             setPaymentStatus('failed');
-            toast.error(getErrorMessage(error as AxiosError));
         }
     });
 
@@ -95,7 +93,7 @@ export const useRazorpayPayment = () => {
         cartData: IRazorpayCartOrderRequest['cartData'],
         userEmail: string = '',
         userPhone: string = ''
-    ): Promise<{ success: boolean; orderId?: string }> => {
+    ): Promise<{ success: boolean; orderId?: string; paymentCaptured?: boolean }> => {
         try {
             // Check if Razorpay is loaded
             if (!window.Razorpay) {
@@ -128,7 +126,7 @@ export const useRazorpayPayment = () => {
             setPaymentStatus('payment_pending');
 
             // Return a promise that resolves based on verification or dismissal
-            return new Promise<{ success: boolean; orderId?: string }>((resolve) => {
+            return new Promise<{ success: boolean; orderId?: string; paymentCaptured?: boolean }>((resolve) => {
                 // Configure Razorpay options
                 const options: IRazorpayOptions = {
                     key: orderResponse.data.key,
@@ -171,8 +169,31 @@ export const useRazorpayPayment = () => {
                             } else {
                                 resolve({ success: false });
                             }
-                        } catch {
-                            resolve({ success: false });
+                        } catch (verifyError) {
+                            // Payment was captured by Razorpay but our verify call failed.
+                            // The server-side webhook will create the order as a fallback.
+                            // Save the payment ID so support can look it up if needed.
+                            try {
+                                localStorage.setItem(
+                                    'pending_razorpay_payment',
+                                    JSON.stringify({
+                                        razorpay_payment_id: response.razorpay_payment_id,
+                                        razorpay_order_id: response.razorpay_order_id,
+                                        timestamp: new Date().toISOString(),
+                                    })
+                                );
+                            } catch {
+                                // localStorage unavailable — ignore
+                            }
+                            toast.error(
+                                `Payment was successful but order confirmation failed. Your order will appear shortly. If it doesn't, contact support with payment ID: ${response.razorpay_payment_id}`
+                            );
+                            if (process.env['NODE_ENV'] === 'development') {
+                                console.error('verifyPaymentAndCreateOrder failed:', verifyError);
+                            }
+                            // paymentCaptured=true tells the caller that money was taken
+                            // and the webhook will recover the order in the background.
+                            resolve({ success: false, paymentCaptured: true });
                         }
                     },
                     modal: {
