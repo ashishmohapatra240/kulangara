@@ -8,6 +8,7 @@ import productsService from "@/app/services/products.service";
 import { ProfileService } from "@/app/services/profile.service";
 import couponService from "@/app/services/coupon.service";
 import orderService from "@/app/services/order.service";
+import { IOrder } from "@/app/types/order.type";
 import { toast } from "react-hot-toast";
 import { AxiosError } from "axios";
 import { getErrorMessage } from "@/app/lib/utils";
