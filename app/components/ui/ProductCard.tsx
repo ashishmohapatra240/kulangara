@@ -38,7 +38,6 @@ function ProductCardComponent({
   price,
   discountedPrice,
   images,
-  category,
   variants,
 }: ProductCardProps) {
   const { data: wishlistResponse, refetch: refetchWishlist } = useWishlist();
