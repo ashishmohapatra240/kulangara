@@ -50,6 +50,7 @@ export default function FeaturedProducts() {
             discountedPrice={product.discountedPrice}
             images={product.images}
             category={product.category}
+            variants={product.variants}
           />
         ))}
       </div>

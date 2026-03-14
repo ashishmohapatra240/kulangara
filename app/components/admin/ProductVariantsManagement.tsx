@@ -32,6 +32,8 @@ interface SizeRow {
 
 type FitSections = Record<ProductFit, SizeRow[]>;
 
+const OVERSIZED_DEFAULT_PRICE = 599;
+
 function buildInitialSections(
   existingVariants: IProductVariant[],
   productPrice: number
@@ -41,10 +43,11 @@ function buildInitialSections(
       const existing = existingVariants.find(
         (v) => v.size === size && v.fit === fit
       );
+      const defaultPrice = fit === "OVERSIZED" ? OVERSIZED_DEFAULT_PRICE : productPrice;
       return {
         size,
         stock: existing ? String(existing.stock) : "100",
-        price: existing?.price ? String(existing.price) : String(productPrice),
+        price: existing?.price ? String(existing.price) : String(defaultPrice),
         color: existing?.color ?? "Black",
         include: !!existing,
       };

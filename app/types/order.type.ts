@@ -3,6 +3,8 @@ export interface IOrderItem {
     variantId?: string;
     quantity: number;
     price: number;
+    size?: string | null;
+    fit?: string | null;
     product?: {
         id?: string;
         name: string;

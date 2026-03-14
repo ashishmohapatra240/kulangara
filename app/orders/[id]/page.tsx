@@ -245,7 +245,9 @@ export default function OrderConfirmationPage() {
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm sm:text-base break-words">{item.product?.name}</h3>
                         <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-xs sm:text-sm text-muted-foreground">
-                          <span>Size: {item.variant?.size || "N/A"}</span>
+                          <span>Size: {item.size ?? item.variant?.size ?? "N/A"}</span>
+                          <span className="hidden sm:inline">•</span>
+                          <span>Fit: {(item.fit ?? item.variant?.fit) === "OVERSIZED" ? "Oversized" : (item.fit ?? item.variant?.fit) ? "Normal" : "—"}</span>
                           <span className="hidden sm:inline">•</span>
                           <span>Color: {item.variant?.color || "Standard"}</span>
                           <span className="hidden sm:inline">•</span>

@@ -27,6 +27,7 @@ interface ProductCardProps {
   discountedPrice?: number;
   images?: { id: string; url: string; alt: string; isPrimary: boolean }[];
   category?: { name: string };
+  variants?: { fit?: string | null }[];
 }
 
 const PLACEHOLDER_IMAGE = "/images/coming-soon.jpg";
@@ -38,6 +39,7 @@ function ProductCardComponent({
   discountedPrice,
   images,
   category,
+  variants,
 }: ProductCardProps) {
   const { data: wishlistResponse, refetch: refetchWishlist } = useWishlist();
   const createWishlist = useCreateWishlistItems();
@@ -166,12 +168,17 @@ function ProductCardComponent({
         </div>
 
         <CardContent className="flex flex-1 flex-col px-3.5 space-y-2">
-          {/* Category Badge */}
-          {category?.name && (
-            <Badge variant="secondary" className="w-fit text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 bg-secondary/80">
-              {category.name}
-            </Badge>
-          )}
+          {/* Fit Badge - show available fits (Oversized only; Normal is default so not shown) */}
+          {(() => {
+            const fits = [...new Set((variants || []).map((v) => v.fit).filter(Boolean))] as string[];
+            const hasOversized = fits.includes("OVERSIZED");
+            if (!hasOversized) return null;
+            return (
+              <Badge variant="secondary" className="w-fit text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 bg-orange-100 text-orange-800 border-orange-200">
+                Oversized
+              </Badge>
+            );
+          })()}
 
           {/* Product Name and Price Row */}
           <div className="flex items-start justify-between gap-2">

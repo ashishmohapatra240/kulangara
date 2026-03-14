@@ -377,9 +377,28 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
   const images = product.images || [
     { url: "/images/coming-soon.jpg", alt: product.name },
   ];
-  const discountPercentage = product.discountedPrice
+
+  // Compute display price based on selected fit (variant price overrides product price)
+  const displayPrice = (() => {
+    if (hasFits && selectedFit) {
+      const variant = product.variants?.find((v) => v.fit === selectedFit);
+      return (variant?.price ?? product.price) as number;
+    }
+    return product.price;
+  })();
+
+  const displayDiscountedPrice = (() => {
+    if (hasFits && selectedFit) {
+      const variant = product.variants?.find((v) => v.fit === selectedFit);
+      if (variant?.price != null) return undefined;
+      return product.discountedPrice;
+    }
+    return product.discountedPrice;
+  })();
+
+  const discountPercentage = displayDiscountedPrice && displayDiscountedPrice < displayPrice
     ? Math.round(
-        ((product.price - product.discountedPrice) / product.price) * 100
+        ((displayPrice - displayDiscountedPrice) / displayPrice) * 100
       )
     : 0;
 
@@ -496,14 +515,14 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
             {/* Price Section */}
             <div className="flex items-end justify-between gap-4 flex-wrap">
               <div className="space-y-1">
-                {product.discountedPrice && product.discountedPrice < product.price ? (
+                {displayDiscountedPrice && displayDiscountedPrice < displayPrice ? (
                   <>
                     <div className="flex items-baseline gap-3">
                       <p className="text-4xl font-bold text-foreground">
-                        ₹{product.discountedPrice.toLocaleString()}
+                        ₹{displayDiscountedPrice.toLocaleString()}
                       </p>
                       <p className="text-xl text-muted-foreground line-through">
-                        ₹{product.price.toLocaleString()}
+                        ₹{displayPrice.toLocaleString()}
                       </p>
                     </div>
                     <p className="text-sm text-muted-foreground">Inclusive of all taxes</p>
@@ -511,15 +530,15 @@ export default function ProductPage({ params }: { params: Promise<Params> }) {
                 ) : (
                   <>
                     <p className="text-4xl font-bold text-foreground">
-                      ₹{product.price.toLocaleString()}
+                      ₹{displayPrice.toLocaleString()}
                     </p>
                     <p className="text-sm text-muted-foreground">Inclusive of all taxes</p>
                   </>
                 )}
               </div>
-              {product.discountedPrice && product.discountedPrice < product.price && (
+              {displayDiscountedPrice && displayDiscountedPrice < displayPrice && (
                 <Badge className="bg-green-500 hover:bg-green-600 text-white font-semibold text-sm px-3 py-1.5">
-                  Save ₹{(product.price - product.discountedPrice).toLocaleString()}
+                  Save ₹{(displayPrice - displayDiscountedPrice).toLocaleString()}
                 </Badge>
               )}
             </div>

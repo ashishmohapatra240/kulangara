@@ -107,7 +107,7 @@ export default function AdminOrdersPage() {
 
   const getOrderSizes = (items: IOrder["items"]) => {
     if (!items || items.length === 0) return "-";
-    const sizes = items.map((item) => item.variant?.size || "—");
+    const sizes = items.map((item) => item.size ?? item.variant?.size ?? "—");
     const uniqueSizes = [...new Set(sizes)];
     if (uniqueSizes.length <= 2) return uniqueSizes.join(", ");
     return `${uniqueSizes.slice(0, 2).join(", ")} +${uniqueSizes.length - 2}`;
@@ -116,7 +116,7 @@ export default function AdminOrdersPage() {
   const getOrderFit = (items: IOrder["items"]) => {
     if (!items || items.length === 0) return "—";
     const fits = items
-      .map((item) => item.variant?.fit)
+      .map((item) => item.fit ?? item.variant?.fit)
       .filter(Boolean) as string[];
     const uniqueFits = [...new Set(fits)];
     if (uniqueFits.length === 0) return "—";
