@@ -120,7 +120,7 @@ function ProductCardComponent({
 
   return (
     <Link href={`/products/${id}`} className="group block h-full">
-      <Card className="flex h-full flex-col overflow-hidden rounded-2xl border border-border/40 bg-card transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 pb-10 pt-0">
+      <Card className="flex h-full flex-col overflow-hidden rounded-2xl border border-border/40 bg-card transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 pb-2 pt-0">
         <div className="relative aspect-square overflow-hidden">
           <Image
             src={displayImage}
@@ -168,7 +168,7 @@ function ProductCardComponent({
 
         <CardContent className="flex flex-1 flex-col px-3.5 space-y-2">
           {/* Fit Badge - show available fits (Oversized only; Normal is default so not shown) */}
-          {(() => {
+          {/* {(() => {
             const fits = [...new Set((variants || []).map((v) => v.fit).filter(Boolean))] as string[];
             const hasOversized = fits.includes("OVERSIZED");
             if (!hasOversized) return null;
@@ -177,7 +177,7 @@ function ProductCardComponent({
                 Oversized
               </Badge>
             );
-          })()}
+          })()} */}
 
           {/* Product Name and Price Row */}
           <div className="flex items-start justify-between gap-2">
