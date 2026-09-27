@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import Modal from "./Modal";
 
 interface SizeGuideModalProps {
@@ -9,135 +10,25 @@ interface SizeGuideModalProps {
   productCategory?: string;
 }
 
-const clothingMeasurements: Record<string, Record<string, string>> = {
-  "Chest (inches)": {
-    XS: "32-34",
-    S: "34-36",
-    M: "36-38",
-    L: "38-40",
-    XL: "40-42",
-    XXL: "42-44",
-    XXXL: "44-46",
-  },
-  "Waist (inches)": {
-    XS: "28-30",
-    S: "30-32",
-    M: "32-34",
-    L: "34-36",
-    XL: "36-38",
-    XXL: "38-40",
-    XXXL: "40-42",
-  },
-  "Length (inches)": {
-    XS: "26-27",
-    S: "27-28",
-    M: "28-29",
-    L: "29-30",
-    XL: "30-31",
-    XXL: "31-32",
-    XXXL: "32-33",
-  },
-};
-
-const instructions = [
-  "Measure your chest at the fullest part, keeping the tape measure horizontal",
-  "Measure your waist at the narrowest part, usually just above the belly button",
-  "For length, measure from the top of the shoulder to the desired hemline",
-  "Take measurements while wearing light clothing for accuracy",
-];
-
-
 export default function SizeGuideModal({
   isOpen,
   onClose,
 }: SizeGuideModalProps) {
-  const firstCategory = Object.keys(clothingMeasurements)[0] || "Men";
-  const sizes = Object.keys(
-    clothingMeasurements[firstCategory as keyof typeof clothingMeasurements] || {}
-  );
-
   return (
-    <Modal isOpen={isOpen} onClose={onClose} maxWidth="max-w-4xl">
+    <Modal isOpen={isOpen} onClose={onClose} maxWidth="max-w-2xl">
       <div className="p-6">
-        {/* Header */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-foreground mb-2">Size Guide</h2>
-          <p className="text-muted-foreground">
-            Find your perfect fit with our clothing size chart
-          </p>
+        <div className="relative w-full aspect-square">
+          <Image
+            src="/images/size-chart-men.png"
+            alt="Men's size chart showing chest and length measurements in inches for regular fit and oversized t-shirts, sizes S to XXL"
+            fill
+            className="object-contain"
+            sizes="(max-width: 768px) 100vw, 640px"
+            priority
+          />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Size Chart Table */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground">
-              Clothing Size Chart
-            </h3>
-
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-border">
-                <thead className="bg-primary text-primary-foreground">
-                  <tr>
-                    <th className="border border-border px-4 py-3 text-left font-semibold">
-                      Measurement
-                    </th>
-                    {sizes.map((size) => (
-                      <th
-                        key={size}
-                        className="border border-border px-3 py-3 text-center font-semibold min-w-[60px]"
-                      >
-                        {size}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(clothingMeasurements).map(
-                    ([measurement, sizeData]) => (
-                      <tr key={measurement} className="hover:bg-muted/50">
-                        <td className="border border-border px-4 py-3 font-medium text-foreground">
-                          {measurement}
-                        </td>
-                        {sizes.map((size) => (
-                          <td
-                            key={size}
-                            className="border border-border px-3 py-3 text-center text-foreground"
-                          >
-                            {sizeData[size] || "-"}
-                          </td>
-                        ))}
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Instructions and Tips */}
-          <div className="space-y-6">
-            {/* How to Measure */}
-            <div>
-              <h3 className="text-lg font-semibold text-foreground mb-4">
-                How to Measure
-              </h3>
-              <div className="space-y-3">
-                {instructions.map((instruction, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 mt-0.5">
-                      {index + 1}
-                    </div>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      {instruction}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8 pt-6 border-t border-border flex justify-between items-center">
+        <div className="mt-6 pt-6 border-t border-border flex justify-between items-center">
           <p className="text-sm text-muted-foreground">
             Need help? Contact our customer service team for personalized sizing
             assistance.
