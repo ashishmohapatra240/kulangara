@@ -11,7 +11,7 @@ const faqs = [
   {
     question: "What sizes do you offer?",
     answer:
-      "We offer sizes from XS to XXXL. You can check our detailed size guide for exact measurements.",
+      "We offer sizes from S to XXL. You can check our detailed size guide for exact measurements.",
   },
   {
     question: "Do you ship internationally?",
