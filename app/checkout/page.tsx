@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
@@ -268,8 +268,14 @@ export default function CheckoutPage() {
     removeCoupon();
   };
 
+  // `loading` only flips after validateCart() resolves, so a fast double-click
+  // would otherwise start two checkouts (and two orders). A ref blocks synchronously.
+  const isSubmittingRef = useRef(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
     setFormError("");
     clearValidationResult();
 
@@ -297,6 +303,8 @@ export default function CheckoutPage() {
       } else {
         setFormError("An unknown error occurred");
       }
+    } finally {
+      isSubmittingRef.current = false;
     }
   };
 
