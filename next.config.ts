@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    // Vercel's image optimizer returns 402 once the quota is exhausted; serve S3 URLs directly.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
